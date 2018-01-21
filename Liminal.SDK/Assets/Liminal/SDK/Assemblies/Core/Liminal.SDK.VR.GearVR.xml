@@ -1,0 +1,256 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Liminal.SDK.VR.GearVR</name>
+    </assembly>
+    <members>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatar">
+            <summary>
+            A device-specific implementation of <see cref="T:Liminal.SDK.VR.Avatars.IVRDeviceAvatar"/> to prepare an <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> for Samsung's GearVR hardware.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatar.Avatar">
+            <summary>
+            Gets the <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> for this device avatar.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatar.InstantiateControllerVisual(Liminal.SDK.VR.Avatars.IVRAvatarLimb)">
+            <summary>
+            Instantiates a <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual"/> for a limb.
+            </summary>
+            <param name="limb">The limb for the controller.</param>
+            <returns>The newly instantiated controller visual for the specified limb, or null if no controller visual was able to be created.</returns>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.Avatar.HmdRecenterPolicy">
+            <summary>
+            Values for the recentering policy for the GearVR HMD.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Devices.GearVR.Avatar.HmdRecenterPolicy.Never">
+            <summary>
+            Never recenter the HMD.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Devices.GearVR.Avatar.HmdRecenterPolicy.OnControllerRecenter">
+            <summary>
+            Recenter the HMD whenever the user recenters the controller.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatarSettings">
+            <summary>
+            A component containing per-application settings for a <see cref="T:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatar"/>. Attach this component to your <see cref="T:Liminal.SDK.VR.Avatars.VRAvatar"/> to have the settings
+            applied when running on a GearVR device.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatarSettings.HmdRecenterPolicy">
+            <summary>
+            Determines if the HMD tracked camera should be recentered when the user recenters the controller.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRControllerInputVisual">
+            <summary>
+            Represents an input visual component on the GearVR Controller.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRControllerInputVisual.Color">
+            <summary>
+            Gets or sets the color of the input visual.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRControllerInputVisual.ResetColor">
+            <summary>
+            Resets the color override of the visual component.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy">
+            <summary>
+            A concrete implementation of <see cref="T:Liminal.SDK.VR.Avatars.IVRTrackedObjectProxy"/> for wrapping around a tracked GearVR controller.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.IsActive">
+            <summary>
+            Indicates if the tracked object is currently active.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.Position">
+            <summary>
+            Gets the world-space position of the tracked object.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.Rotation">
+            <summary>
+            Gets the world-space rotation of the tracked object.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.#ctor(Liminal.SDK.VR.Avatars.IVRAvatar,OVRInput.Controller)">
+            <summary>
+            Creates a new <see cref="T:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy"/> for the specified avatar and controller type.
+            </summary>
+            <param name="avatar">The avatar that owns the controller.</param>
+            <param name="controllerType">The controller type the proxy wraps.</param>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRController">
+            <summary>
+            Represents a GearVR controller.
+            <seealso href="https://developer.oculus.com/documentation/unity/latest/concepts/unity-ovrinput/"/>
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRController.Name">
+            <summary>
+            Gets the name of the input device.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRController.ButtonCount">
+            <summary>
+            Gets the number of click buttons available on the device.
+            This is all buttons that have a 'press' state and does not include triggers or non-clickable touchpads/joysticks.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRController.Hand">
+            <summary>
+            Gets the handedness of the input device.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRDevice">
+            <summary>
+            A concrete implementation of <see cref="T:Liminal.SDK.VR.IVRDevice"/> for Samsung's GearVR hardware.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.Name">
+            <summary>
+            Gets the name of the device.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDeviceCount">
+            <summary>
+            Gets the number of input devices currently connected.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.Headset">
+            <summary>
+            Gets the <see cref="T:Liminal.SDK.VR.IVRHeadset"/> of the device.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.PrimaryInputDevice">
+            <summary>
+            Gets the primary input device, if connected and available.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.SecondaryInputDevice">
+            <summary>
+            Gets the secondary input device, if connected and available.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDevices">
+            <summary>
+            Gets an enumerable collection of <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> objects currently connected.
+            </summary>
+        </member>
+        <member name="E:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDeviceConnected">
+            <summary>
+            Raised when an input device is connected.
+            </summary>
+        </member>
+        <member name="E:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDeviceDisconnected">
+            <summary>
+            Raisd when an input device is disconnected.
+            </summary>
+        </member>
+        <member name="E:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.PrimaryInputDeviceChanged">
+            <summary>
+            Raised when the primary <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> has changed.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.Update">
+            <summary>
+            [Internal use] Updates the state of the device. You do not have to call this manually.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.HasCapabilities(Liminal.SDK.VR.VRDeviceCapability)">
+            <summary>
+            Indicates if the device has a specific set of capabilities. This method returns true only if ALL values within the <paramref name="capabilities"/> bitmask are available on the device.
+            </summary>
+            <param name="capabilities">The capabilities to check. This value is a bitmask of <see cref="T:Liminal.SDK.VR.VRDeviceCapability"/> values.</param>
+            <returns>A boolean indicating if the device has ALL the capabilities specified by the <paramref name="capabilities"/> bitmask.</returns>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.SetupAvatar(Liminal.SDK.VR.Avatars.IVRAvatar)">
+            <summary>
+            [Internal use] Sets up an <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> instance for this device. You should not have to call this manually.
+            </summary>
+            <param name="avatar">The <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> instance to bind to the device.</param>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer">
+            <summary>
+            A GearVR specific implementation of <see cref="T:Liminal.SDK.VR.Pointers.BasePointer"/> that uses the touchpad on the device's HMD for triggering interactions.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.#ctor(Liminal.SDK.VR.Input.IVRInputDevice)">
+            <summary>
+            Creates a new <see cref="T:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer"/> for the specified input device.
+            </summary>
+            <param name="inputDevice">The input device for the pointer.</param>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.OnPointerEnter(UnityEngine.GameObject)">
+            <summary>
+            [Internal use] Executed when the pointer hovers over an interactable GameObject.
+            </summary>
+            <param name="target">The GameObject the pointer the pointer entered.</param>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.OnPointerExit(UnityEngine.GameObject)">
+            <summary>
+            [Internal use] Executed when the pointer leaves an interactable GameObject after <see cref="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.OnPointerEnter(UnityEngine.GameObject)"/> has been executed.
+            </summary>
+            <param name="target">The GameObject the pointer the pointer exited.</param>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.GetButtonDown">
+            <summary>
+            [Internal use] Indicates if the primary interaction button was pressed.
+            </summary>
+            <returns>A boolean indicating if the primary interaction button was pressed.</returns>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.GetButtonUp">
+            <summary>
+            [Internal use] Indicates if the primary interaction button was released.
+            </summary>
+            <returns>A boolean indicating if the primary interaction button was released.</returns>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRHeadset">
+            <summary>
+            The GearVR headset is also a controller and as such implments both <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> and <see cref="T:Liminal.SDK.VR.IVRHeadset"/>.
+            <see cref="T:Liminal.SDK.VR.Devices.GearVR.GearVRDevice"/> will use the same <see cref="!:GvrHeadset"/> instance for both <see cref="P:Liminal.SDK.VR.IVRDevice.Headset"/> and a single <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/>.
+            <seealso href="https://developer.oculus.com/documentation/unity/latest/concepts/unity-ovrinput/"/>
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRHeadset.Name">
+            <summary>
+            Gets the name of the headset device.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRHeadset.ButtonCount">
+            <summary>
+            Gets the number of binary buttons available on the device.
+            This is all buttons that have a 'press' state and does not include axis-triggers or non-clickable touchpads/joysticks.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRHeadset.Hand">
+            <summary>
+            This value always returns <see cref="F:Liminal.SDK.VR.Input.VRInputDeviceHand.None"/>, as the GearVR Headset does not have a handedness.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRInputDevice">
+            <summary>
+            An abstract base implementation of <see cref="T:Liminal.SDK.VR.Devices.GearVR.IGearVRInputDevice"/>.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.IGearVRInputDevice">
+            <summary>
+            An extension interface for <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> that adds specific OVR functionality.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.IGearVRInputDevice.ControllerType">
+            <summary>
+            Gets the OVR controller type assigned to this device.
+            </summary>
+        </member>
+    </members>
+</doc>

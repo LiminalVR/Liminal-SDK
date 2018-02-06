@@ -1,12 +1,14 @@
 fileFormatVersion: 2
 guid: 27ea3119a82e0444d88b007908225fdd
-timeCreated: 1515993518
+timeCreated: 1516581184
 licenseType: Pro
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
-  executionOrder: {}
+  executionOrder:
+    Liminal.SDK.Core.ExperienceApp: -9999
+    Liminal.SDK.VR.Avatars.VRAvatar: -100
   isPreloaded: 0
   isOverridable: 0
   platformData:

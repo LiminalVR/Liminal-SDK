@@ -19,16 +19,16 @@ Shader "GoogleVR/Unlit/Controller" {
   }
   SubShader {
     Tags {
-      "Queue" = "Overlay+100"
+      "Queue" = "AlphaTest"
       "IgnoreProjector" = "True"
       "RenderType"="Transparent"
     }
     LOD 100
 
-    ZWrite On
-    Blend SrcAlpha OneMinusSrcAlpha
-
     Pass {
+	  ZWrite On
+	  Blend SrcAlpha OneMinusSrcAlpha
+
       CGPROGRAM
       #pragma vertex vert
       #pragma fragment frag
@@ -152,6 +152,7 @@ Shader "GoogleVR/Unlit/Controller" {
         texcol.rgb = i.alpha * tintColor + (1-i.alpha)*i.color.rgb;
 
         texcol.a *= _GvrControllerAlpha.x;
+		
         return texcol;
       }
       ENDCG

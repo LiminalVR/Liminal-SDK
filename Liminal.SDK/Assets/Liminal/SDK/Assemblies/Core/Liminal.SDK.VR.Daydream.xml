@@ -26,6 +26,21 @@
             <param name="limb">The limb for the controller.</param>
             <returns>The newly instantiated controller visual for the specified limb, or null if no controller visual was able to be created.</returns>
         </member>
+        <member name="T:Liminal.SDK.VR.Devices.DaydreamView.Avatar.DaydreamControllerInputVisual">
+            <summary>
+            Represents an input visual component on the Daydream Controller.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.Avatar.DaydreamControllerInputVisual.Color">
+            <summary>
+            Gets or sets the color of the input visual.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Devices.DaydreamView.Avatar.DaydreamControllerInputVisual.ResetColor">
+            <summary>
+            Resets the color override of the visual component.
+            </summary>
+        </member>
         <member name="P:Liminal.SDK.VR.Devices.DaydreamView.Avatar.DaydreamTrackedControllerProxy.Position">
             <summary>
             Gets the world-space position of the tracked object.
@@ -256,21 +271,6 @@
             </summary>
             <param name="capabilities">A mask of <see cref="T:Liminal.SDK.VR.VRHeadsetCapability"/> flags to test for.</param>
             <returns>A boolean indicating if the device has all of the capabilities specified by the mask.</returns>
-        </member>
-        <member name="T:Liminal.SDK.VR.Devices.Daydream.Avatar.DaydreamControllerInputVisual">
-            <summary>
-            Represents an input visual component on the Daydream Controller.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.Daydream.Avatar.DaydreamControllerInputVisual.Color">
-            <summary>
-            Gets or sets the color of the input visual.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.Daydream.Avatar.DaydreamControllerInputVisual.ResetColor">
-            <summary>
-            Resets the color override of the visual component.
-            </summary>
         </member>
     </members>
 </doc>

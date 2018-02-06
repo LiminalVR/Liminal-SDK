@@ -579,6 +579,11 @@
             Gets the enumerable collection of controller nodes belonging to the visual.
             </summary>
         </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.IVRControllerVisual.Inputs">
+            <summary>
+            Gets the enumerable collection of controller input visuals belonging to the visual.
+            </summary>
+        </member>
         <member name="M:Liminal.SDK.VR.Avatars.Controllers.IVRControllerVisual.GetNode(System.String)">
             <summary>
             Gets the the <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerNode"/> with the name specified by <paramref name="nodeName"/>.
@@ -616,19 +621,44 @@
             Gets the input name the visual component relates to. This should correspond to <see cref="T:Liminal.SDK.VR.Input.VRButton"/> or <see cref="T:Liminal.SDK.VR.Input.VRAxis"/> values.
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.TipDirection">
-            <summary>
-            Gets the direction of tooltips displayed on this visual component.
-            </summary>
-        </member>
         <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.Color">
             <summary>
             Gets or sets the color of the input visual.
             </summary>
         </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.TipAlignment">
+            <summary>
+            Gets the direction of tooltips displayed on this visual component.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.TipVisible">
+            <summary>
+            Indicates if the tooltip for this input visual is currently visible.
+            </summary>
+        </member>
         <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.ResetColor">
             <summary>
             Resets the color override of the visual component.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.ShowTip">
+            <summary>
+            Displays a tooltip for this input visual.
+            </summary>
+            <returns>The tooltip GameObject instance, or null if no instance was able to be created.</returns>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.ShowTip``1">
+            <summary>
+            Displays a tooltip for this input visual and returns a component of the specified by <typeparamref name="T"/>.
+            </summary>
+            <typeparam name="T">The type of the Component to retrieve from the tip.</typeparam>
+            <returns>The Component of the type specified by <typeparamref name="T"/> on the tooltip GameObject instance,
+            or null if no instance was able to be created or the instance does not have a component of the specified type.
+            </returns>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.HideTip">
+            <summary>
+            Hides the tooltip for this input visual, if one exists.
             </summary>
         </member>
         <member name="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisualExtensions">
@@ -692,41 +722,92 @@
             Gets the name of the node.
             </summary>
         </member>
+        <member name="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerTip">
+            <summary>
+            A basic tooltip visual.
+            </summary>
+        </member>
         <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerTip.Label">
             <summary>
             Gets or sets the label displayed on the tooltip.
             </summary>
         </member>
-        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.GetPrefab(Liminal.SDK.VR.Avatars.Controllers.VRControllerTipDirection)">
+        <member name="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment">
+            <summary>
+            An enumeration of controller tooltip alignments.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment.Left">
+            <summary>
+            The tooltip is aligned to the left.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment.Right">
+            <summary>
+            The tooltip is aligned to the right.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment.Forward">
+            <summary>
+            The tooltip is aligned forward.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment.Backward">
+            <summary>
+            The tooltip is aligned backward.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment.Up">
+            <summary>
+            The tooltip is aligned upward.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment.Down">
+            <summary>
+            The tooltip is aligned downward.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs">
+            <summary>
+            A lookup component for controller tooltip prefabs. Add your custom tooltip GameObject to this lookup to have them displayed when <see cref="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual.ShowTip"/> is used.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.LeftPrefab">
+            <summary>
+            Gets or sets left-aligned tooltip prefab.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.RightPrefab">
+            <summary>
+            Gets or sets right-aligned tooltip prefab.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.ForwardPrefab">
+            <summary>
+            Gets or sets forward-aligned tooltip prefab.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.BackwardPrefab">
+            <summary>
+            Gets or sets backward-aligned tooltip prefab.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.UpPrefab">
+            <summary>
+            Gets or sets upward-aligned tooltip prefab.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.DownPrefab">
+            <summary>
+            Gets or sets downward-aligned tooltip prefab.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerTipPrefabs.GetPrefab(Liminal.SDK.VR.Avatars.Controllers.VRControllerTipAlignment)">
             <summary>
             Gets the controller tooltip prefab for the direction specified by <paramref name="direction"/>.
             </summary>
             <param name="direction">The direction of the tip prefab to retrieve.</param>
             <returns>The tooltip prefab for the specified direction.</returns>
-        </member>
-        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisualProxy.PointerVisual">
-            <summary>
-            Gets or sets the <see cref="T:Liminal.SDK.VR.Pointers.IVRPointerVisual"/> for the controller.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisualProxy.Nodes">
-            <summary>
-            Gets the enumerable collection of controller nodes belonging to the visual.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisualProxy.GetNode(System.String)">
-            <summary>
-            Gets the the <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerNode"/> with the name specified by <paramref name="nodeName"/>.
-            </summary>
-            <param name="nodeName">The name of the node.</param>
-            <returns>The <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerNode"/> with the name specified by <paramref name="nodeName"/>.</returns>
-        </member>
-        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisualProxy.GetInput(System.String)">
-            <summary>
-            Gets the the <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual"/> with the name specified by <paramref name="inputName"/>.
-            </summary>
-            <param name="inputName">The name of the input component.</param>
-            <returns>The <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual"/> with the name specified by <paramref name="inputName"/>.</returns>
         </member>
         <member name="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual">
             <summary>
@@ -743,6 +824,11 @@
             Gets the enumerable collection of controller nodes belonging to the visual.
             </summary>
         </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual.Inputs">
+            <summary>
+            Gets the enumerable collection of controller input visuals belonging to the visual.
+            </summary>
+        </member>
         <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual.GetNode(System.String)">
             <summary>
             Gets the the <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerNode"/> with the name specified by <paramref name="nodeName"/>.
@@ -756,6 +842,28 @@
             </summary>
             <param name="inputName">The name of the input component.</param>
             <returns>The <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual"/> with the name specified by <paramref name="inputName"/>.</returns>
+        </member>
+        <member name="T:Liminal.SDK.VR.Avatars.Events.IAnchorableAnchored">
+            <summary>
+            An interface that can be implemented by components that want to receive OnAnchored events from <see cref="T:Liminal.SDK.VR.Avatars.Interaction.Anchorable"/> components.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Events.IAnchorableAnchored.OnAnchored(Liminal.SDK.VR.Avatars.IVRAvatarLimb)">
+            <summary>
+            Executed when an <see cref="T:Liminal.SDK.VR.Avatars.Interaction.Anchorable"/> component on the same object dispatched and OnAnchored event.
+            </summary>
+            <param name="limb">The limb that object was anchored to.</param>
+        </member>
+        <member name="T:Liminal.SDK.VR.Avatars.Events.IAnchorableUnanchored">
+            <summary>
+            An interface that can be implemented by components that want to receive OnUnanchored events from <see cref="T:Liminal.SDK.VR.Avatars.Interaction.Anchorable"/> components.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Events.IAnchorableUnanchored.OnUnanchored(Liminal.SDK.VR.Avatars.IVRAvatarLimb)">
+            <summary>
+            Executed when an <see cref="T:Liminal.SDK.VR.Avatars.Interaction.Anchorable"/> component on the same object dispatched and OnUnanchored event.
+            </summary>
+            <param name="limb">The limb that object was unanchored from.</param>
         </member>
         <member name="T:Liminal.SDK.VR.Avatars.Extensions.GazeInputActivationPolicy">
             <summary>
@@ -782,9 +890,24 @@
             An avatar extension that automatically manages gaze input.
             </summary>
         </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Extensions.GazeInput.PointerVisual">
+            <summary>
+            Gets the <see cref="T:Liminal.SDK.VR.Pointers.BasePointerVisual"/> assigned to the component.
+            </summary>
+        </member>
         <member name="P:Liminal.SDK.VR.Avatars.Extensions.GazeInput.ActivationPolicy">
             <summary>
             Gets or sets the activation policy for gaze controls.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Extensions.GazeInput.HoverDelay">
+            <summary>
+            Gets or set the duration the pointer must be hovered over an object before the interaction timer begins. Applies only to timed gaze pointers.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Extensions.GazeInput.HoverDuration">
+            <summary>
+            Gets or sets the duration the pointer must be hovered over an object before interaction is triggered. Applies only to timed gaze pointers.
             </summary>
         </member>
         <member name="M:Liminal.SDK.VR.Avatars.Extensions.GazeInput.Initialize(Liminal.SDK.VR.Avatars.IVRAvatar)">
@@ -917,9 +1040,43 @@
             An interface that should be placed on components that handle anchoring events.
             </summary>
         </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Interaction.IAnchorHandler.enabled">
+            <summary>
+            Gets or sets the enabled state of the handler.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Interaction.IAnchorHandler.ModifyPosition(UnityEngine.Vector3@,UnityEngine.Vector3@)">
+            <summary>
+            Applies modifications to the position of the anchored object.
+            </summary>
+            <param name="current">The current position.</param>
+            <param name="target">The target position.</param>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Interaction.IAnchorHandler.ModifyRotation(UnityEngine.Quaternion@,UnityEngine.Quaternion@)">
+            <summary>
+            Applies modifications to the rotation of the anchored object.
+            </summary>
+            <param name="current">The current rotation.</param>
+            <param name="target">The target rotation.</param>
+        </member>
         <member name="T:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor">
             <summary>
             Smoothly transitions an object to an avatar anchor.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor.DefaultTravelTime">
+            <summary>
+            The default travel time for smooth anchored objects.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor.DefaultPositionSmoothing">
+            <summary>
+            The default position smooething time for smooth anchored objects.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor.DefaultRotationSmoothing">
+            <summary>
+            The default rotation smooething time for smooth anchored objects.
             </summary>
         </member>
         <member name="P:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor.TravelTime">
@@ -935,6 +1092,25 @@
         <member name="P:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor.RotationSmoothing">
             <summary>
             Gets or sets the smoothing factor applied to the object's rotation to eliminate jitter. A higher value applies more damping to the rotation.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor.ModifyPosition(UnityEngine.Vector3@,UnityEngine.Vector3@)">
+            <summary>
+            Applies modifications to the position of the anchored object.
+            </summary>
+            <param name="current">The current position.</param>
+            <param name="target">The target position.</param>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.Interaction.SmoothAnchor.ModifyRotation(UnityEngine.Quaternion@,UnityEngine.Quaternion@)">
+            <summary>
+            Applies modifications to the rotation of the anchored object.
+            </summary>
+            <param name="current">The current rotation.</param>
+            <param name="target">The target rotation.</param>
+        </member>
+        <member name="T:Liminal.SDK.VR.Avatars.IVRAvatar">
+            <summary>
+            Base interface for VRAvatar instances.
             </summary>
         </member>
         <member name="P:Liminal.SDK.VR.Avatars.IVRAvatar.IsActive">
@@ -1085,6 +1261,12 @@
             <summary>
             Gets the <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> currently assigned to this hand.
             </summary>
+        </member>
+        <member name="T:Liminal.SDK.VR.Avatars.ActiveCameraChangedEventHandler">
+            <summary>
+            A delegate for use with camera change events on a <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatarHead"/> instance.
+            </summary>
+            <param name="head">The <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatarHead"/> the event relates to.</param>
         </member>
         <member name="T:Liminal.SDK.VR.Avatars.IVRAvatarHead">
             <summary>
@@ -1263,6 +1445,11 @@
             Gets the current active <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/>.
             </summary>
         </member>
+        <member name="E:Liminal.SDK.VR.Avatars.VRAvatar.AvatarChanged">
+            <summary>
+            Raised when the active avatar has changed.
+            </summary>
+        </member>
         <member name="P:Liminal.SDK.VR.Avatars.VRAvatar.IsActive">
             <summary>
             Indicates if the avatar is currently active.
@@ -1327,6 +1514,13 @@
             <summary>
             Initializes all avatar extensions.
             </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.Avatars.VRAvatar.GetLimb(Liminal.SDK.VR.Avatars.VRAvatarLimbAlias)">
+            <summary>
+            Gets the limb for the specified <see cref="T:Liminal.SDK.VR.Avatars.VRAvatarLimbAlias"/> alias.
+            </summary>
+            <param name="alias">The limb alias.</param>
+            <returns>The <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatarLimb"/> for the specified alias, or null if no limb is available for the supplied alias value.</returns>
         </member>
         <member name="M:Liminal.SDK.VR.Avatars.VRAvatar.GetLimb(Liminal.SDK.VR.Avatars.VRAvatarLimbType)">
             <summary>

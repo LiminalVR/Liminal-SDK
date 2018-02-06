@@ -103,8 +103,8 @@ GameObject:
   - component: {fileID: 4210939766147060}
   - component: {fileID: 33322847264535842}
   - component: {fileID: 23866773285044052}
-  - component: {fileID: 114938029142422256}
-  - component: {fileID: 114633218785787858}
+  - component: {fileID: 114389288732296196}
+  - component: {fileID: 114583424743623480}
   m_Layer: 0
   m_Name: trigger_PLY
   m_TagString: Untagged
@@ -309,8 +309,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4720295783167512}
-  - component: {fileID: 114028577448379870}
-  - component: {fileID: 114754301117851080}
   m_Layer: 0
   m_Name: TooltipPos
   m_TagString: Untagged
@@ -402,7 +400,7 @@ Transform:
   m_Children:
   - {fileID: 4720295783167512}
   m_Father: {fileID: 4827968497548242}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4235367289866698
 Transform:
@@ -584,8 +582,8 @@ Transform:
   - {fileID: 4082598430295522}
   - {fileID: 4398932450630776}
   - {fileID: 4682603093960272}
-  - {fileID: 4908747405067176}
   - {fileID: 4210939766147060}
+  - {fileID: 4908747405067176}
   - {fileID: 4828840336425860}
   m_Father: {fileID: 4611496315948190}
   m_RootOrder: 0
@@ -615,7 +613,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4827968497548242}
-  m_RootOrder: 6
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4975774362746326
 Transform:
@@ -958,18 +956,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1140197817601150}
   m_Mesh: {fileID: 4300012, guid: 84c37137326e7b943a87be7ae2a7ea19, type: 3}
---- !u!114 &114028577448379870
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1851663670240648}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 503171222, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_NodeName: ButtonOne
 --- !u!114 &114069791896672876
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -982,7 +968,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InputName: ButtonTouch
-  m_TipDirection: 1
+  m_TipAlignment: 1
   m_TipParentProxy: {fileID: 4741920600493600}
 --- !u!114 &114091602691652220
 MonoBehaviour:
@@ -1008,7 +994,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InputName: ButtonTwo
-  m_TipDirection: 1
+  m_TipAlignment: 1
   m_TipParentProxy: {fileID: 4741920600493600}
 --- !u!114 &114111381710014190
 MonoBehaviour:
@@ -1070,6 +1056,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_NodeName: ButtonOne
+--- !u!114 &114389288732296196
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1330741873390728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 83760152, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InputName: ButtonOne
+  m_TipAlignment: 2
+  m_TipParentProxy: {fileID: 4720295783167512}
 --- !u!114 &114413716656403116
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1106,8 +1106,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InputName: AxisOneRaw
-  m_TipDirection: 0
+  m_TipAlignment: 4
   m_TipParentProxy: {fileID: 4445789192821640}
+--- !u!114 &114583424743623480
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1330741873390728}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 83760152, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_InputName: ButtonTrigger
+  m_TipAlignment: 2
+  m_TipParentProxy: {fileID: 4720295783167512}
 --- !u!114 &114587226587874222
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1120,22 +1134,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InputName: AxisOne
-  m_TipDirection: 0
+  m_TipAlignment: 4
   m_TipParentProxy: {fileID: 4445789192821640}
---- !u!114 &114633218785787858
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1330741873390728}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 83760152, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_InputName: ButtonTrigger
-  m_TipDirection: 2
-  m_TipParentProxy: {fileID: 4720295783167512}
 --- !u!114 &114641128859636708
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1148,18 +1148,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_NodeName: ButtonTouch
---- !u!114 &114754301117851080
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1851663670240648}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 503171222, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_NodeName: ButtonTrigger
 --- !u!114 &114820054254524284
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1196,7 +1184,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_InputName: ButtonBack
-  m_TipDirection: 0
+  m_TipAlignment: 0
   m_TipParentProxy: {fileID: 4148909913704224}
 --- !u!114 &114917534961681672
 MonoBehaviour:
@@ -1210,20 +1198,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_NodeName: ButtonTwo
---- !u!114 &114938029142422256
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1330741873390728}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 83760152, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_InputName: ButtonOne
-  m_TipDirection: 2
-  m_TipParentProxy: {fileID: 4720295783167512}
 --- !u!114 &114943885807158464
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1272,16 +1246,33 @@ MonoBehaviour:
   - {fileID: 114641128859636708}
   - {fileID: 114943885807158464}
   - {fileID: 114091602691652220}
-  - {fileID: 114028577448379870}
-  - {fileID: 114754301117851080}
-  m_InputVisuals:
+  m_NodeNames:
+  - Tip
+  - Base
+  - Center
+  - ButtonBack
+  - ButtonOne
+  - ButtonTrigger
+  - ButtonTwo
+  - ButtonTouch
+  - AxisOne
+  - AxisOneRaw
+  m_InputVisualList:
   - {fileID: 114896238115831334}
   - {fileID: 114093354315734708}
   - {fileID: 114069791896672876}
   - {fileID: 114587226587874222}
   - {fileID: 114466293679165136}
-  - {fileID: 114938029142422256}
-  - {fileID: 114633218785787858}
+  - {fileID: 114389288732296196}
+  - {fileID: 114583424743623480}
+  m_InputVisualNames:
+  - ButtonBack
+  - ButtonTwo
+  - ButtonTouch
+  - AxisOne
+  - AxisOneRaw
+  - ButtonOne
+  - ButtonTrigger
 --- !u!120 &120641308909694268
 LineRenderer:
   m_ObjectHideFlags: 1

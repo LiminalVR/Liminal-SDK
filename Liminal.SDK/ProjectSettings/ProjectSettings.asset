@@ -11,7 +11,7 @@ PlayerSettings:
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: DefaultCompany
+  companyName: Liminal VR
   productName: Liminal.SDK
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
@@ -152,7 +152,7 @@ PlayerSettings:
     Standalone: com.oculus.UnitySample
   buildNumber: {}
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 24
+  AndroidMinSdkVersion: 23
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 0
   aotOptions: 
@@ -255,6 +255,7 @@ PlayerSettings:
   - m_BuildTarget: Android
     m_Enabled: 1
     m_Devices:
+    - Oculus
     - daydream
   m_BuildTargetEnableVuforiaSettings: []
   openGLRequireES31: 0

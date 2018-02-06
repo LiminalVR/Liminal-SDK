@@ -3,6 +3,7 @@ using Liminal.SDK.Extensions;
 using Liminal.SDK.VR.Avatars.Controllers;
 using Liminal.SDK.VR.Input;
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -35,9 +36,9 @@ public class Test : MonoBehaviour
         btnOne.ShowTip<VRControllerTip>().Label = "Activate Things";
         btnOne.PulseColor(Color.cyan, 2f);
 
-        var btnTwo = m_TutorialController.GetInput(VRButton.Two);
+        /*var btnTwo = m_TutorialController.GetInput(VRAxis.One);
         btnTwo.ShowTip<VRControllerTip>().Label = "Touch Me";
-        btnTwo.PulseColor(Color.green, 2f);
+        btnTwo.PulseColor(Color.green, 2f);*/
 
         var btnBack = m_TutorialController.GetInput(VRButton.Back);
         btnBack.ShowTip<VRControllerTip>().Label = "Quit";

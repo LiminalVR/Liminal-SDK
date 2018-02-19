@@ -6,5 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Liminal/AppScene.unity
-    guid: 149170a5f7f47d64c86319eef8956143
+    path: Assets/Liminal/Examples/1.Basics/Basics.unity
+    guid: a72b83fb704185d4685f276a6d614895

@@ -989,7 +989,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_EmulatorDevice: 1
-  m_BuildDevice: 0
+  m_BuildDevice: 2
 --- !u!1 &610728752
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,5 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Liminal/Examples/1.Basics/Basics.unity
-    guid: a72b83fb704185d4685f276a6d614895
+    path: Assets/Liminal/Examples/3.UICanvas/UICanvas.unity
+    guid: 55211b9efaedba045831a8a81f0718b6

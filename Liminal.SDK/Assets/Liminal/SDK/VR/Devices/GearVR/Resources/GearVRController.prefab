@@ -1222,7 +1222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_model: {fileID: 1176140402156270}
-  m_controller: 33554432
+  m_controller: -1
 --- !u!114 &114999172933792370
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -61,7 +61,7 @@ MonoBehaviour:
   usePositionTracking: 1
   useRotationTracking: 1
   useIPDInPositionTracking: 1
-  resetTrackerOnLoad: 0
+  resetTrackerOnLoad: 1
 --- !u!114 &114993481169827174
 MonoBehaviour:
   m_ObjectHideFlags: 1

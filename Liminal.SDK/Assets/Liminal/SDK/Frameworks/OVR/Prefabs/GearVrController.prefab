@@ -22,7 +22,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 112276}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_modelGearVrController: {fileID: 1000010178323718}
   m_modelOculusGoController: {fileID: 1956530202777762}
-  m_controller: 33554432
+  m_controller: -1
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1

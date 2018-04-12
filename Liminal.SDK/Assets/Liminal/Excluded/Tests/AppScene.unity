@@ -88,6 +88,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -516,7 +517,8 @@ MonoBehaviour:
   m_Script: {fileID: -1823838173, guid: 57eb71b760c0c7646989af0b58403dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EmulatorDevice: 1
+  m_EmulatorDevice: 2
+  m_BuildDevice: 2
 --- !u!1 &535401087
 GameObject:
   m_ObjectHideFlags: 0
@@ -931,14 +933,13 @@ GameObject:
   m_Component:
   - component: {fileID: 945797440}
   - component: {fileID: 945797442}
-  - component: {fileID: 945797441}
   m_Layer: 0
   m_Name: TutorialController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &945797440
 Transform:
   m_ObjectHideFlags: 0
@@ -952,17 +953,6 @@ Transform:
   m_Father: {fileID: 1986848203}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: -55.896004, y: -98.97301, z: 55.116}
---- !u!114 &945797441
-MonoBehaviour:
-  m_ObjectHideFlags: 10
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 945797439}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -392917437, guid: 57eb71b760c0c7646989af0b58403dff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &945797442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -975,7 +965,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Limb: 2
-  m_ShowPreview: 1
+  m_ShowPreview: 0
 --- !u!1 &992529417
 GameObject:
   m_ObjectHideFlags: 0
@@ -1650,6 +1640,7 @@ MonoBehaviour:
   m_ActivationPolicy: 1
   m_HoverDelay: 0.5
   m_HoverDuration: 2
+  isControllerConnected: 0
 --- !u!114 &1175264154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2346,7 +2337,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1991859717
 RectTransform:
   m_ObjectHideFlags: 0

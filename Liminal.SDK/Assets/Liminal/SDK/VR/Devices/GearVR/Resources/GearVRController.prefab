@@ -13,7 +13,7 @@ Prefab:
   m_IsPrefabParent: 1
 --- !u!1 &1084210275433120
 GameObject:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   serializedVersion: 5
@@ -68,15 +68,15 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4611496315948190}
-  - component: {fileID: 114798035353469178}
   - component: {fileID: 114162163479847552}
+  - component: {fileID: 114189110600337214}
   m_Layer: 0
   m_Name: GearVRController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1297405934206120
 GameObject:
   m_ObjectHideFlags: 1
@@ -270,9 +270,8 @@ Transform:
   - {fileID: 4682603093960272}
   - {fileID: 4908747405067176}
   - {fileID: 4210939766147060}
-  - {fileID: 4635527374310732}
   m_Father: {fileID: 4611496315948190}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4356327242056288
 Transform:
@@ -285,7 +284,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4611496315948190}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4398932450630776
 Transform:
@@ -310,6 +309,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 4635527374310732}
   - {fileID: 4212124063055720}
   - {fileID: 4356327242056288}
   m_Father: {fileID: 0}
@@ -326,8 +326,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4160392646667050}
-  m_Father: {fileID: 4212124063055720}
-  m_RootOrder: 7
+  m_Father: {fileID: 4611496315948190}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 15, y: 0, z: 0}
 --- !u!4 &4682603093960272
 Transform:
@@ -764,6 +764,23 @@ MonoBehaviour:
   m_modelGearVrController: {fileID: 1121595755122606}
   m_modelOculusGoController: {fileID: 1911134171183546}
   m_controller: 33554432
+--- !u!114 &114189110600337214
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1208539532263042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1328142048, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PointerVisual: {fileID: 114552860015168888}
+  m_NodeList: []
+  m_NodeNames: []
+  m_InputVisualList: []
+  m_InputVisualNames: []
+  trackedRemote: {fileID: 114162163479847552}
 --- !u!114 &114502461431527836
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -800,22 +817,6 @@ MonoBehaviour:
   m_MaxBeamDistance: 0.75
   m_GrowTime: 0.1
   m_HideReticleWhenInvalid: 1
---- !u!114 &114798035353469178
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1208539532263042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -16511719, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_PointerVisual: {fileID: 114552860015168888}
-  m_NodeList: []
-  m_NodeNames: []
-  m_InputVisualList: []
-  m_InputVisualNames: []
 --- !u!120 &120759975265996002
 LineRenderer:
   m_ObjectHideFlags: 1

@@ -57,7 +57,7 @@ public class Test : MonoBehaviour
         m_Event.Invoke(1234, 4321);
     }
 
-    public void InstantiateSomething()
+    public void InstantiateSomething() 
     {
         var p = Instantiate(m_Prefab);
         p.transform.position = new Vector3(-2.74f, 1.56f, 6.43f);

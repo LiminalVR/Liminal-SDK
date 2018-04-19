@@ -2879,41 +2879,6 @@
             Deactivates the pointer.
             </summary>
         </member>
-        <member name="T:Liminal.SDK.VR.Pointers.BasePointerExample">
-            <summary>
-            A concrete implementation of <see cref="T:Liminal.SDK.VR.Pointers.BasePointer"/> that triggers interaction on hover, after a specified time delay and duration has passed.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointerExample.HoverDelay">
-            <summary>
-            Gets or sets the amount of time the pointer must be hovered over an object before the timer begins.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointerExample.HoverActivationDuration">
-            <summary>
-            Gets or sets the amount of time the pointer must be hovered over an object before it is activated.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointerExample.HoverDuration">
-            <summary>
-            Returns the length of time the pointer has been hovering over <see cref="!:CurrentTarget"/>.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointerExample.HoverTimeToActivation">
-            <summary>
-            Gets the amount of time until <see cref="!:CurrentTarget"/> will be activated due to being hovered.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointerExample.HoverTimeNormalized">
-            <summary>
-            Gets the normalized progress of the current hover.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointerExample.HoverPressTriggered">
-            <summary>
-            Indicates if the hover press has been triggered.
-            </summary>
-        </member>
         <member name="T:Liminal.SDK.VR.Pointers.InputDevicePointer">
             <summary>
             A concrete implementation of <see cref="T:Liminal.SDK.VR.Pointers.IVRPointer"/> designed for use with <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/>.

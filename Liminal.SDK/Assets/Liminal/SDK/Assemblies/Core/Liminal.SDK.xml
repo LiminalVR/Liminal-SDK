@@ -34,7 +34,7 @@
             The current version number for AppPack files.
             </summary>
             VERSION 1 - Original
-            VERSION 2 - Add AppVersion
+            VERSION 2 - Add ApplicationVersion
         </member>
         <member name="P:Liminal.SDK.Serialization.AppPack.Identifier">
             <summary>

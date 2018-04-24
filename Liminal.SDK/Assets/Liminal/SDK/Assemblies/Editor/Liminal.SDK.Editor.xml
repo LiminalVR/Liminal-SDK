@@ -57,26 +57,20 @@
             The name of the default Unity project assembly.
             </summary>
         </member>
-        <member name="T:Liminal.SDK.Editor.Build.InvalidAppIdException">
+        <member name="T:Liminal.SDK.Editor.Build.InvalidAppException">
             <summary>
             Thrown when an invalid application id is supplied.
             </summary>
         </member>
-        <member name="P:Liminal.SDK.Editor.Build.InvalidAppIdException.Id">
+        <member name="M:Liminal.SDK.Editor.Build.InvalidAppException.#ctor(System.String)">
             <summary>
-            Gets the Id that was supplied.
+            Creates a new <see cref="T:Liminal.SDK.Editor.Build.InvalidAppException"/>.
             </summary>
-        </member>
-        <member name="M:Liminal.SDK.Editor.Build.InvalidAppIdException.#ctor(System.Int32,System.String)">
-            <summary>
-            Creates a new <see cref="T:Liminal.SDK.Editor.Build.InvalidAppIdException"/>.
-            </summary>
-            <param name="id">The id that was supplied.</param>
             <param name="message">The message for the exception.</param>
         </member>
-        <member name="M:Liminal.SDK.Editor.Build.InvalidAppIdException.#ctor(System.Int32,System.String,System.Exception)">
+        <member name="M:Liminal.SDK.Editor.Build.InvalidAppException.#ctor(System.String,System.Exception)">
             <summary>
-            Creates a new <see cref="T:Liminal.SDK.Editor.Build.InvalidAppIdException"/>.
+            Creates a new <see cref="T:Liminal.SDK.Editor.Build.InvalidAppException"/>.
             </summary>
             <param name="id">The id that was supplied.</param>
             <param name="message">The message for the exception.</param>
@@ -202,6 +196,12 @@
         <member name="P:Liminal.SDK.Build.AppManifest.Id">
             <summary>
             Gets the unique identifier for the application.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Build.AppManifest.Version">
+            <summary>
+            Version number for the application. This should increment between releases and is used to ensure
+            the assembly name is unique to avoid clashes when loading multiple versions in the same Platform session.
             </summary>
         </member>
         <member name="T:Liminal.SDK.Tools.AppTools">

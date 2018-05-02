@@ -69,7 +69,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4611496315948190}
   - component: {fileID: 114162163479847552}
-  - component: {fileID: 114189110600337214}
+  - component: {fileID: 114992844964218898}
   m_Layer: 0
   m_Name: GearVRController
   m_TagString: Untagged
@@ -764,23 +764,6 @@ MonoBehaviour:
   m_modelGearVrController: {fileID: 1121595755122606}
   m_modelOculusGoController: {fileID: 1911134171183546}
   m_controller: 33554432
---- !u!114 &114189110600337214
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1208539532263042}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1328142048, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_PointerVisual: {fileID: 114552860015168888}
-  m_NodeList: []
-  m_NodeNames: []
-  m_InputVisualList: []
-  m_InputVisualNames: []
-  trackedRemote: {fileID: 114162163479847552}
 --- !u!114 &114502461431527836
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -817,6 +800,23 @@ MonoBehaviour:
   m_MaxBeamDistance: 0.75
   m_GrowTime: 0.1
   m_HideReticleWhenInvalid: 1
+--- !u!114 &114992844964218898
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1208539532263042}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 299679811, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PointerVisual: {fileID: 114552860015168888}
+  m_NodeList: []
+  m_NodeNames: []
+  m_InputVisualList: []
+  m_InputVisualNames: []
+  trackedRemote: {fileID: 114162163479847552}
 --- !u!120 &120759975265996002
 LineRenderer:
   m_ObjectHideFlags: 1

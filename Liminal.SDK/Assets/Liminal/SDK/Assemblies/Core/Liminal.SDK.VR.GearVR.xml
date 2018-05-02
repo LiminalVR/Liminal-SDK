@@ -89,6 +89,13 @@
             <param name="avatar">The avatar that owns the controller.</param>
             <param name="controllerType">The controller type the proxy wraps.</param>
         </member>
+        <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRCameraRig">
+            <summary>
+            Specialisation of OVRCameraRig to support setup of the rig based on the VRAvatar setup
+            This is pretty clunky as it depends heavily on the implementation of OVRCameraRig. Will
+            need reviewing when updating OVR Utilities
+            </summary>
+        </member>
         <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRController">
             <summary>
             Represents a GearVR controller.

@@ -3182,6 +3182,11 @@
             Gets or sets the camera-facing settings for the reticle.
             </summary>
         </member>
+        <member name="T:Liminal.SDK.VR.SimpleHeadset">
+            <summary>
+            A simple IVRHeadset implementation suitable for headsets with no input capabilities.
+            </summary>
+        </member>
         <member name="T:Liminal.SDK.VR.UI.VRGraphicRaycaster">
             <summary>
             A <see cref="T:UnityEngine.UI.GraphicRaycaster"/> implementation that is compatible with the <see cref="T:Liminal.SDK.VR.EventSystems.VRPointerInputModule"/> input module. Add this component
@@ -3231,6 +3236,11 @@
         <member name="F:Liminal.SDK.VR.VRHeadsetCapability.ExternalStereoCamera">
             <summary>
             Indicates if the headset has an external stereo camera.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.VR.VRHeadsetCapability.HeadsetDPad">
+            <summary>
+            True if the device has a digital input pad on the headset itself
             </summary>
         </member>
         <member name="T:Liminal.SDK.VR.VRInputDeviceCapability">

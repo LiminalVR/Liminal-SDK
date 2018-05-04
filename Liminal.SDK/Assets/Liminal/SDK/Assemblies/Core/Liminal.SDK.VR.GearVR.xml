@@ -102,17 +102,6 @@
             <seealso href="https://developer.oculus.com/documentation/unity/latest/concepts/unity-ovrinput/"/>
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRController.Name">
-            <summary>
-            Gets the name of the input device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRController.ButtonCount">
-            <summary>
-            Gets the number of click buttons available on the device.
-            This is all buttons that have a 'press' state and does not include triggers or non-clickable touchpads/joysticks.
-            </summary>
-        </member>
         <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRController.Hand">
             <summary>
             Gets the handedness of the input device.
@@ -151,6 +140,11 @@
         <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDevices">
             <summary>
             Gets an enumerable collection of <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> objects currently connected.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.IsOculusGo">
+            <summary>
+            True if the device is an Oculus Go, false for other GearVR devices
             </summary>
         </member>
         <member name="E:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDeviceConnected">
@@ -241,7 +235,7 @@
         </member>
         <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRHeadset.Hand">
             <summary>
-            This value always returns <see cref="F:Liminal.SDK.VR.Input.VRInputDeviceHand.None"/>, as the GearVR Headset does not have a handedness.
+            Returns <see cref="F:Liminal.SDK.VR.Input.VRInputDeviceHand.None"/>, as the GearVR Headset does not have a handedness.
             </summary>
         </member>
         <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRInputDevice">

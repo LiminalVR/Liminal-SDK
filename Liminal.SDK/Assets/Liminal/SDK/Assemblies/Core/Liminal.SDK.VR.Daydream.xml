@@ -172,41 +172,6 @@
             A concrete implementation of <see cref="T:Liminal.SDK.VR.IVRDevice"/> representing the Google Daydream View (non-standalone headset, requires a VR capable mobile device).
             </summary>
         </member>
-        <member name="F:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.DeviceName">
-            <summary>
-            The default name of <see cref="T:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice"/> devices.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.Name">
-            <summary>
-            Gets the name of the device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.InputDeviceCount">
-            <summary>
-            Gets the number of input devices currently connected.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.Headset">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.IVRHeadset"/> of the device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.InputDevices">
-            <summary>
-            Gets an enumerable collection of <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> objects currently connected.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.PrimaryInputDevice">
-            <summary>
-            Gets the primary input device, if connected and available.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.SecondaryInputDevice">
-            <summary>
-            Gets the secondary input device, if connected and available.
-            </summary>
-        </member>
         <member name="E:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.InputDeviceConnected">
             <summary>
             Raised when a <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> is connected.
@@ -244,33 +209,6 @@
             <summary>
             [Internal use] Updates the state of the device. You do not have to call this manually.
             </summary>
-        </member>
-        <member name="T:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewHeadset">
-            <summary>
-            A concrete implementation of <see cref="T:Liminal.SDK.VR.IVRHeadset"/> for the Google Daydream View.
-            </summary>
-        </member>
-        <member name="F:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewHeadset.DeviceName">
-            <summary>
-            The default name of <see cref="T:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewHeadset"/> devices.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewHeadset.Name">
-            <summary>
-            Gets the name of the headset device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewHeadset.Pointer">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.Pointers.IVRPointer"/> assigned to the headset. This is generally used for gaze controls.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewHeadset.HasCapabilities(Liminal.SDK.VR.VRHeadsetCapability)">
-            <summary>
-            Indicates if the headset has any of the capabilities specified by the supplied capabilities mask. Returns true if the device has all the capabilities specified by the mask.
-            </summary>
-            <param name="capabilities">A mask of <see cref="T:Liminal.SDK.VR.VRHeadsetCapability"/> flags to test for.</param>
-            <returns>A boolean indicating if the device has all of the capabilities specified by the mask.</returns>
         </member>
     </members>
 </doc>

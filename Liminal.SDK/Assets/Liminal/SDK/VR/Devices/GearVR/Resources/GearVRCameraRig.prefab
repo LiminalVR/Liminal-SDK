@@ -19,10 +19,9 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4560267839246554}
-  - component: {fileID: 114367757350731982}
   - component: {fileID: 114436203569141754}
   m_Layer: 0
-  m_Name: GearVROVRManager
+  m_Name: GearVRCameraRig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,28 +40,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114367757350731982
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1416298385839676}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -2086852977, guid: e21ce93369dc8c14089762db19bc8822, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  queueAhead: 1
-  useRecommendedMSAALevel: 0
-  enableAdaptiveResolution: 0
-  minRenderScale: 0.7
-  maxRenderScale: 1
-  _trackingOriginType: 0
-  usePositionTracking: 1
-  useRotationTracking: 1
-  useIPDInPositionTracking: 1
-  resetTrackerOnLoad: 1
-  AllowRecenter: 1
 --- !u!114 &114436203569141754
 MonoBehaviour:
   m_ObjectHideFlags: 1

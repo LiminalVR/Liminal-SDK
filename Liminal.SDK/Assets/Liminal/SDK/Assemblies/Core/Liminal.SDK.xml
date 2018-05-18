@@ -3386,11 +3386,6 @@
             Gets or sets the image the fade is applied to.
             </summary>
         </member>
-        <member name="P:Liminal.Core.Fader.PostEffectScreenFader.Camera">
-            <summary>
-            Gets or sets the Camera the effect is applied to. The specified camera component must be on the same GameObject as this <see cref="T:Liminal.Core.Fader.PostEffectScreenFader"/> component.
-            </summary>
-        </member>
         <member name="P:Liminal.Core.Fader.ScreenFader.Instance">
             <summary>
             Gets the singleton <see cref="T:Liminal.Core.Fader.IScreenFader"/> instance that is currently active.

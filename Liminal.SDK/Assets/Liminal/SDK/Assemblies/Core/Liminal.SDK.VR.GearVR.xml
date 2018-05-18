@@ -191,30 +191,6 @@
             </summary>
             <param name="inputDevice">The input device for the pointer.</param>
         </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.OnPointerEnter(UnityEngine.GameObject)">
-            <summary>
-            [Internal use] Executed when the pointer hovers over an interactable GameObject.
-            </summary>
-            <param name="target">The GameObject the pointer the pointer entered.</param>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.OnPointerExit(UnityEngine.GameObject)">
-            <summary>
-            [Internal use] Executed when the pointer leaves an interactable GameObject after <see cref="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.OnPointerEnter(UnityEngine.GameObject)"/> has been executed.
-            </summary>
-            <param name="target">The GameObject the pointer the pointer exited.</param>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.GetButtonDown">
-            <summary>
-            [Internal use] Indicates if the primary interaction button was pressed.
-            </summary>
-            <returns>A boolean indicating if the primary interaction button was pressed.</returns>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer.GetButtonUp">
-            <summary>
-            [Internal use] Indicates if the primary interaction button was released.
-            </summary>
-            <returns>A boolean indicating if the primary interaction button was released.</returns>
-        </member>
         <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRHeadset">
             <summary>
             The GearVR headset is also a controller and as such implments both <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> and <see cref="T:Liminal.SDK.VR.IVRHeadset"/>.

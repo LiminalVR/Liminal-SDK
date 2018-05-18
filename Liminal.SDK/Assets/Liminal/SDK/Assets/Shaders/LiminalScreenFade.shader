@@ -1,30 +1,21 @@
 ﻿Shader "Liminal/Screen Fade"
 {
+	// Based on Oculus/Unlit Transparent Color
+	Properties
+	{
+		_Color("Main Color", Color) = (1,1,1,1)
+	}
+
 	SubShader
 	{
-		Pass
-		{
-			Blend SrcAlpha OneMinusSrcAlpha
-			ZTest Always
-			Cull Off
-			ZWrite Off
-			
-			CGPROGRAM
-				#pragma vertex vert
-				#pragma fragment frag
+		Tags{ "Queue" = "Transparent" "IgnoreProjector" = "True" "RenderType" = "Transparent" }
+		LOD 100
+		Fog{ Mode Off }
 
-				float4 _Color;
+		ZTest Always
+		Blend SrcAlpha OneMinusSrcAlpha
+		Color[_Color]
 
-				float4 vert(float4 vertex : POSITION) : SV_POSITION
-				{
-					return vertex;
-				}
-
-				float4 frag() : SV_Target
-				{
-					return _Color;
-				}
-			ENDCG
-		}
+		Pass{}
 	}
 }

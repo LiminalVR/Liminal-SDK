@@ -790,7 +790,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1153173748471004}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
@@ -798,8 +798,6 @@ MonoBehaviour:
   m_FadeOnStart: 0
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 20156169794639064}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!114 &114060473977694098
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -908,7 +906,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1347919702640120}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
@@ -916,8 +914,6 @@ MonoBehaviour:
   m_FadeOnStart: 0
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 20218923475448722}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!114 &114630145220863516
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1055,7 +1051,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1432647721943236}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
@@ -1063,8 +1059,6 @@ MonoBehaviour:
   m_FadeOnStart: 0
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 20458273247238968}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!114 &114821040449040578
 MonoBehaviour:
   m_ObjectHideFlags: 1

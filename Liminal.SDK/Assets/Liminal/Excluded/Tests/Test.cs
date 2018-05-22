@@ -30,21 +30,12 @@ public class Test : MonoBehaviour
     [SerializeField] private VRControllerVisualProxy m_TutorialController = null;
     [SerializeField] private GameObject m_TutorialCanvas = null;
 
+    public UnityEvent m_NormalUnityEvent;
+
     private void Start()
     {
-        /*
-        var btnOne = m_TutorialController.GetInput(VRButton.One);
-        btnOne.ShowTip<VRControllerTip>().Label = "Activate Things";
-        btnOne.PulseColor(Color.cyan, 2f);
-
-        var btnTwo = m_TutorialController.GetInput(VRAxis.One);
-        btnTwo.ShowTip<VRControllerTip>().Label = "Touch Me";
-        btnTwo.PulseColor(Color.green, 2f);
-
-        var btnBack = m_TutorialController.GetInput(VRButton.Back);
-        btnBack.ShowTip<VRControllerTip>().Label = "Quit";
-        btnBack.PulseColor(Color.red, 2f);
-        */
+        m_Event.Invoke(5,6);
+        m_NormalUnityEvent.Invoke();
     }
 
     public void PrintData()

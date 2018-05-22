@@ -283,6 +283,21 @@
             <param name="type">The type to check.</param>
             <returns>A boolean indicating if the supplied type inherits from <see cref="T:UnityEngine.Events.UnityEventBase"/>.</returns>
         </member>
+        <member name="M:Liminal.SDK.Serialization.SerializationUtils.IsSameModuleAsUnityEvent(System.Type)">
+            <summary>
+            Indicates if the supplied type is from the same module as UnityEventBase
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Liminal.SDK.Serialization.SerializationUtils.IsSameModule(System.Type,System.Type)">
+            <summary>
+            Indicates if typeA and typeB comes from the same module
+            </summary>
+            <param name="typeA"></param>
+            <param name="typeB"></param>
+            <returns></returns>
+        </member>
         <member name="M:Liminal.SDK.Serialization.SerializationUtils.IsUnityObjectType(System.Type)">
             <summary>
             Indicates if the supplied type inherits from <see cref="T:UnityEngine.Object"/>.
@@ -323,10 +338,15 @@
             Provides resolution for JSON contracts on Unity serializable fields.
             </summary>
         </member>
-        <member name="F:Liminal.SDK.Serialization.UnityJsonContractResolver._eventFieldNames">
+        <member name="F:Liminal.SDK.Serialization.UnityJsonContractResolver._unityEventFieldNames">
             <summary>
             The fields from UnityEventBase types that we want to force to be serialized. These values are required
             to reconstruct events when the objects are deserialized later.
+            </summary>
+        </member>
+        <member name="F:Liminal.SDK.Serialization.UnityJsonContractResolver._assemblyUnityEventFieldNames">
+            <summary>
+            The fields from UnityEventBase types that we will be modified to match the assembly
             </summary>
         </member>
         <member name="F:Liminal.SDK.Serialization.UnityJsonContractResolver._fullTypes">

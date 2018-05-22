@@ -88,6 +88,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaDirect: 0.5
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ShowResolutionOverlay: 1
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -883,22 +884,19 @@ Transform:
 --- !u!114 &301350075
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114500411702764408, guid: 58f2ea2a3000de041af42d9d904ce27b,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 301350073}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
   m_DefaultDuration: 2
-  m_FadeOnStart: 0
+  m_FadeOnStart: 1
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 301350076}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!20 &301350076
 Camera:
   m_ObjectHideFlags: 0
@@ -1200,22 +1198,19 @@ Transform:
 --- !u!114 &610728754
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114047644692956218, guid: 58f2ea2a3000de041af42d9d904ce27b,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 610728752}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
   m_DefaultDuration: 2
-  m_FadeOnStart: 0
+  m_FadeOnStart: 1
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 610728755}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!20 &610728755
 Camera:
   m_ObjectHideFlags: 0
@@ -1580,22 +1575,19 @@ Transform:
 --- !u!114 &1117678320
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114773426238397120, guid: 58f2ea2a3000de041af42d9d904ce27b,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1117678318}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
   m_DefaultDuration: 2
-  m_FadeOnStart: 0
+  m_FadeOnStart: 1
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 1117678321}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!20 &1117678321
 Camera:
   m_ObjectHideFlags: 0
@@ -1779,9 +1771,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Singleton: 1
   m_Faders:
-  - {fileID: 1117678320}
-  - {fileID: 301350075}
-  - {fileID: 610728754}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &1175264155
 MonoBehaviour:
   m_ObjectHideFlags: 0

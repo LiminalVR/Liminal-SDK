@@ -402,22 +402,19 @@ Transform:
 --- !u!114 &499613431
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114738234450782568, guid: 68c58bf31db6a5442b81025f6f426d8e,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 499613429}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
   m_DefaultDuration: 2
-  m_FadeOnStart: 0
+  m_FadeOnStart: 1
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 499613432}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!20 &499613432
 Camera:
   m_ObjectHideFlags: 0
@@ -514,9 +511,6 @@ MonoBehaviour:
   m_ActivationPolicy: 2
   m_HoverDelay: 0.5
   m_HoverDuration: 2
-  deviceHasTouchPad: 0
-  isControllerConnected: 0
-  hasController: 0
 --- !u!114 &504230036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -531,9 +525,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Singleton: 1
   m_Faders:
-  - {fileID: 582078524}
-  - {fileID: 1094479443}
-  - {fileID: 499613431}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &504230037
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -773,22 +767,19 @@ GameObject:
 --- !u!114 &582078524
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114089796388955028, guid: 68c58bf31db6a5442b81025f6f426d8e,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 582078523}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
   m_DefaultDuration: 2
-  m_FadeOnStart: 0
+  m_FadeOnStart: 1
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 1117678321}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!4 &582078525
 Transform:
   m_ObjectHideFlags: 0
@@ -1439,22 +1430,19 @@ Transform:
 --- !u!114 &1094479443
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 114884019430750642, guid: 68c58bf31db6a5442b81025f6f426d8e,
-    type: 2}
+  m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1094479441}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 531930646, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Singleton: 0
   m_DefaultDuration: 2
-  m_FadeOnStart: 0
+  m_FadeOnStart: 1
   m_StartColor: {r: 0, g: 0, b: 0, a: 1}
   m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
-  m_Camera: {fileID: 1094479444}
-  m_Shader: {fileID: 4800000, guid: 27fd57b3f8c5a784da50ed6a5709de7f, type: 3}
 --- !u!20 &1094479444
 Camera:
   m_ObjectHideFlags: 0
@@ -2289,6 +2277,11 @@ MonoBehaviour:
   m_Prefab: {fileID: 0}
   m_TutorialController: {fileID: 0}
   m_TutorialCanvas: {fileID: 0}
+  m_NormalUnityEvent:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.Events.UnityEvent, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
 --- !u!114 &1991859719
 MonoBehaviour:
   m_ObjectHideFlags: 0

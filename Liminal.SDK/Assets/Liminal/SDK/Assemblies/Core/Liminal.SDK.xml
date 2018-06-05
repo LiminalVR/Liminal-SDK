@@ -4,6 +4,68 @@
         <name>Liminal.SDK</name>
     </assembly>
     <members>
+        <member name="T:Liminal.SDK.Core.ExperienceApp">
+            <summary>
+            The entry-point for an Experience App. A GameObject with this component is required to be at the root of your scene, and all your scene objects should be nested below it.
+            The master app will search for this component when initializing your app. If it is not found or incorrectly configured, your experience app will not work.
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.Core.ExperienceApp.FadeSettings">
+            <summary>
+            Contains settings for controlling a full screen fade.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Core.ExperienceApp.Instance">
+            <summary>
+            Gets the current <see cref="T:Liminal.SDK.Core.ExperienceApp"/> instance.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Core.ExperienceApp.AssetBundle">
+            <summary>
+            Gets the <see cref="T:UnityEngine.AssetBundle"/> that the experience was loaded from.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Core.ExperienceApp.IsEmulator">
+            <summary>
+            Indicates if the application is running as an emulator. This will be true whenever you are running the app inside
+            the Unity editor during development, and false whenever the app is running inside the Liminal app.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Core.ExperienceApp.IsEnding">
+            <summary>
+            Indicates if the application is in an ending state and shutting down.
+            </summary>
+        </member>
+        <member name="E:Liminal.SDK.Core.ExperienceApp.Initializing">
+            <summary>
+            Raised when the <see cref="T:Liminal.SDK.Core.ExperienceApp"/> is initializing.
+            </summary>
+        </member>
+        <member name="E:Liminal.SDK.Core.ExperienceApp.ShuttingDown">
+            <summary>
+            Raised when the <see cref="T:Liminal.SDK.Core.ExperienceApp"/> is shutting down.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.Core.ExperienceApp.End">
+            <summary>
+            Ends the experience and returns to the Liminal app.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Core.ExperienceApp.FadeInSettings">
+            <summary>
+            Gets the settings for the fade in transition when the app begins.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Core.ExperienceApp.FadeOutSettings">
+            <summary>
+            Gets the settings for the fade out transition when the app ends.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Core.ExperienceApp.RootGameObjects">
+            <summary>
+            Gets the list of GameObjects on the root of the scene.
+            </summary>
+        </member>
         <member name="T:Liminal.SDK.Serialization.AppPackPlatform">
             <summary>
             The platforms Liminal AppPack files can support.
@@ -513,68 +575,6 @@
             </summary>
             <param name="vector">The original Vector3.</param>
             <returns>A new, normalized Vector3 that contains only the X and Z components of the input Vector3</returns>
-        </member>
-        <member name="T:Liminal.SDK.Core.ExperienceApp">
-            <summary>
-            The entry-point for an Experience App. A GameObject with this component is required to be at the root of your scene, and all your scene objects should be nested below it.
-            The master app will search for this component when initializing your app. If it is not found or incorrectly configured, your experience app will not work.
-            </summary>
-        </member>
-        <member name="T:Liminal.SDK.Core.ExperienceApp.FadeSettings">
-            <summary>
-            Contains settings for controlling a full screen fade.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.Core.ExperienceApp.Instance">
-            <summary>
-            Gets the current <see cref="T:Liminal.SDK.Core.ExperienceApp"/> instance.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.Core.ExperienceApp.AssetBundle">
-            <summary>
-            Gets the <see cref="T:UnityEngine.AssetBundle"/> that the experience was loaded from.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.Core.ExperienceApp.IsEmulator">
-            <summary>
-            Indicates if the application is running as an emulator. This will be true whenever you are running the app inside
-            the Unity editor during development, and false whenever the app is running inside the Liminal app.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.Core.ExperienceApp.IsEnding">
-            <summary>
-            Indicates if the application is in an ending state and shutting down.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.Core.ExperienceApp.Initializing">
-            <summary>
-            Raised when the <see cref="T:Liminal.SDK.Core.ExperienceApp"/> is initializing.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.Core.ExperienceApp.ShuttingDown">
-            <summary>
-            Raised when the <see cref="T:Liminal.SDK.Core.ExperienceApp"/> is shutting down.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.Core.ExperienceApp.End">
-            <summary>
-            Ends the experience and returns to the Liminal app.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.Core.ExperienceApp.FadeInSettings">
-            <summary>
-            Gets the settings for the fade in transition when the app begins.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.Core.ExperienceApp.FadeOutSettings">
-            <summary>
-            Gets the settings for the fade out transition when the app ends.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.Core.ExperienceApp.RootGameObjects">
-            <summary>
-            Gets the list of GameObjects on the root of the scene.
-            </summary>
         </member>
         <member name="T:Liminal.SDK.VR.Avatars.Controllers.IVRControllerVisual">
             <summary>

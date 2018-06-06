@@ -172,42 +172,9 @@
             A concrete implementation of <see cref="T:Liminal.SDK.VR.IVRDevice"/> representing the Google Daydream View (non-standalone headset, requires a VR capable mobile device).
             </summary>
         </member>
-        <member name="E:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.InputDeviceConnected">
-            <summary>
-            Raised when a <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> is connected.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.InputDeviceDisconnected">
-            <summary>
-            Raised when a <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> is disconnected.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.PrimaryInputDeviceChanged">
-            <summary>
-            Raised when the primary <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> has changed.
-            </summary>
-        </member>
         <member name="M:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.#ctor">
             <summary>
             Creates a new instance of the <see cref="T:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice"/>.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.HasCapabilities(Liminal.SDK.VR.VRDeviceCapability)">
-            <summary>
-            Indicates if the device has a specific set of capabilities. This method returns true only if ALL values within the <paramref name="capabilities"/> bitmask are available on the device.
-            </summary>
-            <param name="capabilities">The capabilities to check. This value is a bitmask of <see cref="T:Liminal.SDK.VR.VRDeviceCapability"/> values.</param>
-            <returns>A boolean indicating if the device has ALL the capabilities specified by the <paramref name="capabilities"/> bitmask.</returns>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.SetupAvatar(Liminal.SDK.VR.Avatars.IVRAvatar)">
-            <summary>
-            [Internal use] Sets up an <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> instance for this device. You should not have to call this manually.
-            </summary>
-            <param name="avatar">The <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> instance to bind to the device.</param>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.DaydreamView.DaydreamViewDevice.Update">
-            <summary>
-            [Internal use] Updates the state of the device. You do not have to call this manually.
             </summary>
         </member>
     </members>

@@ -112,73 +112,15 @@
             A concrete implementation of <see cref="T:Liminal.SDK.VR.IVRDevice"/> for Samsung's GearVR hardware.
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.Name">
-            <summary>
-            Gets the name of the device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDeviceCount">
-            <summary>
-            Gets the number of input devices currently connected.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.Headset">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.IVRHeadset"/> of the device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.PrimaryInputDevice">
-            <summary>
-            Gets the primary input device, if connected and available.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.SecondaryInputDevice">
-            <summary>
-            Gets the secondary input device, if connected and available.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDevices">
-            <summary>
-            Gets an enumerable collection of <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> objects currently connected.
-            </summary>
-        </member>
         <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.IsOculusGo">
             <summary>
-            True if the device is an Oculus Go, false for other GearVR devices
+            Returns true if the device is an Oculus Go, rather than a GearVR device
             </summary>
         </member>
-        <member name="E:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDeviceConnected">
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.#ctor">
             <summary>
-            Raised when an input device is connected.
+            Create a GearVR device
             </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.InputDeviceDisconnected">
-            <summary>
-            Raisd when an input device is disconnected.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.PrimaryInputDeviceChanged">
-            <summary>
-            Raised when the primary <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> has changed.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.Update">
-            <summary>
-            [Internal use] Updates the state of the device. You do not have to call this manually.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.HasCapabilities(Liminal.SDK.VR.VRDeviceCapability)">
-            <summary>
-            Indicates if the device has a specific set of capabilities. This method returns true only if ALL values within the <paramref name="capabilities"/> bitmask are available on the device.
-            </summary>
-            <param name="capabilities">The capabilities to check. This value is a bitmask of <see cref="T:Liminal.SDK.VR.VRDeviceCapability"/> values.</param>
-            <returns>A boolean indicating if the device has ALL the capabilities specified by the <paramref name="capabilities"/> bitmask.</returns>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.GearVRDevice.SetupAvatar(Liminal.SDK.VR.Avatars.IVRAvatar)">
-            <summary>
-            [Internal use] Sets up an <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> instance for this device. You should not have to call this manually.
-            </summary>
-            <param name="avatar">The <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> instance to bind to the device.</param>
         </member>
         <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRGazePointer">
             <summary>

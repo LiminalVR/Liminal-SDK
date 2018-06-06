@@ -4,6 +4,11 @@
         <name>Liminal.SDK</name>
     </assembly>
     <members>
+        <member name="F:Liminal.SDK.Core.LiminalRenderQueue.Fader">
+            <summary>
+            Screen fader will try to not to obscure materials with a higher RenderQueue 
+            </summary>
+        </member>
         <member name="T:Liminal.SDK.Core.ExperienceApp">
             <summary>
             The entry-point for an Experience App. A GameObject with this component is required to be at the root of your scene, and all your scene objects should be nested below it.
@@ -2800,6 +2805,16 @@
         <member name="M:Liminal.SDK.VR.IVRDevice.Update">
             <summary>
             [Internal use] Updates the state of the device. You do not have to call this manually.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.IVRDevice.CpuLevel">
+            <summary>
+            Control the CPU clock speed if possible. See OVRManager.cpuLevel.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.VR.IVRDevice.GpuLevel">
+            <summary>
+            Control the CPU clock speed if possible. See OVRManager.gpuLevel.
             </summary>
         </member>
         <member name="T:Liminal.SDK.VR.IVRDeviceComponent">

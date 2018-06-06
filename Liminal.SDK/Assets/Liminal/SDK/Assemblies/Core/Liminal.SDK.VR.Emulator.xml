@@ -11,52 +11,7 @@
         </member>
         <member name="F:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.DeviceName">
             <summary>
-            Thed efault name 
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.Name">
-            <summary>
-            Gets the name of the <see cref="T:Liminal.SDK.VR.IVRDevice"/>.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.InputDeviceCount">
-            <summary>
-            Gets the number of input devices connected to this device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.Headset">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.IVRHeadset"/> connected to this device.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.PrimaryInputDevice">
-            <summary>
-            Gets the primary <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> connected to this device. Returns null if the device has no input controllers.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.SecondaryInputDevice">
-            <summary>
-            Gets the secondary <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> connected to this device. Returns null if the device has only one, or no input controllers.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.InputDevices">
-            <summary>
-            Gets an enumerable collection of input devices connected to the device.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.InputDeviceConnected">
-            <summary>
-            Raised when an input device is connected.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.InputDeviceDisconnected">
-            <summary>
-            Raised when an input device is disconnected.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.PrimaryInputDeviceChanged">
-            <summary>
-            Raised when the primary <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> has changed.
+            Thed device name 
             </summary>
         </member>
         <member name="M:Liminal.SDK.VR.Devices.Emulator.EmulatorDevice.#ctor(Liminal.SDK.VR.Devices.Emulator.VREmulatorDevice)">

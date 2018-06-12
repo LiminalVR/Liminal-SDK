@@ -13,6 +13,7 @@ namespace Liminal.SDK.Build
             "Assets/Liminal/SDK/Assets",
             "Assets/Liminal/SDK/Frameworks",
             "Assets/Liminal/SDK/Prefabs",
+            "Assets/Liminal/SDK/Tests",
             "Assets/Liminal/SDK/VR",
         };
 

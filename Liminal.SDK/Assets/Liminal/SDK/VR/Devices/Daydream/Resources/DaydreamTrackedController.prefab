@@ -19,8 +19,8 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4054626957799020}
-  - component: {fileID: 114163496072117454}
-  - component: {fileID: 114086966895513754}
+  - component: {fileID: 114807588573653492}
+  - component: {fileID: 114407952276641624}
   m_Layer: 0
   m_Name: DaydreamTrackedController
   m_TagString: Untagged
@@ -41,7 +41,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &114086966895513754
+--- !u!114 &114407952276641624
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -49,7 +49,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1426296704059138}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 616761353, guid: 9fa49bda5dc8a284eb3e582750def149, type: 3}
+  m_Script: {fileID: 616761353, guid: 790f0dd661e52d748b28d6c8ab8c0964, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   elbowRestPosition: {x: 0.195, y: -0.5, z: 0.005}
@@ -63,7 +63,7 @@ MonoBehaviour:
   tooltipMinDistanceFromFace: 0.45
   tooltipMaxAngleFromCamera: 80
   isLockedToNeck: 0
---- !u!114 &114163496072117454
+--- !u!114 &114807588573653492
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -71,8 +71,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 1426296704059138}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1708664952, guid: 9fa49bda5dc8a284eb3e582750def149, type: 3}
+  m_Script: {fileID: 1708664952, guid: 790f0dd661e52d748b28d6c8ab8c0964, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  armModel: {fileID: 114086966895513754}
+  armModel: {fileID: 114407952276641624}
   isDeactivatedWhenDisconnected: 1

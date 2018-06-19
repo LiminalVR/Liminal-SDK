@@ -50,7 +50,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4343192075377756}
-  - component: {fileID: 114467439081507432}
+  - component: {fileID: 114309467879878776}
   - component: {fileID: 33689086234191576}
   - component: {fileID: 23890659164921232}
   m_Layer: 0
@@ -656,6 +656,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_NodeName: ButtonBack
+--- !u!114 &114309467879878776
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1221508501650996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -2026657213, guid: 790f0dd661e52d748b28d6c8ab8c0964, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attachmentPrefabs: []
+  touchPadColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+  appButtonColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+  systemButtonColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
+  readControllerState: 1
+  displayState:
+    batteryLevel: 0
+    batteryCharging: 0
+    clickButton: 0
+    appButton: 0
+    homeButton: 0
+    touching: 0
+    touchPos: {x: 0, y: 0}
+  maximumAlpha: 1
 --- !u!114 &114464303923910150
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -668,31 +693,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_NodeName: AxisOneRaw
---- !u!114 &114467439081507432
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1221508501650996}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -2026657213, guid: 9fa49bda5dc8a284eb3e582750def149, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attachmentPrefabs: []
-  touchPadColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
-  appButtonColor: {r: 0.27450982, g: 0.27450982, b: 0.27450982, a: 1}
-  systemButtonColor: {r: 0.078431375, g: 0.078431375, b: 0.078431375, a: 1}
-  readControllerState: 1
-  displayState:
-    batteryLevel: -1
-    batteryCharging: 0
-    clickButton: 0
-    appButton: 0
-    homeButton: 0
-    touching: 0
-    touchPos: {x: 0.5, y: 0.5}
-  maximumAlpha: 1
 --- !u!114 &114511253694483866
 MonoBehaviour:
   m_ObjectHideFlags: 1

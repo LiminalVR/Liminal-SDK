@@ -525,9 +525,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Singleton: 1
   m_Faders:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 582078524}
+  - {fileID: 1094479443}
+  - {fileID: 499613431}
 --- !u!114 &504230037
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -953,6 +953,11 @@
             Deactivates gaze control for the avatar.
             </summary>
         </member>
+        <member name="P:Liminal.SDK.VR.Avatars.Extensions.GazeInput.HandsActive">
+            <summary>
+            Return if hands are active for the avatar
+            </summary>
+        </member>
         <member name="T:Liminal.SDK.VR.Avatars.Extensions.IVRAvatarExtension">
             <summary>
             An interface for all <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> extension components.
@@ -2837,6 +2842,13 @@
             Extension methods for the <see cref="T:Liminal.SDK.VR.IVRDevice"/> interface.
             </summary>
         </member>
+        <member name="M:Liminal.SDK.VR.IVRDeviceExtensions.SetPrimaryPointerActive(Liminal.SDK.VR.IVRDevice,System.Boolean)">
+            <summary>
+            Set the primary pointer active
+            </summary>
+            <param name="device"></param>
+            <param name="isActive"></param>
+        </member>
         <member name="M:Liminal.SDK.VR.IVRDeviceExtensions.GetInputDevice(Liminal.SDK.VR.IVRDevice,System.Int32)">
             <summary>
             Gets the <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> connected to a <see cref="!:IRVRDevice"/> with the specified index.
@@ -2863,6 +2875,26 @@
             Creates a new <see cref="T:Liminal.SDK.VR.IVRDevice"/> and returns it.
             </summary>
             <returns>The <see cref="T:Liminal.SDK.VR.IVRDevice"/> that was created.</returns>
+        </member>
+        <member name="T:Liminal.SDK.VR.IVRDeviceInputExtensions">
+            <summary>
+            Input extension methods for the <see cref="T:Liminal.SDK.VR.IVRDevice"/> interface.
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.IVRDeviceInputExtensions.GetButtonDown(Liminal.SDK.VR.IVRDevice,System.String)">
+            <summary>
+            Wrapper for IVRInputDevice.GetButtonDown to handle null checks etc
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.IVRDeviceInputExtensions.GetButton(Liminal.SDK.VR.IVRDevice,System.String)">
+            <summary>
+            Wrapper for IVRInputDevice.GetButtonDown to handle null checks etc
+            </summary>
+        </member>
+        <member name="M:Liminal.SDK.VR.IVRDeviceInputExtensions.GetButtonUp(Liminal.SDK.VR.IVRDevice,System.String)">
+            <summary>
+            Wrapper for IVRInputDevice.GetButtonUp to handle null checks etc
+            </summary>
         </member>
         <member name="T:Liminal.SDK.VR.IVRHeadset">
             <summary>

@@ -21,6 +21,11 @@
             <param name="limb">The limb for the controller.</param>
             <returns>The newly instantiated controller visual for the specified limb, or null if no controller visual was able to be created.</returns>
         </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatar.DetectAndUpdateControllerStates">
+            <summary>
+            Detects and Updates the state of the controllers including the TouchPad on the GearVR headset
+            </summary>
+        </member>
         <member name="T:Liminal.SDK.VR.Devices.GearVR.Avatar.HmdRecenterPolicy">
             <summary>
             Values for the recentering policy for the GearVR HMD.

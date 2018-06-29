@@ -36,6 +36,11 @@
             Builds a Liminal Experience Application from the current scene and build target.
             </summary>
         </member>
+        <member name="M:Liminal.SDK.Editor.Build.AppBuilder.BuildStandalone">
+            <summary>
+            Builds a Liminal Experience Application from the current scene and standalone build target.
+            </summary>
+        </member>
         <member name="M:Liminal.SDK.Editor.Build.AppBuilder.BuildAndroid">
             <summary>
             Builds a Liminal Experience Application from the current scene and the Android build target.
@@ -186,6 +191,16 @@
         <member name="P:Liminal.SDK.Build.AppBuildInfo.BuildTarget">
             <summary>
             The build target for the app package.
+            </summary>
+        </member>
+        <member name="P:Liminal.SDK.Build.AppBuildInfo.BuildTargetDevice">
+            <summary>
+            The build target device for app package
+            </summary>
+        </member>
+        <member name="T:Liminal.SDK.Build.AppBuildInfo.BuildTargetDevices">
+            <summary>
+            The Targetted device for the app package
             </summary>
         </member>
         <member name="T:Liminal.SDK.Build.AppManifest">

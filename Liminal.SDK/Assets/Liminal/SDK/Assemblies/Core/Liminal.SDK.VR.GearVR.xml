@@ -14,6 +14,12 @@
             Gets the <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatar"/> for this device avatar.
             </summary>
         </member>
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatar.IsControllerConnected(OVRInput.Controller)">
+            <summary>
+            Replacement for OVRInput.IsControllerConnected() that handles None properly
+            and works with masks as well as single enum values
+            </summary>
+        </member>
         <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRAvatar.InstantiateControllerVisual(Liminal.SDK.VR.Avatars.IVRAvatarLimb)">
             <summary>
             Instantiates a <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual"/> for a limb.
@@ -72,22 +78,7 @@
             A concrete implementation of <see cref="T:Liminal.SDK.VR.Avatars.IVRTrackedObjectProxy"/> for wrapping around a tracked GearVR controller.
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.IsActive">
-            <summary>
-            Indicates if the tracked object is currently active.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.Position">
-            <summary>
-            Gets the world-space position of the tracked object.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.Rotation">
-            <summary>
-            Gets the world-space rotation of the tracked object.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.#ctor(Liminal.SDK.VR.Avatars.IVRAvatar,OVRInput.Controller)">
+        <member name="M:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy.#ctor(Liminal.SDK.VR.Avatars.IVRAvatar)">
             <summary>
             Creates a new <see cref="T:Liminal.SDK.VR.Devices.GearVR.Avatar.GearVRTrackedControllerProxy"/> for the specified avatar and controller type.
             </summary>
@@ -105,11 +96,8 @@
             <summary>
             Represents a GearVR controller.
             <seealso href="https://developer.oculus.com/documentation/unity/latest/concepts/unity-ovrinput/"/>
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRController.Hand">
-            <summary>
-            Gets the handedness of the input device.
+            An Oculus Touch controller can be used to emulate a GearVR controller in the Editor. At the time of
+            writing, button presses don't seem to be detected from Touch though.
             </summary>
         </member>
         <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRDevice">
@@ -163,17 +151,14 @@
         </member>
         <member name="T:Liminal.SDK.VR.Devices.GearVR.GearVRInputDevice">
             <summary>
-            An abstract base implementation of <see cref="T:Liminal.SDK.VR.Devices.GearVR.IGearVRInputDevice"/>.
+            An abstract base implementation of <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/>.
             </summary>
         </member>
-        <member name="T:Liminal.SDK.VR.Devices.GearVR.IGearVRInputDevice">
-            <summary>
-            An extension interface for <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> that adds specific OVR functionality.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Devices.GearVR.IGearVRInputDevice.ControllerType">
+        <member name="P:Liminal.SDK.VR.Devices.GearVR.GearVRInputDevice.ControllerMask">
             <summary>
             Gets the OVR controller type assigned to this device.
+            Be careful when using OVRInput.Controller values. OVR APIs sometimes treat them as
+            bitfield masks, sometimes as simple enum values.
             </summary>
         </member>
     </members>

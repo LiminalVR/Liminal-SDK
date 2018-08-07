@@ -846,30 +846,6 @@
             Gets or sets the <see cref="T:Liminal.SDK.VR.Pointers.IVRPointerVisual"/> for the controller.
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual.Nodes">
-            <summary>
-            Gets the enumerable collection of controller nodes belonging to the visual.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual.Inputs">
-            <summary>
-            Gets the enumerable collection of controller input visuals belonging to the visual.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual.GetNode(System.String)">
-            <summary>
-            Gets the the <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerNode"/> with the name specified by <paramref name="nodeName"/>.
-            </summary>
-            <param name="nodeName">The name of the node.</param>
-            <returns>The <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerNode"/> with the name specified by <paramref name="nodeName"/>.</returns>
-        </member>
-        <member name="M:Liminal.SDK.VR.Avatars.Controllers.VRControllerVisual.GetInput(System.String)">
-            <summary>
-            Gets the the <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual"/> with the name specified by <paramref name="inputName"/>.
-            </summary>
-            <param name="inputName">The name of the input component.</param>
-            <returns>The <see cref="T:Liminal.SDK.VR.Avatars.Controllers.VRControllerInputVisual"/> with the name specified by <paramref name="inputName"/>.</returns>
-        </member>
         <member name="T:Liminal.SDK.VR.Avatars.Events.IAnchorableAnchored">
             <summary>
             An interface that can be implemented by components that want to receive OnAnchored events from <see cref="T:Liminal.SDK.VR.Avatars.Interaction.Anchorable"/> components.
@@ -1271,11 +1247,11 @@
             <param name="type">The <see cref="T:Liminal.SDK.VR.Avatars.VRAvatarLimbType"/> of the limb to search for.</param>
             <returns>A boolean indicating if the avatar has a <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatarLimb"/> of the specified <see cref="T:Liminal.SDK.VR.Avatars.VRAvatarLimbType"/> type.</returns>
         </member>
-        <member name="M:Liminal.SDK.VR.Avatars.IVRAvatar.SetHandsActiveState(System.Boolean)">
+        <member name="M:Liminal.SDK.VR.Avatars.IVRAvatar.SetHandsActive(System.Boolean)">
             <summary>
             Sets the active state for the hand limbs.
             </summary>
-            <param name="activeState">The active state for the hand limbs.</param>
+            <param name="active">The active state for the hand limbs.</param>
         </member>
         <member name="M:Liminal.SDK.VR.Avatars.IVRAvatar.SetLimbActiveState(Liminal.SDK.VR.Avatars.VRAvatarLimbType,System.Boolean)">
             <summary>
@@ -1575,7 +1551,7 @@
             <param name="type">The <see cref="T:Liminal.SDK.VR.Avatars.VRAvatarLimbType"/> of the limb to search for.</param>
             <returns>A boolean indicating if the avatar has a <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatarLimb"/> of the specified <see cref="T:Liminal.SDK.VR.Avatars.VRAvatarLimbType"/> type.</returns>
         </member>
-        <member name="M:Liminal.SDK.VR.Avatars.VRAvatar.SetHandsActiveState(System.Boolean)">
+        <member name="M:Liminal.SDK.VR.Avatars.VRAvatar.SetHandsActive(System.Boolean)">
             <summary>
             Sets the active state for the hand limbs.
             </summary>
@@ -1747,11 +1723,6 @@
             A concrete implmentation of <see cref="T:Liminal.SDK.VR.Avatars.IVRAvatarHand"/>, representing a hand limb.
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Avatars.VRAvatarHand.DeviceComponent">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.IVRDeviceComponent"/> the limb is assigned to.
-            </summary>
-        </member>
         <member name="P:Liminal.SDK.VR.Avatars.VRAvatarHand.InputDevice">
             <summary>
             Gets the <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> currently assigned to this hand.
@@ -1808,13 +1779,6 @@
             <summary>
             A collection of helper methods for working with the VRAvatar system.
             </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Avatars.VRAvatarHelper.LimbTypeToInputDeviceHand(Liminal.SDK.VR.Avatars.VRAvatarLimbType)">
-            <summary>
-            Maps a <see cref="T:Liminal.SDK.VR.Avatars.VRAvatarLimbType"/> to its corresponding <see cref="T:Liminal.SDK.VR.Input.VRInputDeviceHand"/> value.
-            </summary>
-            <param name="limbType">The limb type to map.</param>
-            <returns>The <see cref="T:Liminal.SDK.VR.Input.VRInputDeviceHand"/> that matches the specified limb type. Returns <see cref="F:Liminal.SDK.VR.Input.VRInputDeviceHand.None"/> if the limb type cannot be mapped.</returns>
         </member>
         <member name="M:Liminal.SDK.VR.Avatars.VRAvatarHelper.EnsureLoadPrefab``1(System.String)">
             <summary>
@@ -2648,11 +2612,6 @@
             An interface that represents a hardware VR input device (such as a controller).
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Input.IVRInputDevice.Index">
-            <summary>
-            Gets the index of the input device.
-            </summary>
-        </member>
         <member name="P:Liminal.SDK.VR.Input.IVRInputDevice.ButtonCount">
             <summary>
             Gets the number of buttons the device has.
@@ -2849,22 +2808,6 @@
             <param name="device"></param>
             <param name="isActive"></param>
         </member>
-        <member name="M:Liminal.SDK.VR.IVRDeviceExtensions.GetInputDevice(Liminal.SDK.VR.IVRDevice,System.Int32)">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> connected to a <see cref="!:IRVRDevice"/> with the specified index.
-            </summary>
-            <param name="device">The <see cref="T:Liminal.SDK.VR.IVRDevice"/>.</param>
-            <param name="index">The index of the connected input device.</param>
-            <returns>The <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> with the specified index.</returns>
-        </member>
-        <member name="M:Liminal.SDK.VR.IVRDeviceExtensions.GetInputDevice(Liminal.SDK.VR.IVRDevice,Liminal.SDK.VR.Input.VRInputDeviceHand)">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> connected to a <see cref="!:IRVRDevice"/> for the specified hand.
-            </summary>
-            <param name="device">The <see cref="T:Liminal.SDK.VR.IVRDevice"/>.</param>
-            <param name="hand">The hand of the input device to retrieve.</param>
-            <returns>The <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> assigned to the specified hand.</returns>
-        </member>
         <member name="T:Liminal.SDK.VR.IVRDeviceInitializer">
             <summary>
             An interface for allowing an object to create <see cref="T:Liminal.SDK.VR.IVRDevice"/> instances.
@@ -2913,74 +2856,10 @@
             An abstract base implementation of <see cref="T:Liminal.SDK.VR.Pointers.IVRPointer"/>.
             </summary>
         </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointer.IsActive">
-            <summary>
-            Indicates if the pointer is currently active.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointer.DeviceComponent">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.IVRDeviceComponent"/> the pointer is bound to.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointer.CurrentRaycastResult">
-            <summary>
-            Gets the current input <see cref="T:UnityEngine.EventSystems.RaycastResult"/>.
-            </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.BasePointer.Transform">
-            <summary>
-            Gets the transform for the origin of the pointer ray.
-            </summary>
-        </member>
-        <member name="E:Liminal.SDK.VR.Pointers.BasePointer.ActiveStateChanged">
-            <summary>
-            Raised when the active state of the pointer has changed.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Pointers.BasePointer.Activate">
-            <summary>
-            Activates the pointer.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Pointers.BasePointer.Deactivate">
-            <summary>
-            Deactivates the pointer.
-            </summary>
-        </member>
         <member name="T:Liminal.SDK.VR.Pointers.InputDevicePointer">
             <summary>
             A concrete implementation of <see cref="T:Liminal.SDK.VR.Pointers.IVRPointer"/> designed for use with <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/>.
             </summary>
-        </member>
-        <member name="P:Liminal.SDK.VR.Pointers.InputDevicePointer.InputDevice">
-            <summary>
-            Gets the <see cref="T:Liminal.SDK.VR.Input.IVRInputDevice"/> the pointer is bound to.
-            </summary>
-        </member>
-        <member name="M:Liminal.SDK.VR.Pointers.InputDevicePointer.OnPointerEnter(UnityEngine.GameObject)">
-            <summary>
-            [Internal use] Executed when the pointer hovers over an interactable GameObject.
-            </summary>
-            <param name="target">The GameObject the pointer the pointer entered.</param>
-        </member>
-        <member name="M:Liminal.SDK.VR.Pointers.InputDevicePointer.OnPointerExit(UnityEngine.GameObject)">
-            <summary>
-            [Internal use] Executed when the pointer leaves an interactable GameObject after <see cref="M:Liminal.SDK.VR.Pointers.InputDevicePointer.OnPointerEnter(UnityEngine.GameObject)"/> has been executed.
-            </summary>
-            <param name="target">The GameObject the pointer the pointer exited.</param>
-        </member>
-        <member name="M:Liminal.SDK.VR.Pointers.InputDevicePointer.GetButtonDown">
-            <summary>
-            [Internal use] Indicates if the primary interaction button was pressed.
-            </summary>
-            <returns>A boolean indicating if the primary interaction button was pressed.</returns>
-        </member>
-        <member name="M:Liminal.SDK.VR.Pointers.InputDevicePointer.GetButtonUp">
-            <summary>
-            [Internal use] Indicates if the primary interaction button was released.
-            </summary>
-            <returns>A boolean indicating if the primary interaction button was released.</returns>
         </member>
         <member name="T:Liminal.SDK.VR.Pointers.IVRPointer">
             <summary>
@@ -3451,6 +3330,11 @@
         <member name="P:Liminal.Core.Fader.ImageScreenFader.Image">
             <summary>
             Gets or sets the image the fade is applied to.
+            </summary>
+        </member>
+        <member name="T:Liminal.Core.Fader.MeshScreenFader">
+            <summary>
+            ScreenFader implementation adapted from Oculus's OVRScreenFade 
             </summary>
         </member>
         <member name="P:Liminal.Core.Fader.ScreenFader.Instance">

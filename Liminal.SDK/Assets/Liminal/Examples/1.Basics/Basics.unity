@@ -204,7 +204,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 35086829}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -347508319, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -347508319, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &180355806
@@ -398,7 +398,7 @@ MonoBehaviour:
   m_Script: {fileID: -1913601763, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Type: 0
+  m_Type: 3
   m_Anchor: {fileID: 1406670152}
   m_AnchorAttachments: []
   m_Tracking:
@@ -621,9 +621,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 301350073}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Singleton: 0
+  m_DefaultDuration: 2
+  m_FadeOnStart: 1
+  m_StartColor: {r: 0, g: 0, b: 0, a: 1}
+  m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!20 &301350076
 Camera:
   m_ObjectHideFlags: 0
@@ -889,7 +894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_EmulatorDevice: 1
-  m_BuildDevice: 1
+  m_BuildDevice: 0
 --- !u!1 &610728752
 GameObject:
   m_ObjectHideFlags: 0
@@ -933,9 +938,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 610728752}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -824621335, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -824621335, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Singleton: 0
+  m_DefaultDuration: 2
+  m_FadeOnStart: 1
+  m_StartColor: {r: 0, g: 0, b: 0, a: 1}
+  m_CurrentColor: {r: 0, g: 0, b: 0, a: 0}
 --- !u!20 &610728755
 Camera:
   m_ObjectHideFlags: 0
@@ -1430,9 +1440,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 1143539083}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1704348805, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: 1704348805, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_SizeBasedOnCameraDistance: 1
+  m_SizeMeters: 0.1
+  m_InvalidScale: 0.25
+  m_FaceCamera:
+    AlongXAxis: 1
+    AlongYAxis: 1
+    AlongZAxis: 1
+  m_SortingOrder: 0
 --- !u!1 &1175264152
 GameObject:
   m_ObjectHideFlags: 0
@@ -1463,9 +1481,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1175264152}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1439041086, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -1439041086, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_PointerVisual: {fileID: 0}
+  m_ActivationPolicy: 1
+  m_HoverDelay: 0.5
+  m_HoverDuration: 2
 --- !u!114 &1175264154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1476,9 +1498,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1175264152}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 979137986, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: 979137986, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Singleton: 0
+  m_Faders: []
 --- !u!114 &1175264156
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1492,10 +1516,10 @@ MonoBehaviour:
   m_Script: {fileID: -2089645732, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Head: {fileID: 0}
-  m_PrimaryHand: {fileID: 0}
-  m_SecondaryHand: {fileID: 0}
-  m_Auxiliaries: {fileID: 0}
+  m_Head: {fileID: 992529419}
+  m_PrimaryHand: {fileID: 202984490}
+  m_SecondaryHand: {fileID: 1775772140}
+  m_Auxiliaries: {fileID: 993579123}
 --- !u!1 &1310145530
 GameObject:
   m_ObjectHideFlags: 0
@@ -1848,9 +1872,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1468389701}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1903785820, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: 1903785820, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Reticle: {fileID: 1143539087}
+  m_ReticleDistance: 1
+  m_HideReticleWhenInvalid: 0
 --- !u!1 &1572486628
 GameObject:
   m_ObjectHideFlags: 0
@@ -2143,9 +2170,27 @@ MonoBehaviour:
   m_GameObject: {fileID: 1775772138}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1913601763, guid: 27ea3119a82e0444d88b007908225fdd, type: 3}
+  m_Script: {fileID: -1913601763, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Type: 2
+  m_Anchor: {fileID: 2067039578}
+  m_AnchorAttachments: []
+  m_Tracking:
+    MatchActive: 1
+    MatchPosition: 1
+    MatchRotation: 1
+  m_Events:
+    m_OnAnchored:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: Liminal.SDK.VR.Avatars.VRLimbAttachmentEvent, Liminal.SDK, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
+    m_OnUnanchored:
+      m_PersistentCalls:
+        m_Calls: []
+      m_TypeName: Liminal.SDK.VR.Avatars.VRLimbAttachmentEvent, Liminal.SDK, Version=1.0.0.0,
+        Culture=neutral, PublicKeyToken=null
 --- !u!1 &1816417214
 GameObject:
   m_ObjectHideFlags: 0

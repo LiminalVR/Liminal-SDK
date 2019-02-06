@@ -1,14 +1,14 @@
 fileFormatVersion: 2
 guid: 57eb71b760c0c7646989af0b58403dff
-timeCreated: 1515993523
-licenseType: Pro
 PluginImporter:
   externalObjects: {}
   serializedVersion: 2
   iconMap: {}
   executionOrder: {}
+  defineConstraints: []
   isPreloaded: 0
   isOverridable: 0
+  isExplicitlyReferenced: 0
   platformData:
   - first:
       '': Any
@@ -23,6 +23,7 @@ PluginImporter:
         Exclude OSXIntel: 1
         Exclude OSXIntel64: 1
         Exclude OSXUniversal: 1
+        Exclude WebGL: 1
         Exclude Win: 1
         Exclude Win64: 1
   - first:
@@ -83,7 +84,7 @@ PluginImporter:
     second:
       enabled: 0
       settings:
-        CPU: None
+        CPU: x86
   - first:
       Standalone: Win
     second:

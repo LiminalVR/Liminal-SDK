@@ -322,7 +322,7 @@ MonoBehaviour:
   m_Script: {fileID: 299679811, guid: bcbf3faac1ccb0744a9c50db2f2401e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PointerVisual: {fileID: 0}
+  m_PointerVisual: {fileID: 114552860015168888}
   m_NodeList: []
   m_NodeNames: []
   m_InputVisualList: []

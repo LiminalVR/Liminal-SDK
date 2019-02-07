@@ -339,7 +339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_EmulatorDevice: 1
-  m_BuildDevice: 1
+  m_BuildDevice: 2
 --- !u!1 &650509772
 GameObject:
   m_ObjectHideFlags: 0
@@ -648,7 +648,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1603606180}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 983088689, guid: cda8cff47f8081944b0080632caf2bb8, type: 3}
+  m_Script: {fileID: 983088689, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreReversedGraphics: 1

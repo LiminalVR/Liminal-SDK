@@ -137,8 +137,8 @@ MonoBehaviour:
   m_Script: {fileID: 559119221, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Type: 0
-  m_Anchor: {fileID: 0}
+  m_Type: 1
+  m_Anchor: {fileID: 1260162969793040546}
   m_AnchorAttachments: []
   m_Tracking:
     MatchActive: 1
@@ -760,7 +760,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1260162969912512416}
   - component: {fileID: 1260162969912512422}
-  - component: {fileID: 1260162969912512423}
   m_Layer: 0
   m_Name: Ears
   m_TagString: Untagged
@@ -790,26 +789,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1260162969912512417}
   m_Enabled: 1
---- !u!114 &1260162969912512423
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1260162969912512417}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1019033653, guid: d07c68e02b52a6f448d506ac32833618, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  globalGainDb: 0
-  occlusionMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  stereoSpeakerModeEnabled: 0
-  recorderSeamless: 0
-  recorderSourceTag: Untagged
-  recorderFoldout: 0
 --- !u!1 &1260162969970794165
 GameObject:
   m_ObjectHideFlags: 0
@@ -968,7 +947,7 @@ MonoBehaviour:
   m_Script: {fileID: 979137986, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Singleton: 0
+  m_Singleton: 1
   m_Faders:
   - {fileID: 389286676940360084}
   - {fileID: 1260162969218418912}

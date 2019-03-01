@@ -304,7 +304,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1208539532263042}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1367410070, guid: e21ce93369dc8c14089762db19bc8822, type: 3}
+  m_Script: {fileID: 1367410070, guid: c91ccb7da332d7e4face1c4e8da7d049, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_modelGearVrController: {fileID: 1121595755122606}

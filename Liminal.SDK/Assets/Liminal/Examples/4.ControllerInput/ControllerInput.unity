@@ -338,7 +338,7 @@ MonoBehaviour:
   m_Script: {fileID: -1823838173, guid: 57eb71b760c0c7646989af0b58403dff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EmulatorDevice: 1
+  m_EmulatorDevice: 2
   m_BuildDevice: 2
 --- !u!1 &650509772
 GameObject:

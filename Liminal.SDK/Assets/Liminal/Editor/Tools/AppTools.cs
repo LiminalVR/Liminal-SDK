@@ -112,11 +112,8 @@ namespace Liminal.SDK.Tools
             var vrAvatar = UnityEngine.Object.FindObjectOfType<VRAvatar>();
             if (vrAvatar == null)
             {
-                const string prefabPath = "Assets/Liminal/SDK/Prefabs/VRAvatar.prefab";
-                var prefabAsset = AssetDatabase.LoadAssetAtPath<VRAvatar>(prefabPath);
-                
+                var prefabAsset = Resources.Load<VRAvatar>("VRAvatar");
                 vrAvatar = (VRAvatar)PrefabUtility.InstantiatePrefab(prefabAsset);
-                PrefabUtility.DisconnectPrefabInstance(vrAvatar);
             }
 
             // Move avatar to the app

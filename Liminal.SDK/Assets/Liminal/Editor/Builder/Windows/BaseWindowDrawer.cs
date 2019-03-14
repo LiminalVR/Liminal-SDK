@@ -3,5 +3,5 @@
 /// </summary>
 public abstract class BaseWindowDrawer
 {
-    public abstract void Draw();
+    public abstract void Draw(BuildWindowConfig config);
 }

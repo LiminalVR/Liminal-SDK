@@ -41,7 +41,6 @@ partial class OculusBuildApp
 	static void SetAndroidTarget()
 	{
 		EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
-		EditorUserBuildSettings.androidBuildSystem = AndroidBuildSystem.Internal;
 
 		if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
 		{

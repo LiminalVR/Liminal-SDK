@@ -68,7 +68,7 @@ namespace Liminal.SDK.Editor.Serialization
                 {
                     // Is this a prefab?
                     // We only need to serialize data if the prefab root hasn't been serialized yet
-                    var prefab = PrefabUtility.GetPrefabObject(go);
+                    var prefab = PrefabUtility.GetPrefabInstanceHandle(go);
                     if (prefab != null)
                     {
                         var assetPath = AssetDatabase.GetAssetPath(prefab);

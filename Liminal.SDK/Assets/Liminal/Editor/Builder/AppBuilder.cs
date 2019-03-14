@@ -221,12 +221,16 @@ namespace Liminal.SDK.Editor.Build
             {
                 Debug.LogError("[Liminal.Build] Build failed.");
                 Debug.LogException(ex);
+
+                EditorUtility.ClearProgressBar();
             }
             finally
             {
                 // Ensure everything is always cleaned up...
                 ClearAppData(app);
                 AssetLookupBuilder.DestroyExisting(buildInfo.Scene);
+
+                GUIUtility.ExitGUI();
             }
         }
 

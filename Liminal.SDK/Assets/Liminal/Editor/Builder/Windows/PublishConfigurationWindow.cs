@@ -26,7 +26,7 @@ namespace Liminal.SDK.Build
             _version = appManifest.Version;
         }
 
-        public override void Draw()
+        public override void Draw(BuildWindowConfig config)
         {
             var appManifest = AppTools.GetAppManifest;
             var appManifestAsset = AppTools.GetAppManifestAsset;

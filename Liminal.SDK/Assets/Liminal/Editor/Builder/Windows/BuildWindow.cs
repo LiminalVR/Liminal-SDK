@@ -9,15 +9,16 @@ namespace Liminal.SDK.Build
     /// </summary>
     public class BuildWindow : BaseWindowDrawer
     {
-        public override void Draw()
+        public override void Draw(BuildWindowConfig config)
         {
             EditorGUILayout.BeginVertical("Box");
             {
                 EditorGUIHelper.DrawTitle("Build Limapp");
-                EditorGUILayout.LabelField(
-                    "This process will build a .limapp file that will run on the Liminal Platform");
+                EditorGUILayout.LabelField("This process will build a .limapp file that will run on the Liminal Platform");
 
-                _selectedPlatform = (BuildPlatform) EditorGUILayout.EnumPopup("Select Platform", _selectedPlatform);
+                _selectedPlatform = config.SelectedPlatform;
+                _selectedPlatform = (BuildPlatform)EditorGUILayout.EnumPopup("Select Platform", _selectedPlatform);
+                config.SelectedPlatform = _selectedPlatform;
 
                 GUILayout.FlexibleSpace();
 

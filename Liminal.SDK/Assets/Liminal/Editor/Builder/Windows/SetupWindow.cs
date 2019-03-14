@@ -8,7 +8,7 @@ namespace Liminal.SDK.Build
     /// </summary>
     public class SetupWindow : BaseWindowDrawer
     {
-        public override void Draw()
+        public override void Draw(BuildWindowConfig config)
         {
             GUILayout.Label(
                 "In order to build for the Liminal Platform, you need to set up the app scene" +

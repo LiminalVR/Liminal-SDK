@@ -286,6 +286,9 @@ namespace Liminal.SDK.Editor.Build
                 if (relativePath.IndexOf("/editor/", StringComparison.OrdinalIgnoreCase) > -1)
                     continue;
 
+                if (relativePath.IndexOf($"/{BuildWindowConsts.PlatformViewerFolderName}/", StringComparison.OrdinalIgnoreCase) > -1)
+                    continue;
+
                 var path = "Assets" + relativePath;
                 list.Add(path);
             }

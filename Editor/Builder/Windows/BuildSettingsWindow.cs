@@ -33,6 +33,13 @@ namespace Liminal.SDK.Build
             Window.Show();
         }
 
+        [MenuItem("Liminal/Update Package")]
+        public static void RefreshPackage()
+        {
+            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithoutLock);
+            AssetDatabase.Refresh();
+        }
+
         private void OnEnable()
         {
             var fileExists = File.Exists(BuildWindowConsts.BuildWindowConfigPath);

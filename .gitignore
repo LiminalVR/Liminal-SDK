@@ -4,10 +4,13 @@
 [Bb]uild/
 [Bb]uilds/
 Assets/AssetStoreTools*
-StreamingAssets
 
 _Builds.*
 _Builds/
+
+Liminal
+StreamingAssets
+__Build
 
 # Visual Studio 2015 cache directory
 /.vs/

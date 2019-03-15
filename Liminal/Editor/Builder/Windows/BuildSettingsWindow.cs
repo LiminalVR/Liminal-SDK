@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using Swing.Editor;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Networking;
-using Object = UnityEngine.Object;
 
 namespace Liminal.SDK.Build
 {

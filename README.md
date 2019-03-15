@@ -24,7 +24,7 @@ The Liminal SDK use Unity Package Manager.
 > 4. Open Windows > Unity Package Manager and import Oculus (Android)
 
 #### Updating the SDK
-**Resolving** This process may take a bit of time as it is downloading the package from git.
 
+**Resolving** This process may take a bit of time as it is downloading the package from git.
 > Liminal > Update Package
 

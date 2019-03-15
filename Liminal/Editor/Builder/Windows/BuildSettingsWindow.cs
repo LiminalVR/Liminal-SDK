@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Swing.Editor;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 using Object = UnityEngine.Object;
 
 namespace Liminal.SDK.Build
@@ -62,8 +65,13 @@ namespace Liminal.SDK.Build
 
             var configJson = JsonUtility.ToJson(_windowConfig);
             File.WriteAllText(BuildWindowConsts.BuildWindowConfigPath, configJson);
-        }
 
+            if (GUILayout.Button("Download Scene"))
+            {
+                //EditorCoroutine.Start(DownloadScene());
+                PrintPackageLocation();
+            }
+        }
 
         private void SetupMenuWindows()
         {
@@ -88,8 +96,14 @@ namespace Liminal.SDK.Build
             AssetDatabase.Refresh();
         }
 
+        private void PrintPackageLocation()
+        {
+            Debug.Log(UnityPackageManagerUtils.FullPackageLocation);
+        }
+
         private void SetupPreviewScene()
         {
+            /*
             var sceneExists = File.Exists(BuildWindowConsts.PreviewAppScenePath);
             if (!sceneExists)
             {
@@ -97,6 +111,31 @@ namespace Liminal.SDK.Build
                 File.Copy(scenePath, BuildWindowConsts.PreviewAppScenePath);
                 AssetDatabase.Refresh();
             }
+            */
         }
+
+        /*
+        private IEnumerator DownloadScene()
+        {
+            var path = "https://github.com/LiminalVR/Liminal-SDK/blob/feature/run-as-unity-package-manager/Liminal/PlatformViewer/Scenes/PlatformAppViewer.unity";
+            UnityWebRequest www = new UnityWebRequest("path");
+            www.downloadHandler = new DownloadHandlerBuffer();
+            yield return www.SendWebRequest();
+
+            if (www.isNetworkError || www.isHttpError)
+            {
+                Debug.Log(www.error);
+            }
+            else
+            {
+                Debug.Log("Downloaded " + path);
+
+                byte[] results = www.downloadHandler.data;
+
+                File.WriteAllBytes("Assets/Test.bytes", results);
+                AssetDatabase.Refresh();
+            }
+        }
+        */
     }
 }

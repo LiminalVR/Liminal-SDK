@@ -4,7 +4,8 @@ using Liminal.SDK.Extensions;
 public static class UnityPackageManagerUtils
 {
     public const string sdkName = "Liminal.SDK";
-    public const string sdkSeperator = "Assets\\Liminal\\SDK\\Assemblies";
+    //public const string sdkSeperator = "Assets\\Liminal\\SDK\\Assemblies";
+    public const string sdkSeperator = "Liminal\\SDK\\Assemblies";
 
     /// <summary>
     /// Return the full package location to the package folder

@@ -10,7 +10,7 @@
     /// <summary>
     /// Path to Platform Folder without assets
     /// </summary>
-    public const string PackagePreviewAppScenePath = "Liminal/Scenes/PlatformAppViewer.unity";
+    public const string PackagePreviewAppScenePath = "Liminal/PlatformViewer/Scenes/PlatformAppViewer.unity";
 
     /// <summary>
     /// Path to Platform Folder

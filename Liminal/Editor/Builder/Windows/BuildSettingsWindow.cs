@@ -103,6 +103,7 @@ namespace Liminal.SDK.Build
             if (!sceneExists)
             {
                 var scenePath = $"{UnityPackageManagerUtils.FullPackageLocation}/{BuildWindowConsts.PackagePreviewAppScenePath}";
+                Debug.Log(scenePath);
                 File.Copy(scenePath, BuildWindowConsts.PreviewAppScenePath);
                 AssetDatabase.Refresh();
             }

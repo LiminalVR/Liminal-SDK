@@ -66,9 +66,8 @@ namespace Liminal.SDK.Build
             var configJson = JsonUtility.ToJson(_windowConfig);
             File.WriteAllText(BuildWindowConsts.BuildWindowConfigPath, configJson);
 
-            if (GUILayout.Button("Download Scene"))
+            if (GUILayout.Button("Make Scene"))
             {
-                //EditorCoroutine.Start(DownloadScene());
                 PrintPackageLocation();
             }
         }
@@ -99,6 +98,14 @@ namespace Liminal.SDK.Build
         private void PrintPackageLocation()
         {
             Debug.Log(UnityPackageManagerUtils.FullPackageLocation);
+
+            var sceneExists = File.Exists(BuildWindowConsts.PreviewAppScenePath);
+            if (!sceneExists)
+            {
+                var scenePath = $"{UnityPackageManagerUtils.FullPackageLocation}/{BuildWindowConsts.PackagePreviewAppScenePath}";
+                File.Copy(scenePath, BuildWindowConsts.PreviewAppScenePath);
+                AssetDatabase.Refresh();
+            }
         }
 
         private void SetupPreviewScene()
@@ -113,29 +120,5 @@ namespace Liminal.SDK.Build
             }
             */
         }
-
-        /*
-        private IEnumerator DownloadScene()
-        {
-            var path = "https://github.com/LiminalVR/Liminal-SDK/blob/feature/run-as-unity-package-manager/Liminal/PlatformViewer/Scenes/PlatformAppViewer.unity";
-            UnityWebRequest www = new UnityWebRequest("path");
-            www.downloadHandler = new DownloadHandlerBuffer();
-            yield return www.SendWebRequest();
-
-            if (www.isNetworkError || www.isHttpError)
-            {
-                Debug.Log(www.error);
-            }
-            else
-            {
-                Debug.Log("Downloaded " + path);
-
-                byte[] results = www.downloadHandler.data;
-
-                File.WriteAllBytes("Assets/Test.bytes", results);
-                AssetDatabase.Refresh();
-            }
-        }
-        */
     }
 }

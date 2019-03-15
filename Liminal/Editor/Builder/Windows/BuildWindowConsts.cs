@@ -8,6 +8,11 @@
     public const string PlatformFolderPath = "Assets/Liminal/" + PlatformViewerFolderName;
 
     /// <summary>
+    /// Path to Platform Folder without assets
+    /// </summary>
+    public const string PackagePreviewAppScenePath = "Liminal/Scenes/PlatformAppViewer.unity";
+
+    /// <summary>
     /// Path to Platform Folder
     /// </summary>
     public const string PlatformSceneFolderPath = PlatformFolderPath + "/Scenes";

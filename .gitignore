@@ -9,9 +9,11 @@ _Builds.*
 _Builds/
 
 Liminal
+Liminal.meta
 StreamingAssets
 StreamingAssets.meta
 __Build
+__Build.meta
 
 # Visual Studio 2015 cache directory
 /.vs/

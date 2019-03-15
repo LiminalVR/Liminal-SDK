@@ -59,11 +59,6 @@ namespace Liminal.SDK.Build
 
             var configJson = JsonUtility.ToJson(_windowConfig);
             File.WriteAllText(BuildWindowConsts.BuildWindowConfigPath, configJson);
-
-            if (GUILayout.Button("Make Scene"))
-            {
-                PrintPackageLocation();
-            }
         }
 
         private void SetupMenuWindows()
@@ -89,10 +84,8 @@ namespace Liminal.SDK.Build
             AssetDatabase.Refresh();
         }
 
-        private void PrintPackageLocation()
+        private void SetupPreviewScene()
         {
-            Debug.Log(UnityPackageManagerUtils.FullPackageLocation);
-
             var sceneExists = File.Exists(BuildWindowConsts.PreviewAppScenePath);
             if (!sceneExists)
             {
@@ -101,19 +94,6 @@ namespace Liminal.SDK.Build
                 File.Copy(scenePath, BuildWindowConsts.PreviewAppScenePath);
                 AssetDatabase.Refresh();
             }
-        }
-
-        private void SetupPreviewScene()
-        {
-            /*
-            var sceneExists = File.Exists(BuildWindowConsts.PreviewAppScenePath);
-            if (!sceneExists)
-            {
-                var scenePath = $"{UnityPackageManagerUtils.FullPackageLocation}/{BuildWindowConsts.PreviewAppScenePath}";
-                File.Copy(scenePath, BuildWindowConsts.PreviewAppScenePath);
-                AssetDatabase.Refresh();
-            }
-            */
         }
     }
 }

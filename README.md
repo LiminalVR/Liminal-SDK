@@ -22,6 +22,11 @@ If you have any of the SDKs above:
 
 **Important:** You must close Unity, otherwise the SDKs will auto-generate again.
 
+### Setup Git
+> - If you do not have Git installed, Download Git https://git-scm.com/downloads
+> - Once git has been installed, locate cmd/git.exe, copy the path to just cmd
+> - Add the path to cmd to your Environment Variables. (Press Window, Search Environment Variables) 
+
 ### Importing the _Liminal SDK_
 
 The Liminal SDK uses Unity Package Manager.

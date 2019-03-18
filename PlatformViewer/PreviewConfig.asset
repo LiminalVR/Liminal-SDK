@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0c244b87eac02a45b4fea6e0c3a435a, type: 3}
+  m_Script: {fileID: 11500000, guid: f4a3c01ccdeb50541b24baa71f9ecfbd, type: 3}
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
-  EmulatorPath: E:/Unity Projects/Liminal/Platform/SDK/Unity/Liminal.SDK/Assets/_Builds/app_23121_emulator_v1.limapp
-  AndroidPath: E:/Unity Projects/Liminal/Platform/SDK/Unity/Liminal.SDK/Assets
-  AndroidAppFullName: app_23121_emulator_v1.limapp
+  EmulatorPath: E:/Unity Projects/Liminal/Playground/LimappBuilder/Assets/_Builds/app_999_emulator_v1.limapp
+  AndroidPath: E:/Unity Projects/Liminal/Platform/LiminalPlatformSDK/Liminal-SDK-Unity-Package/Assets
+  AndroidAppFullName: 

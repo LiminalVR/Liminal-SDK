@@ -2,7 +2,7 @@
 
 ## About
 
-This is a repository containing the Liminal SDK as a Unity Package. This package is used combine a bundle  of `scripts`, a `Unity Scene` and `Assets` into a `.limapp` file. The `.limapp` file is required for the Liminal Platform to run as one of our `Experiences`. 
+This is a repository containing the Liminal SDK as a Unity Package. This package is used to bundle `scripts`, a `Unity Scene` and `Assets` into a `.limapp` file. The `.limapp` file is required for the Liminal Platform to run as one of our `Experiences`. 
 
 ### Unity Version
 Unity 2018.3.8f1
@@ -22,10 +22,6 @@ If you have any of the SDKs above:
 
 **Important:** You must close Unity, otherwise the SDKs will auto-generate again.
 
-If you have already imported the SDK, simply click
-
-`Liminal > Update Package`
-
 ### Importing the _Liminal SDK_
 
 The Liminal SDK uses Unity Package Manager.
@@ -38,6 +34,8 @@ The Liminal SDK uses Unity Package Manager.
 ### Updating the SDK
 
 **Resolving**: This process may take a bit of time as it is downloading the package from git.
+
+From Unity Editor toolbars:
 
 > `Liminal > Update Package`
 

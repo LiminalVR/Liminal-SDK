@@ -29,7 +29,8 @@ The Liminal SDK uses Unity Package Manager.
 > 1. Locate YourProjectName/Packages/manifest.json
 > 2. Include Liminal SDK by adding the package name and git path. At the top, add `"com.liminal.sdk": "https://github.com/LiminalVR/Liminal-SDK-Unity-Package.git",`
 > 3. Open the Unity Project and the Liminal SDK will automatically be imported.
-> 4. Open Windows > Unity Package Manager and import Oculus (Android)
+> 4. Player Settings > Scripting Runtime Version `.NET 4.x Equivalent`
+> 5. Open Windows > Unity Package Manager and import Oculus (Android)
 
 ### Updating the SDK
 

@@ -28,3 +28,7 @@ The Liminal SDK use Unity Package Manager.
 **Resolving** This process may take a bit of time as it is downloading the package from git.
 > Liminal > Update Package
 
+## Troubleshooting
+
+- All files must have .meta
+

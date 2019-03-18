@@ -27,6 +27,8 @@ If you have any of the SDKs above:
 > - Once git has been installed, locate cmd/git.exe, copy the path to just cmd
 > - Add the path to cmd to your Environment Variables. (Press Window, Search Environment Variables) 
 
+*Important* If this is your first time adding a git path to your environment variable, you must ensure all Unity instances are closed after setting up git. Alternatively, you can just restart your machine.
+
 ### Importing the _Liminal SDK_
 
 The Liminal SDK uses Unity Package Manager.

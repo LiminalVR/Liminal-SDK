@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Liminal.SDK.Editor.Build;
 using UnityEditor;
 using UnityEngine;
 using Assembly = System.Reflection.Assembly;
@@ -17,8 +14,7 @@ namespace Liminal.SDK.Build
     {
         private static BindingFlags _flags =
             BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-        private List<AssemblyIssue> _assemblyIssues = new List<AssemblyIssue>();
-        private bool[] _assemblyIssueFoldouts;
+        private List<Issue> _issues = new List<Issue>();
         private Vector2 _scrollPos = new Vector2(0, 0);
         private string _status = "Ready to begin analysis . . . ";
         private static GUIStyle _textStyle;
@@ -37,32 +33,24 @@ namespace Liminal.SDK.Build
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Analyse Project", "LargeButtonRight"))
             {
-                _assemblyIssues = AnalyseSolution();
-                if (_assemblyIssues != null)
-                    _assemblyIssueFoldouts = new bool[_assemblyIssues.Count];
+                _issues = FindIssuesInSolution();
             }
 
             _flags = (BindingFlags)EditorGUILayout.EnumFlagsField(_flags, "OffsetDropDown");
             GUILayout.EndHorizontal();
 
             _textStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.UpperLeft, richText = true, fontSize = _fontSize };
-            GUI.backgroundColor = Color.white * 0.85f;
 
-            if (_status != null)
-                GUILayout.Label(_status, new GUIStyle("AnimationEventTooltip") { alignment = TextAnchor.UpperCenter, fixedHeight = 22 });
+            GUI.backgroundColor = Color.white * 0.85f;
+            GUILayout.Label(_status, new GUIStyle("AnimationEventTooltip") { alignment = TextAnchor.UpperCenter, fixedHeight = 22 });
 
             _fontSize = EditorGUILayout.IntSlider("Zoom", _fontSize, 8, 36);
             GUILayout.Space(4);
+
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, "PopupCurveSwatchBackground");
-            if (_assemblyIssues != null)
+            if (_issues != null)
             {
-                for (var i = 0; i < _assemblyIssues.Count; i++)
-                {
-                    var assemblyIssue = _assemblyIssues[i];
-                    _assemblyIssueFoldouts[i] = EditorGUILayout.Foldout(_assemblyIssueFoldouts[i], assemblyIssue.Assembly.GetName().Name);
-                    if (_assemblyIssueFoldouts[i])
-                        DrawAssemblyFoldout(assemblyIssue);
-                }
+                DrawIssues(_issues);
             }
             else
             {
@@ -73,44 +61,113 @@ namespace Liminal.SDK.Build
             GUI.backgroundColor = Color.white;
         }
 
-        private static void DrawAssemblyFoldout(AssemblyIssue assemblyIssue)
+        private void DrawIssues(List<Issue> issues)
         {
-            StringBuilder strBuilder = new StringBuilder();
-            strBuilder.AppendLine($"<color=#6a119e>[Assembly ► {assemblyIssue.Assembly.FullName}]</color>");
-            foreach (var typeIssue in assemblyIssue.TypeIssues)
+            foreach (var issue in issues)
             {
-                strBuilder.AppendLine($"\t<color=#0f8e08>[Type ► {typeIssue.Type.Name}]</color> ");
-                foreach (var methodIssue in typeIssue.MethodIssues)
-                {
-                    strBuilder.AppendLine($"\t\t<color=#c1164c>[Method ► {methodIssue.MethodInfo.Name}]</color>");
-                    strBuilder.Append($"\t\t\t");
-                    foreach (var parameterIssue in methodIssue.ParameterIssues)
-                    {
-                        strBuilder.Append($"<color=#0766af>[{parameterIssue.Name} = {parameterIssue.RawDefaultValue}]</color> ");
-                    }
-                    strBuilder.AppendLine();
-                }
+                GUILayout.Space(6);
+                DrawIssue(issue);
             }
-
-            GUILayout.Label(strBuilder.ToString(), _textStyle, GUILayout.ExpandWidth(true));
         }
 
-        private List<AssemblyIssue> AnalyseSolution()
+        private void DrawIssue(Issue issue)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(issue.GetParentCount() * 16);
+            if (GUILayout.Button(issue.Message, _textStyle))
+                _status = $"<color=yellow>{issue.Details}</color>";
+            GUILayout.EndHorizontal();
+            issue.SubIssues.ForEach(DrawIssue);
+        }
+
+        private List<Issue> FindIssuesInSolution()
         {
             List<Assembly> assemblies = GetAssemblies();
+            List<Issue> issues = new List<Issue>();
             _status = $"Analysing {assemblies.Count} assemblies . . . \n";
-            List<AssemblyIssue> issues = new List<AssemblyIssue>();
 
             foreach (var assembly in assemblies)
             {
-                var assemblyIssue = AnalyseAssembly(assembly);
-                if (assemblyIssue != null)
+                var assemblyIssue = new Issue($"<color=#6a119e>[Assembly] ⟶ {assembly.FullName}</color>");
+                assemblyIssue.SubIssues.AddRange(FindIssuesInAssembly(assembly, assemblyIssue));
+                if (assemblyIssue.IsValid)
                     issues.Add(assemblyIssue);
-
             }
-            if (issues.Any())
-                return issues;
-            return null;
+            return issues;
+        }
+
+        private static IEnumerable<Issue> FindIssuesInAssembly(Assembly assembly, Issue parentIssue)
+        {
+            IEnumerable<Type> types = assembly.GetTypes();
+            List<Issue> issues = new List<Issue>();
+
+            foreach (var type in types)
+            {
+                // Find missing constructor
+                if (type.IsSerializable && !HasValidConstructors(type))
+                    issues.Add(new Issue($"<color=#0f8e08>[Type] ⟶ {type.Name}</color>",
+                        "Serializable classes without constructors may cause build errors.",
+                        parentIssue));
+
+                var typeIssue = new Issue($"<color=#0f8e08>[Type] ⟶ {type.Name}</color>", parentIssue);
+                typeIssue.SubIssues.AddRange(FindIssuesInType(type, typeIssue));
+                if (typeIssue.IsValid)
+                    issues.Add(typeIssue);
+            }
+            return issues;
+        }
+
+        private static IEnumerable<Issue> FindIssuesInType(Type type, Issue parentIssue)
+        {
+            IEnumerable<MethodInfo> methods = type.GetMethods(_flags);
+            List<Issue> issues = new List<Issue>();
+
+            // Find issues in methods
+            foreach (var method in methods)
+            {
+                var methodIssue = new Issue($"<color=#c1164c>[Method] ⟶ {method.Name}</color>", parentIssue);
+                methodIssue.SubIssues.AddRange(FindIssuesInMethod(method, methodIssue));
+                if (methodIssue.IsValid)
+                    issues.Add(methodIssue);
+            }
+            return issues;
+        }
+
+        /// <summary>
+        /// Has valid constructors if there are no ctors or there are ctors with arguments
+        /// </summary>
+        /// <returns></returns>
+        private static bool HasValidConstructors(Type type)
+        {
+            if (type.Assembly.FullName.Contains("Editor"))
+                return true;
+
+            var ctors = type.GetConstructors();
+            if (!ctors.Any())
+                return true;
+
+            return ctors.Any(ctor => !ctor.GetParameters().Any());
+        }
+
+        private static IEnumerable<Issue> FindIssuesInMethod(MethodInfo method, Issue parentIssue)
+        {
+            var issues = method.GetParameters()
+                .Where(HasDefaultParamIssue)
+                .Select(p => new Issue($"<color=#0766af>({p.ParameterType.Name} {p.Name} = {p.RawDefaultValue})</color>",
+                    $"Default parameters referencing UnityEngine.CoreModule may cause build errors.",
+                    parentIssue));
+            return issues;
+        }
+
+        private static bool HasDefaultParamIssue(ParameterInfo param)
+        {
+            if (!param.HasDefaultValue)
+                return false;
+
+            if (param.DefaultValue == null)
+                return false;
+
+            return param.DefaultValue.GetType().Assembly.FullName.Contains("UnityEngine.CoreModule");
         }
 
         private static List<Assembly> GetAssemblies()
@@ -145,90 +202,45 @@ namespace Liminal.SDK.Build
 
             return assemblies;
         }
-
-        private static AssemblyIssue AnalyseAssembly(Assembly assembly)
-        {
-            var types = assembly.GetTypes();
-            var assemblyIssue = new AssemblyIssue(assembly);
-            foreach (var type in types)
-            {
-                var typeIssue = AnalyseType(type);
-                if (typeIssue != null)
-                    assemblyIssue.TypeIssues.Add(typeIssue);
-            }
-            if (assemblyIssue.TypeIssues.Any())
-                return assemblyIssue;
-            return null;
-        }
-
-        private static TypeIssue AnalyseType(Type type)
-        {
-            var methods = type.GetMethods(_flags);
-            var typeIssue = new TypeIssue(type);
-
-            foreach (var method in methods)
-            {
-                var methodIssue = AnalyseMethod(method);
-                if (methodIssue != null)
-                    typeIssue.MethodIssues.Add(methodIssue);
-            }
-            if (typeIssue.MethodIssues.Any())
-                return typeIssue;
-            return null;
-        }
-
-        private static MethodIssue AnalyseMethod(MethodInfo method)
-        {
-            var methodIssue = new MethodIssue(method)
-            {
-                ParameterIssues = method.GetParameters().Where(
-                    param =>
-                    {
-                        if (!param.HasDefaultValue)
-                            return false;
-
-                        if (param.DefaultValue == null)
-                            return false;
-
-                        return param.DefaultValue.GetType().Assembly.FullName.Contains("UnityEngine.CoreModule");
-                    }).ToList()
-            };
-            if (methodIssue.ParameterIssues.Any())
-                return methodIssue;
-            return null;
-        }
     }
 }
 
-public class AssemblyIssue
+public class Issue
 {
-    public AssemblyIssue(Assembly assembly)
+    public Issue(string message, Issue parent)
     {
-        Assembly = assembly;
+        Message = message;
+        Parent = parent;
     }
 
-    public Assembly Assembly;
-    public List<TypeIssue> TypeIssues = new List<TypeIssue>();
-}
-
-public class TypeIssue
-{
-    public TypeIssue(Type type)
+    public Issue(string message, string detail, Issue parent)
     {
-        Type = type;
+        Message = message;
+        Details = detail;
+        Parent = parent;
     }
 
-    public Type Type;
-    public List<MethodIssue> MethodIssues = new List<MethodIssue>();
-}
-
-public class MethodIssue
-{
-    public MethodIssue(MethodInfo methodInfo)
+    public Issue(string message)
     {
-        MethodInfo = methodInfo;
+        Message = message;
+        Parent = null;
     }
 
-    public MethodInfo MethodInfo;
-    public List<ParameterInfo> ParameterIssues = new List<ParameterInfo>();
+    public Issue Parent;
+    public List<Issue> SubIssues = new List<Issue>();
+    public string Message;
+    public string Details;
+    public bool IsValid => SubIssues.Any();
+
+    public int GetParentCount()
+    {
+        var count = 0;
+        Issue parent = Parent;
+        while (parent != null)
+        {
+            count++;
+            parent = parent.Parent;
+        }
+        return count;
+    }
 }

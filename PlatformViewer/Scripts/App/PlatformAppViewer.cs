@@ -6,6 +6,7 @@ using Liminal.Platform.Experimental.VR;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Liminal.Platform.Experimental.App
 {
@@ -14,9 +15,15 @@ namespace Liminal.Platform.Experimental.App
         public VRAvatar Avatar;
         public ExperienceAppPlayer ExperienceAppPlayer;
         public AppPreviewConfig PreviewConfig;
+        public BaseLoadingBar LoadingBar;
 
         private VRDeviceLoader _deviceLoader;
         private byte[] _limappData;
+
+        private void OnValidate()
+        {
+            Assert.IsNotNull(LoadingBar, "LoadingBar must have a value or else the progress towards loading an experience will not be displayed.");
+        }
 
         private void Awake()
         {
@@ -57,6 +64,7 @@ namespace Liminal.Platform.Experimental.App
             };
 
             var loadOp = ExperienceAppPlayer.Load(experience);
+            LoadingBar.Load(loadOp);
             yield return loadOp.LoadScene();
             ExperienceAppPlayer.Begin();
         }

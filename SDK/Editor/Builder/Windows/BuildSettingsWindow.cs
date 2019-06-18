@@ -64,7 +64,7 @@ namespace Liminal.SDK.Build
             var activeWindow = BuildSettingLookup[_selectedMenu];
             activeWindow.Draw(_windowConfig);
 
-            var configJson = JsonUtility.ToJson(_windowConfig);
+            var configJson = JsonUtility.ToJson(_windowConfig, true);
             File.WriteAllText(BuildWindowConsts.BuildWindowConfigPath, configJson);
         }
 

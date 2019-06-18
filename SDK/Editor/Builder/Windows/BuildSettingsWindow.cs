@@ -42,6 +42,11 @@ namespace Liminal.SDK.Build
 
         private void OnEnable()
         {
+            if (!Directory.Exists(BuildWindowConsts.BuildPath + "/Config"))
+            {
+                Directory.CreateDirectory(BuildWindowConsts.BuildPath + "/Config");
+            }
+
             var fileExists = File.Exists(BuildWindowConsts.BuildWindowConfigPath);
             if (fileExists)
             {

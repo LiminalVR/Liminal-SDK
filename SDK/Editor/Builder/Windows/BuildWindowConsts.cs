@@ -30,5 +30,5 @@
     /// <summary>
     /// Path to Build Window Configuration
     /// </summary>
-    public const string BuildWindowConfigPath = BuildPath + "/BuildWindowConfig.json";
+    public const string BuildWindowConfigPath = BuildPath + "/Config/BuildWindowConfig.json";
 }

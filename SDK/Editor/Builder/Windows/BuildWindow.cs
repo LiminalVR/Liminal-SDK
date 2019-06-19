@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Liminal.SDK.Editor.Build;
+﻿using Liminal.SDK.Editor.Build;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -17,9 +16,10 @@ namespace Liminal.SDK.Build
             {
                 EditorGUIHelper.DrawTitle("Build Limapp");
                 EditorGUILayout.LabelField("This process will build a .limapp file that will run on the Liminal Platform");
-
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
-                DrawSceneSelection(ref _scenePath, "Target Scene", config);
+
+                DrawSceneSelector(ref _scenePath, "Target Scene", config);
+
                 config.TargetScene = _scenePath;
                 EditorGUILayout.Space();
 
@@ -55,25 +55,29 @@ namespace Liminal.SDK.Build
             }
         }
 
-        public void DrawSceneSelection(ref string scenePath, string name, BuildWindowConfig config)
+        public void DrawSceneSelector(ref string scenePath, string name, BuildWindowConfig config)
         {
             EditorGUILayout.BeginHorizontal();
             {
                 GUILayout.Label(name, GUILayout.Width(Screen.width * 0.2F));
 
-                scenePath = File.Exists(scenePath) ? scenePath : config.TargetScene;
-                scenePath = GUILayout.TextField(scenePath, GUILayout.Width(Screen.width * 0.7F));
-
-                if (GUILayout.Button("...", GUILayout.Width(Screen.width * 0.05F)))
+                if (AssetDatabase.LoadAssetAtPath(config.TargetScene, typeof(SceneAsset)) != null)
                 {
-                    scenePath = EditorUtility.OpenFilePanelWithFilters("Scene Finder", scenePath, new string[] { "FileType", "unity" });
-                    scenePath = DirectoryUtils.ReplaceBackWithForwardSlashes(scenePath);
+                    _targetScene = (SceneAsset) AssetDatabase.LoadAssetAtPath(config.TargetScene, typeof(SceneAsset));
+                }
+
+                _targetScene = (SceneAsset)EditorGUILayout.ObjectField(_targetScene, typeof(SceneAsset), true, GUILayout.Width(Screen.width * 0.75F));
+
+                if (_targetScene != null)
+                {
+                    scenePath = AssetDatabase.GetAssetPath(_targetScene);
                 }
             }
             EditorGUILayout.EndHorizontal();
         }
 
         private BuildPlatform _selectedPlatform;
+        private SceneAsset _targetScene;
         private string _scenePath = string.Empty;
     }
 

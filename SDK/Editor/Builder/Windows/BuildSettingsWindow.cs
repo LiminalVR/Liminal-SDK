@@ -42,12 +42,8 @@ namespace Liminal.SDK.Build
 
         private void OnEnable()
         {
-            if (!Directory.Exists(BuildWindowConsts.BuildPath + "/Config"))
-            {
-                Directory.CreateDirectory(BuildWindowConsts.BuildPath + "/Config");
-            }
+            var fileExists = Directory.Exists(BuildWindowConsts.ConfigFolderPath) || File.Exists(BuildWindowConsts.BuildWindowConfigPath);
 
-            var fileExists = File.Exists(BuildWindowConsts.BuildWindowConfigPath);
             if (fileExists)
             {
                 var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
@@ -69,6 +65,12 @@ namespace Liminal.SDK.Build
             var activeWindow = BuildSettingLookup[_selectedMenu];
             activeWindow.Draw(_windowConfig);
 
+            if (!Directory.Exists(BuildWindowConsts.ConfigFolderPath))
+            {
+                Directory.CreateDirectory(BuildWindowConsts.ConfigFolderPath);
+            }
+
+            // boolean true is used to format the resulting string for maximum readability. False would format it for minimum size.
             var configJson = JsonUtility.ToJson(_windowConfig, true);
             File.WriteAllText(BuildWindowConsts.BuildWindowConfigPath, configJson);
         }

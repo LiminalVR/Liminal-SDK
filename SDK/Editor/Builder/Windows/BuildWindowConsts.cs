@@ -28,7 +28,12 @@
     public const string BuildPath = "Assets/_Builds";
 
     /// <summary>
+    /// Path to config folder
+    /// </summary>
+    public const string ConfigFolderPath = BuildPath + "/Config";
+
+    /// <summary>
     /// Path to Build Window Configuration
     /// </summary>
-    public const string BuildWindowConfigPath = BuildPath + "/Config/BuildWindowConfig.json";
+    public const string BuildWindowConfigPath = ConfigFolderPath + "/BuildWindowConfig.json";
 }

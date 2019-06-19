@@ -19,7 +19,8 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.LabelField("This process will build a .limapp file that will run on the Liminal Platform");
 
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
-                DrawSceneSelection(ref _scenePath, "Target Scene");
+                DrawSceneSelection(ref _scenePath, "Target Scene", config);
+                config.TargetScene = _scenePath;
                 EditorGUILayout.Space();
 
                 _selectedPlatform = config.SelectedPlatform;
@@ -54,13 +55,13 @@ namespace Liminal.SDK.Build
             }
         }
 
-        public void DrawSceneSelection(ref string scenePath, string name)
+        public void DrawSceneSelection(ref string scenePath, string name, BuildWindowConfig config)
         {
             EditorGUILayout.BeginHorizontal();
             {
                 GUILayout.Label(name, GUILayout.Width(Screen.width * 0.2F));
 
-                scenePath = File.Exists(scenePath) ? scenePath : string.Empty;
+                scenePath = File.Exists(scenePath) ? scenePath : config.TargetScene;
                 scenePath = GUILayout.TextField(scenePath, GUILayout.Width(Screen.width * 0.7F));
 
                 if (GUILayout.Button("...", GUILayout.Width(Screen.width * 0.05F)))

@@ -95,10 +95,10 @@ namespace Liminal.SDK.Editor.Build
             if (buildInfo == null)
                 throw new ArgumentNullException("buildInfo");
 
-            // boolean true forces the asset bundles to be deleted even if they're in use.
             var assetBundles = AssetDatabase.GetAllAssetBundleNames();
             foreach (var bundle in assetBundles)
             {
+                // boolean true forces the asset bundles to be deleted even if they're in use.
                 AssetDatabase.RemoveAssetBundleName(bundle, true);
             }
 

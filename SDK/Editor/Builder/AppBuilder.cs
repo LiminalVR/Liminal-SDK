@@ -95,6 +95,15 @@ namespace Liminal.SDK.Editor.Build
             if (buildInfo == null)
                 throw new ArgumentNullException("buildInfo");
 
+            var assetBundles = AssetDatabase.GetAllAssetBundleNames();
+            foreach (var bundle in assetBundles)
+            {
+                // boolean true forces the asset bundles to be deleted even if they're in use.
+                AssetDatabase.RemoveAssetBundleName(bundle, true);
+            }
+
+            AssetImporter.GetAtPath(buildInfo.Scene.path).SetAssetBundleNameAndVariant("appscene", "");
+
             // Get and verify the target platform is supported
             var appPlatform = MapAppTargetPlatform(buildInfo.BuildTarget);
             if (appPlatform == AppPackPlatform.Unknown)

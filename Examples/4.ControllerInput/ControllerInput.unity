@@ -329,7 +329,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 531037337}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: -1823838173, guid: 57eb71b760c0c7646989af0b58403dff, type: 3}
+  m_Script: {fileID: 11500000, guid: 8066ed3b2e9e4c64f9c11142d910e9c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_EmulatorDevice: 1
@@ -841,6 +841,11 @@ PrefabInstance:
     - target: {fileID: 1260162969423114810, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1260162970045296578, guid: 22276a8657744e04cba8ad0a2caf4195,
+        type: 3}
+      propertyPath: m_ActivationPolicy
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

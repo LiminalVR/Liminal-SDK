@@ -278,11 +278,12 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             Debug.Log("[GearVR] UpdateHandedness()");
 
+            // GetActiveController seems to always return Touch and not TouchL or TouchR will be a problem when we support 2 hands.
             mCachedActiveController = OVRInput.GetActiveController();
 
-            // GearVR only supports a single controller, so the tracker for the currently active
-            // controller is always assigned to the avatar's primary hand - the secondary hand is not tracked
-            // and is always deactivated
+            // GearVR only supports a single controller, so the tracker for the currently active.
+            // controller is always assigned to the avatar's primary hand - the secondary hand is not tracked.
+            // and is always deactivated.
             bool isHandController = ((mCachedActiveController & GearVRController.AllHandControllersMask) != 0);
             mAvatar.PrimaryHand.TrackedObject = isHandController ? mControllerTracker : null;
 

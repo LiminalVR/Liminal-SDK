@@ -55,7 +55,7 @@ public class OVRControllerHelper : MonoBehaviour
 	/// <summary>
 	/// The controller that determines whether or not to enable rendering of the controller model.
 	/// </summary>
-	public OVRInput.Controller m_controller = OVRInput.Controller.RTrackedRemote;
+	public OVRInput.Controller m_controller;
 
 	private enum ControllerType
 	{
@@ -146,8 +146,6 @@ public class OVRControllerHelper : MonoBehaviour
 				m_modelOculusGoController.SetActive(false);
 				m_modelGearVrController.SetActive(false);
 
-                Debug.Log("Controller Type: " + activeControllerType + " " + m_controller);
-
                 m_modelOculusTouchQuestAndRiftSLeftController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.LTouch));
 				m_modelOculusTouchQuestAndRiftSRightController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.RTouch));
 				m_modelOculusTouchRiftLeftController.SetActive(false);
@@ -166,8 +164,6 @@ public class OVRControllerHelper : MonoBehaviour
 			m_prevControllerConnected = controllerConnected;
 			m_prevControllerConnectedCached = true;
 		}
-
-        m_modelOculusTouchQuestAndRiftSRightController.SetActive(true);
 
         if (!controllerConnected)
 		{

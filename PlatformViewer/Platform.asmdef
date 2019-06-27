@@ -1,7 +1,8 @@
 {
     "name": "Platform",
     "references": [
-        "External"
+        "External",
+        "LiminalSdk"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

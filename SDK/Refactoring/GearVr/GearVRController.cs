@@ -27,8 +27,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         private static readonly Dictionary<string, OVRInput.Button> vrButtonToOVRButton = new Dictionary<string, OVRInput.Button>()
         {
-            { VRButton.One, OVRInput.Button.PrimaryIndexTrigger },
-            { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger },
+            { VRButton.One, OVRInput.Button.PrimaryIndexTrigger | OVRInput.Button.SecondaryIndexTrigger},
+            { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger | OVRInput.Button.SecondaryIndexTrigger},
             { VRButton.Two, OVRInput.Button.PrimaryTouchpad },
             { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
             { VRButton.Back, OVRInput.Button.Back }
@@ -68,32 +68,30 @@ namespace Liminal.SDK.VR.Devices.GearVR
                     }                    
 
                 case VRAxis.One:
-                    return OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad, base.ControllerMask);
+                    return OVRInput.Get(OVRInput.Axis2D.PrimaryTouchpad);
                     
                 default:
                     return Vector2.zero;
             }
         }
 
+        // TODO: Add Controller masks to detect between left or right hand
         public override bool GetButton(string button)
         {
-            OVRInput.Button ovrButton = OVRInput.Button.None;
-            vrButtonToOVRButton.TryGetValue(button, out ovrButton);
-            return (ovrButton != OVRInput.Button.None) && OVRInput.Get(ovrButton, base.ControllerMask);
+            vrButtonToOVRButton.TryGetValue(button, out var ovrButton);
+            return (ovrButton != OVRInput.Button.None) && OVRInput.Get(ovrButton);
         }
 
         public override bool GetButtonDown(string button)
         {
-            OVRInput.Button ovrButton = OVRInput.Button.None;
-            vrButtonToOVRButton.TryGetValue(button, out ovrButton);
-            return (ovrButton != OVRInput.Button.None) && OVRInput.GetDown(ovrButton, base.ControllerMask);
+            vrButtonToOVRButton.TryGetValue(button, out var ovrButton);
+            return (ovrButton != OVRInput.Button.None) && OVRInput.GetDown(ovrButton);
         }
 
         public override bool GetButtonUp(string button)
         {
-            OVRInput.Button ovrButton = OVRInput.Button.None;
-            vrButtonToOVRButton.TryGetValue(button, out ovrButton);
-            return (ovrButton != OVRInput.Button.None) && OVRInput.GetUp(ovrButton, base.ControllerMask);            
+            vrButtonToOVRButton.TryGetValue(button, out var ovrButton);
+            return (ovrButton != OVRInput.Button.None) && OVRInput.GetUp(ovrButton);            
         }
 
         public override bool HasAxis1D(string axis)

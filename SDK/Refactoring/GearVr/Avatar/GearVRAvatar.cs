@@ -278,6 +278,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             Debug.Log("[GearVR] UpdateHandedness()");
 
+            // GetActiveController seems to always return Touch and not TouchL or TouchR which is a problem
             mCachedActiveController = OVRInput.GetActiveController();
 
             // GearVR only supports a single controller, so the tracker for the currently active

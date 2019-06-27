@@ -6,7 +6,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
 {
     public class GearVRControllerVisual : VRControllerVisual
     {
-        [SerializeField] private OVRTrackedRemote trackedRemote = null;
+        [SerializeField] private OVRControllerHelper trackedRemote = null;
         private bool isOculusGo;
 
         protected override void Awake()

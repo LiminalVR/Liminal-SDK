@@ -21,7 +21,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private const string ControllerVisualPrefabName = "GearVRController";
         private const int TargetFramerate = 72;
-        private readonly List<OVRTrackedRemote> mRemotes = new List<OVRTrackedRemote>();
+        private readonly List<OVRControllerHelper> mRemotes = new List<OVRControllerHelper>();
 
         private IVRAvatar mAvatar;
         private IVRDevice mDevice;
@@ -193,10 +193,10 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             instance.transform.SetParentAndIdentity(avatarController.transform);
 
             // Make sure the OVRGearVrController component exists...
-            var trackedRemote = instance.gameObject.GetComponent<OVRTrackedRemote>();
+            var trackedRemote = instance.gameObject.GetComponent<OVRControllerHelper>();
 
             if (trackedRemote == null)
-                trackedRemote = instance.gameObject.AddComponent<OVRTrackedRemote>();
+                trackedRemote = instance.gameObject.AddComponent<OVRControllerHelper>();
 
             avatarController.ControllerVisual = instance;
             mRemotes.Add(trackedRemote);
@@ -244,7 +244,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
             var instance = Instantiate(prefab);
 
-            var ovrController = instance.GetComponent<OVRTrackedRemote>();
+            var ovrController = instance.GetComponent<OVRControllerHelper>();
             ovrController.m_controller = GetControllerTypeForLimb(limb);
             ovrController.m_modelGearVrController.SetActive(true);
             ovrController.enabled = false;

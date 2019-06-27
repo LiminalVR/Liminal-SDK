@@ -18,6 +18,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
         //#TODO set up proper listener
         void Update()
         {
+            return;
             var model = isOculusGo ? trackedRemote.m_modelOculusGoController : trackedRemote.m_modelGearVrController;
             Assert.IsNotNull(model, "GearVRControllerVisual model is null");
             Assert.IsNotNull(PointerVisual, "GearVRControllerVisual PointerVisual is null");

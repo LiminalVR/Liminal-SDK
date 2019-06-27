@@ -89,15 +89,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             UpdateHandedness();
         }
 
-        private void Start()
-        {
-            if (OVRManager.display.displayFrequenciesAvailable.Contains(TargetFramerate))
-            {
-                OVRManager.display.displayFrequency = TargetFramerate;
-                Debug.LogFormat(this, "[GearVR] Display frequency is {0}Hz", OVRManager.display.displayFrequency);
-            }
-        }
-
         private void OnEnable()
         {
             DetectAndUpdateControllerStates();
@@ -300,7 +291,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 mAvatar.PrimaryHand.TrackedObject = mControllerTracker;
                 foreach (var remote in mRemotes)
                 {
-                    remote.m_controller = mCachedActiveController;
+                    remote.m_controller = GetControllerTypeForLimb(mAvatar.PrimaryHand);
                 }
             }
 
@@ -372,6 +363,18 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private OVRInput.Controller GetControllerTypeForLimb(IVRAvatarLimb limb)
         {
+            if (limb.LimbType == VRAvatarLimbType.LeftHand)
+            {
+                // if you're on the quest return Touch
+                return OVRInput.Controller.LTouch;
+            }
+            if (limb.LimbType == VRAvatarLimbType.RightHand)
+            {
+                return OVRInput.Controller.RTouch;
+            }
+
+            return OVRInput.Controller.None;
+
             //TODO: Should be primary, rather than right hand.
             if ((limb != null) && (limb.LimbType == VRAvatarLimbType.RightHand))
             {
@@ -388,7 +391,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             }
             else
             {
-                return OVRInput.Controller.None;
             }
         }
 

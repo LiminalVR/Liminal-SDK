@@ -1,7 +1,8 @@
 {
     "name": "Editor",
     "references": [
-        "Platform"
+        "Platform",
+        "LiminalSdk"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

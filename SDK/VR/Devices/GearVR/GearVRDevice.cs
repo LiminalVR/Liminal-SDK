@@ -51,19 +51,36 @@ namespace Liminal.SDK.VR.Devices.GearVR
         public event VRDeviceEventHandler PrimaryInputDeviceChanged;
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
+        public bool IsGearVRHeadset()
+        {
+		    OVRPlugin.SystemHeadset headsetType = OVRPlugin.GetSystemHeadsetType();
+            switch (headsetType)
+            {
+                case OVRPlugin.SystemHeadset.GearVR_R320:
+                case OVRPlugin.SystemHeadset.GearVR_R321:
+                case OVRPlugin.SystemHeadset.GearVR_R322:
+                case OVRPlugin.SystemHeadset.GearVR_R323:
+                case OVRPlugin.SystemHeadset.GearVR_R324:
+                case OVRPlugin.SystemHeadset.GearVR_R325:
+                    return false;
+                default:
+                    return true;
+            }
+        }
+
         /// <summary>
         /// Create a GearVR device
         /// </summary>
         public GearVRDevice()
         {
-            Headset = IsOculusGo ? MakeOculusGoHeadset() : new GearVRHeadset();
+            Headset = IsGearVRHeadset() ? GenericHeadset() : new GearVRHeadset();
             OVRInput.Update();
             UpdateConnectedControllers();
         }
 
-        private static IVRHeadset MakeOculusGoHeadset()
+        private static IVRHeadset GenericHeadset()
         {
-            return new SimpleHeadset("OculusGoHeadset", VRHeadsetCapability.None);
+            return new SimpleHeadset("GenericHeadset", VRHeadsetCapability.None);
         }
 
         //Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)

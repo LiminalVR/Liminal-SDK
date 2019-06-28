@@ -167,6 +167,11 @@ namespace Liminal.SDK.VR.Avatars.Extensions
 
         private void DetectAndUpdateActiveState()
         {
+            // TODO: Find out why DetectAndUpdateActiveState is called when we build the application.
+            // Prevents build errors from assembly definition not being usable yet.
+            if (!Application.isPlaying)
+                return;
+
             if (!enabled || !gameObject.activeInHierarchy)
                 return;
 
@@ -181,9 +186,8 @@ namespace Liminal.SDK.VR.Avatars.Extensions
                 case GazeInputActivationPolicy.NoControllers:
                     if (!mExternalActivated)
                     {
-                        var hasController = IsNonHeadsetControllerConnected();
-                        Debug.Log("Has Controller: " + hasController);
-                        InternalSetActive(!hasController);
+                        var hand = VRAvatar.Active.PrimaryHand;
+                        InternalSetActive(!hand.IsActive);
                     }
                     break;
             

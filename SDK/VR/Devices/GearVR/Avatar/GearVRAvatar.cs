@@ -91,7 +91,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void OnEnable()
         {
-            DetectAndUpdateControllerStates();
+            TrySetHandsActive(IsHandControllerActive);
         }
 
         private void OnDestroy()
@@ -122,7 +122,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 UpdateHandedness();
             }
 
-            DetectAndUpdateControllerStates();
+            TrySetHandsActive(IsHandControllerActive);
             RecenterHmdIfRequired();
         }
 
@@ -301,23 +301,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             secondary.SetActive(false);
         }
 
-        /// <summary>
-        /// Detects and Updates the state of the controllers including the TouchPad on the GearVR headset
-        /// </summary>
-        public void DetectAndUpdateControllerStates()
-        {
-            if (IsHandControllerActive)
-            {
-                TrySetHandsActive(true);
-                TrySetGazeInputActive(false);
-            }
-            else
-            {
-                TrySetHandsActive(false);
-                TrySetGazeInputActive(true);
-            }
-        }
-
         private bool IsHandControllerActive
         {
             get
@@ -331,22 +314,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             if (mAvatar != null)
             {
                 mAvatar.SetHandsActive(active);
-            }
-        }
-
-        private void TrySetGazeInputActive(bool active)
-        {
-            //Ignore Always & Never Policy
-            if ((mGazeInput != null) && (mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers))
-            {
-                if (active)
-                {
-                    mGazeInput.Activate();
-                }
-                else
-                {
-                    mGazeInput.Deactivate();
-                }
             }
         }
 
@@ -375,24 +342,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             }
 
             return OVRInput.Controller.None;
-
-            //TODO: Should be primary, rather than right hand.
-            if ((limb != null) && (limb.LimbType == VRAvatarLimbType.RightHand))
-            {
-                // TODO: What happens if no controller is connected during startup? If the Left Hand controller
-                // connects, will this get sorted out?
-                if ((OVRInput.GetConnectedControllers() & GearVRController.LeftHandControllerMask) != 0)
-                {
-                    return Application.isEditor ? OVRInput.Controller.LTouch : OVRInput.Controller.LTrackedRemote;
-                }
-                else
-                {
-                    return Application.isEditor ? OVRInput.Controller.RTouch : OVRInput.Controller.RTrackedRemote;
-                }                
-            }
-            else
-            {
-            }
         }
 
         #region Event Handlers

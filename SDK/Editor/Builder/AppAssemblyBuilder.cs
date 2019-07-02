@@ -52,7 +52,7 @@ namespace Liminal.SDK.Editor.Build
                 // Returning false here indicates that no assembly is required
                 return false;
             }
-            
+
             // Setup the builder
             var buildSuccess = false;
             var builder = new AssemblyBuilder(outputPath, scripts)
@@ -287,6 +287,12 @@ namespace Liminal.SDK.Editor.Build
                     continue;
 
                 if (relativePath.IndexOf($"/{BuildWindowConsts.PlatformViewerFolderName}/", StringComparison.OrdinalIgnoreCase) > -1)
+                    continue;
+
+                if (relativePath.IndexOf("/Oculus/VR/Scripts", StringComparison.OrdinalIgnoreCase) > -1)
+                    continue;
+
+                if (relativePath.IndexOf("/VR/Devices", StringComparison.OrdinalIgnoreCase) > -1)
                     continue;
 
                 var path = "Assets" + relativePath;

@@ -3,6 +3,7 @@ using System.IO;
 using Liminal.Platform.Experimental.App.Experiences;
 using Liminal.Platform.Experimental.Utils;
 using Liminal.Platform.Experimental.VR;
+using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using UnityEngine;
@@ -67,6 +68,13 @@ namespace Liminal.Platform.Experimental.App
             LoadingBar.Load(loadOp);
             yield return loadOp.LoadScene();
             ExperienceAppPlayer.Begin();
+
+            ExperienceApp.OnComplete += OnExperienceComplete;
+        }
+
+        private void OnExperienceComplete(bool completed)
+        {
+            Stop();   
         }
 
         private IEnumerator StopRoutine()

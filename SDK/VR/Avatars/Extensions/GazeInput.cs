@@ -186,8 +186,8 @@ namespace Liminal.SDK.VR.Avatars.Extensions
                 case GazeInputActivationPolicy.NoControllers:
                     if (!mExternalActivated)
                     {
-                        var hand = VRAvatar.Active.PrimaryHand;
-                        InternalSetActive(!hand.IsActive);
+                        var hasController = VRAvatar.Active != null && VRAvatar.Active.PrimaryHand.IsActive;
+                        InternalSetActive(!hasController);
                     }
                     break;
             
@@ -241,7 +241,6 @@ namespace Liminal.SDK.VR.Avatars.Extensions
 
             if (active)
             {
-                Debug.Log("Activates");
                 mPointer.Activate();
 
                 if (mPointerVisual != null)
@@ -251,7 +250,6 @@ namespace Liminal.SDK.VR.Avatars.Extensions
             }
             else
             {
-                Debug.Log("Deactivates");
                 mPointer.Deactivate();
                 mPointer.Transform = null;
             }

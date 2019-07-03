@@ -17,6 +17,7 @@ namespace Liminal.Platform.Experimental.App
         public ExperienceAppPlayer ExperienceAppPlayer;
         public AppPreviewConfig PreviewConfig;
         public BaseLoadingBar LoadingBar;
+        public GameObject SceneContainer;
 
         private VRDeviceLoader _deviceLoader;
         private byte[] _limappData;
@@ -30,11 +31,6 @@ namespace Liminal.Platform.Experimental.App
         {
             SetupVRDevice();
             BetterStreamingAssets.Initialize();
-        }
-
-        private void Start()
-        {
-            Play();
         }
 
         private void SetupVRDevice()
@@ -56,6 +52,8 @@ namespace Liminal.Platform.Experimental.App
 
         private IEnumerator PlayRoutine()
         {
+            SceneContainer.SetActive(false);
+
             ResolvePlatformLimapp(out _limappData, out string fileName);
 
             var experience = new Experience
@@ -81,6 +79,7 @@ namespace Liminal.Platform.Experimental.App
         {
             yield return ExperienceAppPlayer.Unload();
             Avatar.SetActive(true);
+            SceneContainer.SetActive(true);
         }
 
         private void ResolvePlatformLimapp(out byte[] data, out string fileName)

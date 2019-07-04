@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace Liminal.SDK.VR.Devices.GearVR
 {
@@ -52,29 +51,12 @@ namespace Liminal.SDK.VR.Devices.GearVR
         public event VRDeviceEventHandler PrimaryInputDeviceChanged;
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
 
-        public bool IsGearVRHeadset()
-        {
-		    OVRPlugin.SystemHeadset headsetType = OVRPlugin.GetSystemHeadsetType();
-            switch (headsetType)
-            {
-                case OVRPlugin.SystemHeadset.GearVR_R320:
-                case OVRPlugin.SystemHeadset.GearVR_R321:
-                case OVRPlugin.SystemHeadset.GearVR_R322:
-                case OVRPlugin.SystemHeadset.GearVR_R323:
-                case OVRPlugin.SystemHeadset.GearVR_R324:
-                case OVRPlugin.SystemHeadset.GearVR_R325:
-                    return false;
-                default:
-                    return true;
-            }
-        }
-
         /// <summary>
         /// Create a GearVR device
         /// </summary>
         public GearVRDevice()
         {
-            Headset = IsGearVRHeadset() ? GenericHeadset() : new GearVRHeadset();
+            Headset = OVRUtils.IsGearVRHeadset() ? GenericHeadset() : new GearVRHeadset();
             OVRInput.Update();
             UpdateConnectedControllers();
         }
@@ -222,6 +204,29 @@ namespace Liminal.SDK.VR.Devices.GearVR
             // Raise change event
             if (PrimaryInputDeviceChanged != null)
                 PrimaryInputDeviceChanged(this);
+        }
+    }
+}
+
+public static class OVRUtils
+{
+    public static bool IsOculusQuest => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest;
+    public static bool IsOculusGo => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go;
+
+    public static bool IsGearVRHeadset()
+    {
+        OVRPlugin.SystemHeadset headsetType = OVRPlugin.GetSystemHeadsetType();
+        switch (headsetType)
+        {
+            case OVRPlugin.SystemHeadset.GearVR_R320:
+            case OVRPlugin.SystemHeadset.GearVR_R321:
+            case OVRPlugin.SystemHeadset.GearVR_R322:
+            case OVRPlugin.SystemHeadset.GearVR_R323:
+            case OVRPlugin.SystemHeadset.GearVR_R324:
+            case OVRPlugin.SystemHeadset.GearVR_R325:
+                return false;
+            default:
+                return true;
         }
     }
 }

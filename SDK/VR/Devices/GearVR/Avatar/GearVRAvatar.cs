@@ -36,7 +36,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         private OVRInput.Controller mCachedActiveController;
 
         #region Properties
-
         /// <summary>
         /// Gets the <see cref="IVRAvatar"/> for this device avatar.
         /// </summary>
@@ -50,9 +49,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 return mAvatar;
             }
         }
-
-        public bool IsOculusQuest => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest;
-
         #endregion
 
         #region MonoBehaviour
@@ -179,7 +175,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
             // TODO Support Left Hand on the Oculus Quest.
             // Presently we have decided to not support the left hand on the Oculus Quest, including it will mess up the pointers.
-            if (IsOculusQuest && limb.LimbType == VRAvatarLimbType.LeftHand)
+            if (OVRUtils.IsOculusQuest && limb.LimbType == VRAvatarLimbType.LeftHand)
                 return;
 
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);

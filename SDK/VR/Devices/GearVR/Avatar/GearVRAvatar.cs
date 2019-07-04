@@ -86,12 +86,13 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             mDevice.InputDeviceDisconnected += OnInputDeviceDisconnected;
             mAvatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
             SetupInitialControllerState();
+
             UpdateHandedness();
         }
 
         private void OnEnable()
         {
-            TrySetHandsActive(IsHandControllerActive);
+            // TrySetHandsActive(IsHandControllerActive);
         }
 
         private void OnDestroy()
@@ -122,8 +123,10 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 UpdateHandedness();
             }
 
-            TrySetHandsActive(IsHandControllerActive);
+            TrySetHandsActive(true);
             RecenterHmdIfRequired();
+
+            VRAvatar.Active.SetHandsActive(true);
         }
 
         #endregion
@@ -276,15 +279,26 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void UpdateHandedness()
         {
-            Debug.Log("[GearVR] UpdateHandedness()");
+            var primary = mAvatar.PrimaryHand;
+            primary.TrackedObject = mControllerTracker;
+            primary.SetActive(true);
 
-            // GetActiveController seems to always return Touch and not TouchL or TouchR will be a problem when we support 2 hands.
+            var secondary = mAvatar.SecondaryHand;
+            secondary.TrackedObject = null;
+            secondary.SetActive(false);
+
+            Debug.Log("[GearVR] UpdateHandedness for " + OVRInput.GetActiveController());
+            Debug.Log("R Touch Controller: " + OVRInput.IsControllerConnected(OVRInput.Controller.RTouch));
+            Debug.Log("R Tracked Controller: " + OVRInput.IsControllerConnected(OVRInput.Controller.RTrackedRemote));
+            Debug.Log("Touch Controller: " + OVRInput.IsControllerConnected(OVRInput.Controller.Touch));
+
+            /*
             mCachedActiveController = OVRInput.GetActiveController();
 
             // GearVR only supports a single controller, so the tracker for the currently active.
             // controller is always assigned to the avatar's primary hand - the secondary hand is not tracked.
             // and is always deactivated.
-            bool isHandController = ((mCachedActiveController & GearVRController.AllHandControllersMask) != 0);
+            bool isHandController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
             mAvatar.PrimaryHand.TrackedObject = isHandController ? mControllerTracker : null;
 
             if (isHandController)
@@ -294,11 +308,21 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 {
                     remote.m_controller = GetControllerTypeForLimb(mAvatar.PrimaryHand);
                 }
+
+                if (mControllerTracker == null)
+                {  
+                    Debug.Log("Controller Tracker is null");
+                }
+
+                Debug.Log("Setting primary active");
+                TrySetHandsActive(true);
+                VRDevice.Device.SetPrimaryPointerActive(true);
             }
 
             var secondary = mAvatar.SecondaryHand;
             secondary.TrackedObject = null;
             secondary.SetActive(false);
+            */
         }
 
         private bool IsHandControllerActive

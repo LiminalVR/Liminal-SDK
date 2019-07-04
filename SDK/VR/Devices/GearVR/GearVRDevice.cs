@@ -86,6 +86,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
         //Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
         void IVRDevice.Update()
         {
+            var hasController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
+            //has controller is true
             if (mConnectedControllerMask != OVRInput.GetConnectedControllers())
             {
                 // Connected controller mask has changed
@@ -131,8 +133,11 @@ namespace Liminal.SDK.VR.Devices.GearVR
             #region Controller
 
             // GearVR/Touch controller
-            if ((ctrlMask & GearVRController.AllHandControllersMask) != 0)
+            var hasController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
+
+            if (hasController)
             {
+                Debug.Log("UpdateConnectedControllers: added controller to connected list");
                 mController = mController ?? new GearVRController();
 
                 // Add to the connected list if the device isn't already in the device list
@@ -198,10 +203,14 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         private void UpdateInputDevices()
         {
+            Debug.Log("Try updating input device");
             mCachedActiveController = OVRInput.GetActiveController();
 
-            if ((mCachedActiveController & GearVRController.AllHandControllersMask) != 0)
+            var hasController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
+
+            if (hasController)
             {
+                Debug.Log("UpdateInputDevices: Set Controller as Primary Input");
                 PrimaryInputDevice = mController;
                 SecondaryInputDevice = Headset as GearVRInputDevice;
             }

@@ -115,6 +115,7 @@ namespace Liminal.SDK.VR.Avatars.Extensions
 
         private void Update()
         {
+            m_ActivationPolicy = GazeInputActivationPolicy.Never;
             DetectAndUpdateActiveState();
         }
 

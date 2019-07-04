@@ -34,9 +34,13 @@ namespace Liminal.SDK.VR.Devices.GearVR
         {
             ControllerMask = controllerMask;
             Pointer = CreatePointer();
+
+            Debug.Log("Pointer created for " + Hand);
+
             if (Pointer != null)
             {
                 Pointer.Activate();
+                Debug.Log("Pointer activated " + controllerMask);
             }
         }
 

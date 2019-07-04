@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Liminal.SDK.VR.Devices.GearVR
 {
@@ -86,8 +87,6 @@ namespace Liminal.SDK.VR.Devices.GearVR
         //Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
         void IVRDevice.Update()
         {
-            var hasController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
-            //has controller is true
             if (mConnectedControllerMask != OVRInput.GetConnectedControllers())
             {
                 // Connected controller mask has changed

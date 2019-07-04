@@ -58,7 +58,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
             }
             catch(Exception e)
             {
-                Debug.LogError(e);
+                // Ignored
             }
 
             return null;

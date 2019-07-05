@@ -166,7 +166,7 @@ MonoBehaviour:
   m_DefaultReticleDistance: 20
   m_MaxBeamDistance: 0.75
   m_GrowTime: 0.1
-  m_HideReticleWhenInvalid: 0
+  m_HideReticleWhenInvalid: 1
 --- !u!120 &2654315242507988017
 LineRenderer:
   m_ObjectHideFlags: 0

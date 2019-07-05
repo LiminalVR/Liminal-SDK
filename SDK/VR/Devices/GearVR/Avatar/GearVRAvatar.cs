@@ -131,7 +131,9 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             }
 
             RecenterHmdIfRequired();
-            DetectAndUpdateControllerStates();
+
+            if(!OVRUtils.IsOculusQuest)
+                DetectAndUpdateControllerStates();
         }
 
         #endregion
@@ -282,6 +284,8 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void UpdateHandedness()
         {
+            mCachedActiveController = OVRInput.GetActiveController();
+
             var primary = mAvatar.PrimaryHand;
             primary.TrackedObject = mControllerTracker;
             primary.SetActive(true);

@@ -54,6 +54,9 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             get
             {
+                if (OVRUtils.IsOculusQuest)
+                    return OVRUtils.IsQuestControllerConnected;
+
                 return (OVRInput.GetActiveController() & GearVRController.AllHandControllersMask) != 0;
             }
         }
@@ -132,8 +135,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
             RecenterHmdIfRequired();
 
-            if(!OVRUtils.IsOculusQuest)
-                DetectAndUpdateControllerStates();
+            DetectAndUpdateControllerStates();
         }
 
         #endregion
@@ -302,6 +304,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         /// </summary>
         public void DetectAndUpdateControllerStates()
         {
+            Debug.Log("Hands are " + IsHandControllerActive);
             TrySetHandsActive(IsHandControllerActive);
             TrySetGazeInputActive(!IsHandControllerActive);
         }

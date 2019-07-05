@@ -115,7 +115,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
             // GearVR/Touch controller
             var hasController = OVRUtils.IsOculusQuest
-                ? OVRInput.IsControllerConnected(OVRInput.Controller.Touch)
+                ? OVRUtils.IsQuestControllerConnected
                 : (ctrlMask & GearVRController.AllHandControllersMask) != 0;
 
             if (hasController)
@@ -187,9 +187,11 @@ namespace Liminal.SDK.VR.Devices.GearVR
         {
             mCachedActiveController = OVRInput.GetActiveController();
 
-            var hasController = OVRUtils.IsOculusQuest ? 
-                OVRInput.IsControllerConnected(OVRInput.Controller.Touch) :
+            var hasController = OVRUtils.IsOculusQuest ?
+                OVRUtils.IsQuestControllerConnected :
                 (mCachedActiveController & GearVRController.AllHandControllersMask) != 0;
+
+            Debug.Log("GearVRDevice HasController " + hasController);
 
             if (hasController)
             {
@@ -213,6 +215,10 @@ public static class OVRUtils
 {
     public static bool IsOculusQuest => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest;
     public static bool IsOculusGo => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go;
+
+    public static bool IsQuestControllerConnected 
+        => OVRInput.IsControllerConnected(OVRInput.Controller.Touch) || 
+           OVRInput.IsControllerConnected(OVRInput.Controller.RTouch);
 
     public static bool IsGearVRHeadset()
     {

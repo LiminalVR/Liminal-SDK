@@ -58,11 +58,9 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             OVRInput.Controller controller = OVRInput.GetActiveController();
 
-            var hasController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
-
             // In Editor, active controller is Touch, representing both hand controllers.
             // But for querying position/rotation we need to specify
-            if (hasController)
+            if (OVRUtils.IsQuestControllerConnected)
                 controller = OVRInput.Controller.RTouch;
 
             return controller;

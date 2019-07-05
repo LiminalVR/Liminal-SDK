@@ -131,9 +131,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             }
 
             RecenterHmdIfRequired();
-
-            if(OVRUtils.IsGearVRHeadset())
-                DetectAndUpdateControllerStates();
+            DetectAndUpdateControllerStates();
         }
 
         #endregion
@@ -248,8 +246,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             if (limb.LimbType == VRAvatarLimbType.Head)
                 return null;
 
-            Debug.LogFormat("GearVRAvatar.InstantiateControllerVisual() {0}", limb.LimbType);
-
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
             var instance = Instantiate(prefab);
 
@@ -331,7 +327,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void TrySetGazeInputActive(bool active)
         {
-            //Ignore Always & Never Policy
+            // Ignore Always & Never Policy
             if (mGazeInput != null && mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
             {
                 if (active)

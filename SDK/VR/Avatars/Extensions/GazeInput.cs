@@ -187,7 +187,6 @@ namespace Liminal.SDK.VR.Avatars.Extensions
                     if (!mExternalActivated)
                     {
                         var hasController = VRAvatar.Active != null && VRAvatar.Active.PrimaryHand.IsActive;
-                        Debug.Log(hasController);
                         InternalSetActive(!hasController);
                     }
                     break;

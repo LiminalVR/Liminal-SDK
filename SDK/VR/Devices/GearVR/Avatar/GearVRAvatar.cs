@@ -49,6 +49,15 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 return mAvatar;
             }
         }
+
+        private bool IsHandControllerActive
+        {
+            get
+            {
+                return (OVRInput.GetActiveController() & GearVRController.AllHandControllersMask) != 0;
+            }
+        }
+
         #endregion
 
         #region MonoBehaviour
@@ -122,6 +131,9 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             }
 
             RecenterHmdIfRequired();
+
+            if(OVRUtils.IsGearVRHeadset())
+                DetectAndUpdateControllerStates();
         }
 
         #endregion
@@ -168,7 +180,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 DisableAllControllers();
             }
         }
-        
+ 
         private void AttachControllerVisual(VRAvatarController avatarController)
         {
             var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
@@ -285,14 +297,13 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             VRDevice.Device.SetPrimaryPointerActive(true);
         }
 
-        private bool IsHandControllerActive
+        /// <summary>
+        /// Detects and Updates the state of the controllers including the TouchPad on the GearVR headset
+        /// </summary>
+        public void DetectAndUpdateControllerStates()
         {
-            get
-            {
-                // #Check
-                //return OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
-                return (OVRInput.GetActiveController() & GearVRController.AllHandControllersMask) != 0;
-            }
+            TrySetHandsActive(IsHandControllerActive);
+            TrySetGazeInputActive(!IsHandControllerActive);
         }
 
         private void TrySetHandsActive(bool active)
@@ -306,8 +317,21 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 }
                 else
                 {
+                    // Gear if active is not a hand, you should be false!
                     mAvatar.SetHandsActive(active);
                 }
+            }
+        }
+
+        private void TrySetGazeInputActive(bool active)
+        {
+            //Ignore Always & Never Policy
+            if (mGazeInput != null && mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
+            {
+                if (active)
+                    mGazeInput.Activate();
+                else
+                    mGazeInput.Deactivate();
             }
         }
 

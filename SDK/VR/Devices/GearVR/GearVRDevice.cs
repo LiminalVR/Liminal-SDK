@@ -56,7 +56,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
         /// </summary>
         public GearVRDevice()
         {
-            Headset = OVRUtils.IsGearVRHeadset() ? GenericHeadset() : new GearVRHeadset();
+            Headset = OVRUtils.IsGearVRHeadset() ? new GearVRHeadset() : GenericHeadset();
             OVRInput.Update();
             UpdateConnectedControllers();
         }
@@ -225,9 +225,9 @@ public static class OVRUtils
             case OVRPlugin.SystemHeadset.GearVR_R323:
             case OVRPlugin.SystemHeadset.GearVR_R324:
             case OVRPlugin.SystemHeadset.GearVR_R325:
-                return false;
-            default:
                 return true;
+            default:
+                return false;
         }
     }
 }

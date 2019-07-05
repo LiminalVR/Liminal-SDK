@@ -13,11 +13,11 @@ namespace Liminal.SDK.VR.Devices.GearVR
     /// </summary>
     internal class GearVRController : GearVRInputDevice
     {
-        public override string Name { get { return "GearVRController " + Hand; } }
+        public override string Name => "GearVRController";
         public override int ButtonCount { get { return 3; } }
 
-        public static readonly OVRInput.Controller RightHandControllerMask = OVRInput.Controller.RTouch;
-        public static readonly OVRInput.Controller LeftHandControllerMask = OVRInput.Controller.LTouch;
+        public static readonly OVRInput.Controller RightHandControllerMask = OVRInput.Controller.RTouch | OVRInput.Controller.RTrackedRemote;
+        public static readonly OVRInput.Controller LeftHandControllerMask = OVRInput.Controller.LTouch | OVRInput.Controller.LTrackedRemote;
         public static readonly OVRInput.Controller AllHandControllersMask = RightHandControllerMask | LeftHandControllerMask;
 
         private static readonly VRInputDeviceCapability _capabilities =
@@ -34,7 +34,10 @@ namespace Liminal.SDK.VR.Devices.GearVR
             { VRButton.Back, OVRInput.Button.Back }
         };
 
-        public override VRInputDeviceHand Hand => VRInputDeviceHand.Right;
+        public override VRInputDeviceHand Hand => 
+            ((OVRInput.GetActiveController() & LeftHandControllerMask) != 0) ?
+                VRInputDeviceHand.Left : 
+                VRInputDeviceHand.Right;
 
         public GearVRController() : base(AllHandControllersMask)
         {

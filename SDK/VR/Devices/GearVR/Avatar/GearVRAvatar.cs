@@ -176,7 +176,10 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             // TODO Support Left Hand on the Oculus Quest.
             // Presently we have decided to not support the left hand on the Oculus Quest, including it will mess up the pointers.
             if (OVRUtils.IsOculusQuest && limb.LimbType == VRAvatarLimbType.LeftHand)
+            {
+                Debug.Log("Left hand not supported yet.");
                 return;
+            }
 
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
             prefab.gameObject.SetActive(false);
@@ -286,7 +289,8 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             get
             {
-                return OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
+                // #Check
+                //return OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
                 return (OVRInput.GetActiveController() & GearVRController.AllHandControllersMask) != 0;
             }
         }
@@ -295,10 +299,15 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             if (mAvatar != null)
             {
-                mAvatar.PrimaryHand.SetActive(active);
-                mAvatar.SecondaryHand.SetActive(false);
-
-                // mAvatar.SetHandsActive(active);
+                if (OVRUtils.IsOculusQuest)
+                {
+                    mAvatar.PrimaryHand.SetActive(active);
+                    mAvatar.SecondaryHand.SetActive(false);
+                }
+                else
+                {
+                    mAvatar.SetHandsActive(active);
+                }
             }
         }
 

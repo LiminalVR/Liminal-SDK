@@ -114,11 +114,12 @@ namespace Liminal.SDK.VR.Devices.GearVR
             #region Controller
 
             // GearVR/Touch controller
-            var hasController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
+            var hasController = OVRUtils.IsOculusQuest
+                ? OVRInput.IsControllerConnected(OVRInput.Controller.Touch)
+                : (ctrlMask & GearVRController.AllHandControllersMask) != 0;
 
             if (hasController)
             {
-                Debug.Log("UpdateConnectedControllers: added controller to connected list");
                 mController = mController ?? new GearVRController();
 
                 // Add to the connected list if the device isn't already in the device list
@@ -184,14 +185,14 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         private void UpdateInputDevices()
         {
-            Debug.Log("Try updating input device");
             mCachedActiveController = OVRInput.GetActiveController();
 
-            var hasController = OVRInput.IsControllerConnected(OVRInput.Controller.Touch);
+            var hasController = OVRUtils.IsOculusQuest ? 
+                OVRInput.IsControllerConnected(OVRInput.Controller.Touch) :
+                (mCachedActiveController & GearVRController.AllHandControllersMask) != 0;
 
             if (hasController)
             {
-                Debug.Log("UpdateInputDevices: Set Controller as Primary Input");
                 PrimaryInputDevice = mController;
                 SecondaryInputDevice = Headset as GearVRInputDevice;
             }

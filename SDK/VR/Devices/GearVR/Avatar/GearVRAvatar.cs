@@ -317,7 +317,13 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 }
                 else
                 {
-                    // Gear if active is not a hand, you should be false!
+                    // This is a specific case for gear vr
+                    if (OVRUtils.IsGearVRHeadset())
+                    {
+                        if (OVRInput.GetActiveController() == OVRInput.Controller.Touchpad)
+                            active = false;
+                    }
+
                     mAvatar.SetHandsActive(active);
                 }
             }

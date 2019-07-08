@@ -304,7 +304,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         /// </summary>
         public void DetectAndUpdateControllerStates()
         {
-            Debug.Log("Hands are " + IsHandControllerActive);
             TrySetHandsActive(IsHandControllerActive);
             TrySetGazeInputActive(!IsHandControllerActive);
         }

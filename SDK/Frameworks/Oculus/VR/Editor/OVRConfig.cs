@@ -25,13 +25,21 @@ public class OVRConfig : ScriptableObject
 	{
 		get
 		{
-			if (instance == null)
+            //var liminalResourcesFolder = $"{Application.dataPath}/Liminal/Resources";
+            //EnsureFolderExists(liminalResourcesFolder);
+
+            if (instance == null)
 			{
 				instance = Resources.Load<OVRConfig>("OVRConfig");
+
 				if (instance == null)
 				{
 					instance = ScriptableObject.CreateInstance<OVRConfig>();
+
 					string resourcePath = Path.Combine(UnityEngine.Application.dataPath, "Resources");
+
+                    Debug.Log("Resource Path: " + resourcePath);
+
 					if (!Directory.Exists(resourcePath))
 					{
 						UnityEditor.AssetDatabase.CreateFolder("Assets", "Resources");
@@ -49,8 +57,14 @@ public class OVRConfig : ScriptableObject
 		}
 	}
 
-	// Returns the path to the base directory of the Android SDK
-	public string GetAndroidSDKPath(bool throwError = true)
+    public static void EnsureFolderExists(string folder)
+    {
+        if (!Directory.Exists(folder))
+            Directory.CreateDirectory(folder);
+    }
+
+    // Returns the path to the base directory of the Android SDK
+    public string GetAndroidSDKPath(bool throwError = true)
 	{
 #if UNITY_2019_1_OR_NEWER
 		// Check for use of embedded path or user defined 

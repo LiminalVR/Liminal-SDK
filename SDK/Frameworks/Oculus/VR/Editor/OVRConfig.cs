@@ -25,9 +25,6 @@ public class OVRConfig : ScriptableObject
 	{
 		get
 		{
-            //var liminalResourcesFolder = $"{Application.dataPath}/Liminal/Resources";
-            //EnsureFolderExists(liminalResourcesFolder);
-
             if (instance == null)
 			{
 				instance = Resources.Load<OVRConfig>("OVRConfig");
@@ -37,8 +34,6 @@ public class OVRConfig : ScriptableObject
 					instance = ScriptableObject.CreateInstance<OVRConfig>();
 
 					string resourcePath = Path.Combine(UnityEngine.Application.dataPath, "Resources");
-
-                    Debug.Log("Resource Path: " + resourcePath);
 
 					if (!Directory.Exists(resourcePath))
 					{

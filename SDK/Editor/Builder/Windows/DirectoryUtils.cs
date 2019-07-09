@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using UnityEditor;
 
 public static class DirectoryUtils
 {
@@ -7,9 +8,14 @@ public static class DirectoryUtils
         return s.Replace("\\", "/");
     }
 
-    public static void EnsureFolderExists(string folder)
+    public static void EnsureFolderExists(string folder, bool refreshAfterCreation = false)
     {
         if (!Directory.Exists(folder))
+        {
             Directory.CreateDirectory(folder);
+
+            if(refreshAfterCreation)
+                AssetDatabase.Refresh();
+        }
     }
 }

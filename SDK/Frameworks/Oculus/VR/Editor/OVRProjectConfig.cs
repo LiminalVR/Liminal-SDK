@@ -62,13 +62,15 @@ public class OVRProjectConfig : ScriptableObject
 		try
 		{
 			projectConfig = AssetDatabase.LoadAssetAtPath(oculusProjectConfigAssetPath, typeof(OVRProjectConfig)) as OVRProjectConfig;
-		}
-		catch (System.Exception e)
+            Debug.Log("Found project config");
+        }
+        catch (System.Exception e)
 		{
 			Debug.LogWarningFormat("Unable to load ProjectConfig from {0}, error {1}", oculusProjectConfigAssetPath, e.Message);
 		}
 		if (projectConfig == null)
 		{
+            Debug.Log("Recreating project config");
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
 			projectConfig.targetDeviceTypes.Add(DeviceType.GearVrOrGo);

@@ -70,7 +70,8 @@ public class OVRProjectConfig : ScriptableObject
 		}
 		if (projectConfig == null)
 		{
-            Debug.Log("Recreating project config");
+            // It can't find it so it's making it. so we'll just have to match oculusProjectConfigAssetPath
+            Debug.Log($"Recreating project config at {oculusProjectConfigAssetPath}");
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
 			projectConfig.targetDeviceTypes.Add(DeviceType.GearVrOrGo);

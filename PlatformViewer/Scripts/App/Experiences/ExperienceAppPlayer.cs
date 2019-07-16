@@ -124,13 +124,21 @@ namespace Liminal.Platform.Experimental.App.Experiences
             _stateModel.SetStartTime(Time.realtimeSinceStartup);
             InputTracking.Recenter();
 
-            if (VRAvatar.Active.PrimaryHand != null && VRAvatar.Active.PrimaryHand.IsActive)
+            // TODO Investigate if activating the pointer is necessary.
+            try
             {
-                VRDevice.Device.PrimaryInputDevice.Pointer.Activate();
+                if (VRAvatar.Active.PrimaryHand != null && VRAvatar.Active.PrimaryHand.IsActive)
+                {
+                    VRDevice.Device.PrimaryInputDevice.Pointer.Activate();
+                }
+                else
+                {
+                    Debug.Log("Could not activate pointer");
+                }
             }
-            else
+            catch(Exception e)
             {
-                Debug.Log("Could not activate pointer");
+                Debug.Log($"Could not activate pointer {e}");
             }
 
             return StartCoroutine(_InitializeApp());

@@ -65,7 +65,8 @@ public class OVRProjectConfig : ScriptableObject
 	{
 		OVRProjectConfig projectConfig = null;
 
-        // The only change to the script's logic is here.
+        // #Changed. 
+        // GetOculusProjectConfigAssetPath points to the Package cache path and we cannot create an asset inside a remote package.
         // string oculusProjectConfigAssetPath = GetOculusProjectConfigAssetPath();
 
         var oculusProjectConfigAssetPath = ProjectConfigPath;
@@ -80,10 +81,13 @@ public class OVRProjectConfig : ScriptableObject
 		}
 		if (projectConfig == null)
 		{
-            Debug.Log($"Recreating project config at {oculusProjectConfigAssetPath}");
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
 			projectConfig.targetDeviceTypes.Add(DeviceType.GearVrOrGo);
+
+            // #Changed.
+            // By default, Liminal will be supporting Oculus Quest.
+            projectConfig.targetDeviceTypes.Add(DeviceType.Quest);
 
             AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
 		}

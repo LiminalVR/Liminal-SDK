@@ -19,13 +19,17 @@ limitations under the License.
 
 ************************************************************************************/
 
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System;
 
+/// <summary>
+/// This class has been modified.
+/// Due to Liminal including OVR as a package, creating a config inside the package is not possible so instead
+/// this script has been modifed to create and read from Liminal/Resources.
+/// </summary>
 [System.Serializable]
 public class OVRProjectConfig : ScriptableObject
 {
@@ -57,12 +61,13 @@ public class OVRProjectConfig : ScriptableObject
 
     private static string ProjectConfigPath => "Assets/Liminal/Resources/OculusProjectConfig.asset";
 
-    [MenuItem("Oculus/GetProjectConfig")]
 	public static OVRProjectConfig GetProjectConfig()
 	{
 		OVRProjectConfig projectConfig = null;
 
-        //string oculusProjectConfigAssetPath = GetOculusProjectConfigAssetPath();
+        // The only change to the script's logic is here.
+        // string oculusProjectConfigAssetPath = GetOculusProjectConfigAssetPath();
+
         var oculusProjectConfigAssetPath = ProjectConfigPath;
 
         try
@@ -75,7 +80,6 @@ public class OVRProjectConfig : ScriptableObject
 		}
 		if (projectConfig == null)
 		{
-            // It can't find it so it's making it. so we'll just have to match oculusProjectConfigAssetPath
             Debug.Log($"Recreating project config at {oculusProjectConfigAssetPath}");
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
@@ -83,10 +87,7 @@ public class OVRProjectConfig : ScriptableObject
 
             AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
 		}
-        else
-        {
-            Debug.Log("Found project config");
-        }
+
 		return projectConfig;
 	}
 

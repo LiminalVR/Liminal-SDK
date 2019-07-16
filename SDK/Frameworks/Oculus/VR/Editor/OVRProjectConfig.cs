@@ -55,6 +55,7 @@ public class OVRProjectConfig : ScriptableObject
 		return relativeUri.ToString();
 	}
 
+    [MenuItem("Oculus/GetProjectConfig")]
 	public static OVRProjectConfig GetProjectConfig()
 	{
 		OVRProjectConfig projectConfig = null;

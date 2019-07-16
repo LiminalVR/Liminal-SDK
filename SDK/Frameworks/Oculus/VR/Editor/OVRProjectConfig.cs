@@ -55,15 +55,19 @@ public class OVRProjectConfig : ScriptableObject
 		return relativeUri.ToString();
 	}
 
+    private static string ProjectConfigPath => "Assets/Liminal/Resources/OculusProjectConfig.asset";
+
     [MenuItem("Oculus/GetProjectConfig")]
 	public static OVRProjectConfig GetProjectConfig()
 	{
 		OVRProjectConfig projectConfig = null;
-		string oculusProjectConfigAssetPath = GetOculusProjectConfigAssetPath();
-		try
-		{
-			projectConfig = AssetDatabase.LoadAssetAtPath(oculusProjectConfigAssetPath, typeof(OVRProjectConfig)) as OVRProjectConfig;
-            Debug.Log("Found project config");
+
+        //string oculusProjectConfigAssetPath = GetOculusProjectConfigAssetPath();
+        var oculusProjectConfigAssetPath = ProjectConfigPath;
+
+        try
+        {
+            projectConfig = AssetDatabase.LoadAssetAtPath(oculusProjectConfigAssetPath, typeof(OVRProjectConfig)) as OVRProjectConfig;
         }
         catch (System.Exception e)
 		{
@@ -76,8 +80,13 @@ public class OVRProjectConfig : ScriptableObject
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
 			projectConfig.targetDeviceTypes.Add(DeviceType.GearVrOrGo);
-			AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
+
+            AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
 		}
+        else
+        {
+            Debug.Log("Found project config");
+        }
 		return projectConfig;
 	}
 

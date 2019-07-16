@@ -12,6 +12,8 @@
     [InitializeOnLoad]
     public static class OVRConfigHelper
     {
+        public static string ResourcePath => Path.Combine(Application.dataPath, BuildWindowConsts.ResourcesFolder);
+
         /// <summary>
         /// In Oculus Integration v1.38, there is an issue where OVRConfig.cs creates an .asset with filename  OVRConfigBuild,
         /// however Resources.Load was used to look for OVRConfig. So if this is patched and fixed in a later update,
@@ -26,8 +28,7 @@
 
         private static void OnEditorUpdate()
         {
-            var resourceDirectoryPath = Path.Combine(Application.dataPath, BuildWindowConsts.ResourcesFolder);
-            DirectoryUtils.EnsureFolderExists(resourceDirectoryPath, refreshAfterCreation: true);
+            DirectoryUtils.EnsureFolderExists(ResourcePath, refreshAfterCreation: true);
             EnsureConfigExists();
         }
 

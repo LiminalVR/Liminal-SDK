@@ -23,10 +23,6 @@ namespace Liminal.SDK.Editor.Build
             public int Version;
         }
 
-        #region Static
-
-        #endregion
-
         /// <summary>
         /// Builds the application assembly with the specificed Assembly name, and writes it to the supplied output path.
         /// </summary>
@@ -53,14 +49,23 @@ namespace Liminal.SDK.Editor.Build
                 return false;
             }
 
-            // Setup the builder
             var buildSuccess = false;
+
+            // Usage of assembly definition generated assemblies outside of Unity in the UPM Packages that references UnityEngine.CoreModule, 
+            // will not pass the AssemblyBuilder process without us adding additional references to the builder.
+            var additionalReferences = new string[] 
+            {
+                GetAssemblyPath("UnityEngine.CoreModule"),
+                GetAssemblyPath("UnityEngine"),
+            };
+
             var builder = new AssemblyBuilder(outputPath, scripts)
             {
                 buildTargetGroup = buildInfo.BuildTargetGroup,
                 buildTarget = buildInfo.BuildTarget,
+                additionalReferences = additionalReferences,
             };
-            
+
             // Hook in listeners
             builder.buildStarted += (path) => Debug.LogFormat("[Liminal.Build] Assembly build started: {0}", buildInfo.Name);
             builder.buildFinished += (path, messages) =>
@@ -276,6 +281,8 @@ namespace Liminal.SDK.Editor.Build
 
         private string[] GetAssemblyScripts()
         {
+            // Here we are building the AppModule.dll, we only want scripts from the project.
+
             var list = new List<string>();
             var csFiles = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
             foreach (var csFilePath in csFiles)
@@ -314,6 +321,12 @@ namespace Liminal.SDK.Editor.Build
         private string FormatCompilerMessage(CompilerMessage message)
         {
             return string.Format("{0}\nin {1}, Line {2}, Column {3}", message.message, message.file, message.line, message.column);
+        }
+
+        private string GetAssemblyPath(string name)
+        {
+            var asm = System.Reflection.Assembly.Load(name);
+            return asm.Location;
         }
 
         #endregion

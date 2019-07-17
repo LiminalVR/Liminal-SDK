@@ -53,6 +53,7 @@ namespace Liminal.SDK.Editor.Build
 
             // Usage of assembly definition generated assemblies outside of Unity in the UPM Packages that references UnityEngine.CoreModule, 
             // will not pass the AssemblyBuilder process without us adding additional references to the builder.
+            // These assemblies will not be included in the Limapp Build.
             var additionalReferences = new string[] 
             {
                 GetAssemblyPath("UnityEngine"),

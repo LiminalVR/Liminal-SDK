@@ -25,10 +25,10 @@ public class OVRConfig : ScriptableObject
 	{
 		get
 		{
-			if (instance == null)
+            if (instance == null)
 			{
 				instance = Resources.Load<OVRConfig>("OVRConfig");
-				if (instance == null)
+                if (instance == null)
 				{
 					instance = ScriptableObject.CreateInstance<OVRConfig>();
 					string resourcePath = Path.Combine(UnityEngine.Application.dataPath, "Resources");
@@ -36,7 +36,6 @@ public class OVRConfig : ScriptableObject
 					{
 						UnityEditor.AssetDatabase.CreateFolder("Assets", "Resources");
 					}
-
 					string fullPath = Path.Combine(Path.Combine("Assets", "Resources"), "OVRBuildConfig.asset");
 					UnityEditor.AssetDatabase.CreateAsset(instance, fullPath);
 				}
@@ -49,8 +48,8 @@ public class OVRConfig : ScriptableObject
 		}
 	}
 
-	// Returns the path to the base directory of the Android SDK
-	public string GetAndroidSDKPath(bool throwError = true)
+    // Returns the path to the base directory of the Android SDK
+    public string GetAndroidSDKPath(bool throwError = true)
 	{
 #if UNITY_2019_1_OR_NEWER
 		// Check for use of embedded path or user defined 

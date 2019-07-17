@@ -21,23 +21,13 @@ namespace Liminal.SDK.VR.Devices.GearVR
         /// bitfield masks, sometimes as simple enum values.
         /// </summary>
         public OVRInput.Controller ControllerMask { get; private set; }
-
-        public bool IsTouching
-        {
-            get
-            {
-                return OVRInput.Get(OVRInput.Touch.One);
-            }
-        }
+        public bool IsTouching => OVRInput.Get(OVRInput.Touch.One);
 
         protected GearVRInputDevice(OVRInput.Controller controllerMask)
         {
             ControllerMask = controllerMask;
             Pointer = CreatePointer();
-            if (Pointer != null)
-            {
-                Pointer.Activate();
-            }
+            Pointer?.Activate();
         }
 
         protected abstract IVRPointer CreatePointer();

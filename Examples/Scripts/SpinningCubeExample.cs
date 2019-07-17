@@ -1,29 +1,36 @@
-﻿using System.Collections;
-using Liminal.SDK.Core;
-using UnityEngine;
-
-public class SpinningCubeExample : MonoBehaviour
+﻿namespace Liminal.SDK.Examples
 {
-    public float Speed = 5;
+    using System.Collections;
+    using UnityEngine;
+    using Core;
 
-    private void Update()
+    /// <summary>
+    /// A controller for the spinning cube example scene, containing the exit point to the application.
+    /// </summary>
+    public class SpinningCubeExample
+        : MonoBehaviour
     {
-        transform.Rotate(Vector3.up, Time.deltaTime * Speed);
-    }
+        public float Speed = 5;
 
-    private void OnEnable()
-    {
-        StartCoroutine(ShutDown());
-    }
+        private void Update()
+        {
+            transform.Rotate(Vector3.up, Time.deltaTime*Speed);
+        }
 
-    private IEnumerator ShutDown()
-    {
-        yield return new WaitForSeconds(100);
-        End();
-    }
+        private void OnEnable()
+        {
+            StartCoroutine(ShutDown());
+        }
 
-    private void End()
-    {
-        ExperienceApp.End();
+        private IEnumerator ShutDown()
+        {
+            yield return new WaitForSeconds(100);
+            End();
+        }
+
+        public void End()
+        {
+            ExperienceApp.End();
+        }
     }
 }

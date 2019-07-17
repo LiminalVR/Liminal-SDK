@@ -56,14 +56,14 @@ namespace Liminal.SDK.VR.Devices.GearVR
         /// </summary>
         public GearVRDevice()
         {
-            Headset = IsOculusGo ? MakeOculusGoHeadset() : new GearVRHeadset();
+            Headset = OVRUtils.IsGearVRHeadset() ? new GearVRHeadset() : GenericHeadset();
             OVRInput.Update();
             UpdateConnectedControllers();
         }
 
-        private static IVRHeadset MakeOculusGoHeadset()
+        private static IVRHeadset GenericHeadset()
         {
-            return new SimpleHeadset("OculusGoHeadset", VRHeadsetCapability.None);
+            return new SimpleHeadset("GenericHeadset", VRHeadsetCapability.None);
         }
 
         //Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
@@ -114,7 +114,11 @@ namespace Liminal.SDK.VR.Devices.GearVR
             #region Controller
 
             // GearVR/Touch controller
-            if ((ctrlMask & GearVRController.AllHandControllersMask) != 0)
+            var hasController = OVRUtils.IsOculusQuest
+                ? OVRUtils.IsQuestControllerConnected
+                : (ctrlMask & GearVRController.AllHandControllersMask) != 0;
+
+            if (hasController)
             {
                 mController = mController ?? new GearVRController();
 
@@ -183,7 +187,13 @@ namespace Liminal.SDK.VR.Devices.GearVR
         {
             mCachedActiveController = OVRInput.GetActiveController();
 
-            if ((mCachedActiveController & GearVRController.AllHandControllersMask) != 0)
+            var hasController = OVRUtils.IsOculusQuest ?
+                OVRUtils.IsQuestControllerConnected :
+                (mCachedActiveController & GearVRController.AllHandControllersMask) != 0;
+
+            Debug.Log("GearVRDevice HasController " + hasController);
+
+            if (hasController)
             {
                 PrimaryInputDevice = mController;
                 SecondaryInputDevice = Headset as GearVRInputDevice;
@@ -197,6 +207,33 @@ namespace Liminal.SDK.VR.Devices.GearVR
             // Raise change event
             if (PrimaryInputDeviceChanged != null)
                 PrimaryInputDeviceChanged(this);
+        }
+    }
+}
+
+public static class OVRUtils
+{
+    public static bool IsOculusQuest => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest;
+    public static bool IsOculusGo => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go;
+
+    public static bool IsQuestControllerConnected 
+        => OVRInput.IsControllerConnected(OVRInput.Controller.Touch) || 
+           OVRInput.IsControllerConnected(OVRInput.Controller.RTouch);
+
+    public static bool IsGearVRHeadset()
+    {
+        OVRPlugin.SystemHeadset headsetType = OVRPlugin.GetSystemHeadsetType();
+        switch (headsetType)
+        {
+            case OVRPlugin.SystemHeadset.GearVR_R320:
+            case OVRPlugin.SystemHeadset.GearVR_R321:
+            case OVRPlugin.SystemHeadset.GearVR_R322:
+            case OVRPlugin.SystemHeadset.GearVR_R323:
+            case OVRPlugin.SystemHeadset.GearVR_R324:
+            case OVRPlugin.SystemHeadset.GearVR_R325:
+                return true;
+            default:
+                return false;
         }
     }
 }

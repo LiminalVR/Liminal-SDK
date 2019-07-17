@@ -5,6 +5,7 @@ using Liminal.Platform.Experimental.App.BundleLoader;
 using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
 using Liminal.SDK.VR;
+using Liminal.SDK.VR.Avatars;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR;
@@ -121,9 +122,24 @@ namespace Liminal.Platform.Experimental.App.Experiences
         {
             _stateModel.SetState(AppState.Running);
             _stateModel.SetStartTime(Time.realtimeSinceStartup);
-
             InputTracking.Recenter();
-            VRDevice.Device.PrimaryInputDevice.Pointer.Activate();
+
+            // TODO Investigate if activating the pointer is necessary.
+            try
+            {
+                if (VRAvatar.Active.PrimaryHand != null && VRAvatar.Active.PrimaryHand.IsActive)
+                {
+                    VRDevice.Device.PrimaryInputDevice.Pointer.Activate();
+                }
+                else
+                {
+                    Debug.Log("Could not activate pointer");
+                }
+            }
+            catch(Exception e)
+            {
+                Debug.Log($"Could not activate pointer {e}");
+            }
 
             return StartCoroutine(_InitializeApp());
         }

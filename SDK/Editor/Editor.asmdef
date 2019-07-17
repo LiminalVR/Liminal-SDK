@@ -2,7 +2,8 @@
     "name": "Editor",
     "references": [
         "Platform",
-        "LiminalSdk"
+        "LiminalSdk",
+        "Oculus.VR.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

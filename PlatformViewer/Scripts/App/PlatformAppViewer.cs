@@ -1,21 +1,28 @@
 ﻿using System.Collections;
 using System.IO;
+using UnityEngine;
+using UnityEngine.Assertions;
 using Liminal.Platform.Experimental.App.Experiences;
 using Liminal.Platform.Experimental.Utils;
 using Liminal.Platform.Experimental.VR;
+using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
-using UnityEngine;
-using UnityEngine.Assertions;
 
+// TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
 {
-    public class PlatformAppViewer : MonoBehaviour
+    /// <summary>
+    /// A component to view a limapp within the SDK based on the AppPreviewConfig.
+    /// </summary>
+    public class PlatformAppViewer 
+        : MonoBehaviour
     {
         public VRAvatar Avatar;
         public ExperienceAppPlayer ExperienceAppPlayer;
         public AppPreviewConfig PreviewConfig;
         public BaseLoadingBar LoadingBar;
+        public GameObject SceneContainer;
 
         private VRDeviceLoader _deviceLoader;
         private byte[] _limappData;
@@ -29,11 +36,6 @@ namespace Liminal.Platform.Experimental.App
         {
             SetupVRDevice();
             BetterStreamingAssets.Initialize();
-        }
-
-        private void Start()
-        {
-            Play();
         }
 
         private void SetupVRDevice()
@@ -55,6 +57,8 @@ namespace Liminal.Platform.Experimental.App
 
         private IEnumerator PlayRoutine()
         {
+            SceneContainer.SetActive(false);
+
             ResolvePlatformLimapp(out _limappData, out string fileName);
 
             var experience = new Experience
@@ -67,12 +71,20 @@ namespace Liminal.Platform.Experimental.App
             LoadingBar.Load(loadOp);
             yield return loadOp.LoadScene();
             ExperienceAppPlayer.Begin();
+
+            ExperienceApp.OnComplete += OnExperienceComplete;
+        }
+
+        private void OnExperienceComplete(bool completed)
+        {
+            Stop();   
         }
 
         private IEnumerator StopRoutine()
         {
             yield return ExperienceAppPlayer.Unload();
             Avatar.SetActive(true);
+            SceneContainer.SetActive(true);
         }
 
         private void ResolvePlatformLimapp(out byte[] data, out string fileName)

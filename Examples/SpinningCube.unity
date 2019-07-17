@@ -156,11 +156,9 @@ MonoBehaviour:
   m_Script: {fileID: 403216476, guid: 1661fa78af9aece459a3302206a05902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_AppData: {fileID: 4900000, guid: 1911c3f9e7af5aa4d91cc2417ba6e462, type: 3}
+  m_AppData: {fileID: 0}
   m_AssetLookup: {fileID: 0}
-  m_RootGameObjects:
-  - {fileID: 0}
-  - {fileID: 961715199}
+  m_RootGameObjects: []
   m_FadeIn:
     m_Color: {r: 0, g: 0, b: 0, a: 1}
     m_Duration: 2
@@ -195,7 +193,7 @@ GameObject:
   - component: {fileID: 1635994517}
   - component: {fileID: 1635994518}
   m_Layer: 0
-  m_Name: '[SpinningCube]'
+  m_Name: SpinningCube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -228,7 +226,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53d296d1b9f982e43bf8cecce645c034, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Speed: 5
+  Speed: 20
 --- !u!1 &1717466329
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,7 +297,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Button
+  m_Text: Quit
 --- !u!222 &1717466332
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -386,7 +384,18 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1816313768}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1635994518}
+        m_MethodName: End
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_TypeName: UnityEngine.UI.Button+ButtonClickedEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
 --- !u!114 &1816313768
@@ -437,10 +446,9 @@ GameObject:
   - component: {fileID: 1854168337}
   - component: {fileID: 1854168341}
   - component: {fileID: 1854168340}
-  - component: {fileID: 1854168339}
   - component: {fileID: 1854168338}
   m_Layer: 0
-  m_Name: Canvas
+  m_Name: UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -483,23 +491,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &1854168339
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1854168336}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IgnoreReversedGraphics: 0
-  m_BlockingObjects: 0
-  m_BlockingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
 --- !u!114 &1854168340
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,7 +523,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 2
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 2014227394}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -692,6 +683,12 @@ PrefabInstance:
 --- !u!4 &2014227393 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1260162969423114810, guid: 22276a8657744e04cba8ad0a2caf4195,
+    type: 3}
+  m_PrefabInstance: {fileID: 2014227392}
+  m_PrefabAsset: {fileID: 0}
+--- !u!20 &2014227394 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1260162969970794154, guid: 22276a8657744e04cba8ad0a2caf4195,
     type: 3}
   m_PrefabInstance: {fileID: 2014227392}
   m_PrefabAsset: {fileID: 0}

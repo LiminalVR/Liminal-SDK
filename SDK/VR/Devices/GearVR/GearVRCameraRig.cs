@@ -35,28 +35,33 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         private Transform GetAnchorFromAvatar(string name)
         {
-            var avatar = VRAvatar.Active;
+            try
+            {
+                var avatar = VRAvatar.Active;
 
-            if (name == centerEyeAnchorName)
-            {
-                return avatar.Head.CenterEyeCamera.transform;
+                if (name == centerEyeAnchorName)
+                {
+                    return avatar.Head.CenterEyeCamera.transform;
+                }
+                else if (name == leftEyeAnchorName)
+                {
+                    return avatar.Head.LeftEyeCamera.transform;
+                }
+                else if (name == rightEyeAnchorName)
+                {
+                    return avatar.Head.RightEyeCamera.transform;
+                }
+                else if (name == trackerAnchorName)
+                {
+                    return avatar.Auxiliaries.Find(name);
+                }
             }
-            else if (name == leftEyeAnchorName)
+            catch(Exception e)
             {
-                return avatar.Head.LeftEyeCamera.transform;
+                // Ignored as an error here should not block the app.
             }
-            else if (name == rightEyeAnchorName)
-            {
-                return avatar.Head.RightEyeCamera.transform;
-            }
-            else if (name == trackerAnchorName)
-            {
-                return avatar.Auxiliaries.Find(name);
-            }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }

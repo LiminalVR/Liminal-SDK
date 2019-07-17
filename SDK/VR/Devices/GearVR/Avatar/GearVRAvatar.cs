@@ -36,7 +36,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         private OVRInput.Controller mCachedActiveController;
 
         #region Properties
-
         /// <summary>
         /// Gets the <see cref="IVRAvatar"/> for this device avatar.
         /// </summary>
@@ -48,6 +47,17 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                     mAvatar = GetComponentInParent<IVRAvatar>();
 
                 return mAvatar;
+            }
+        }
+
+        private bool IsHandControllerActive
+        {
+            get
+            {
+                if (OVRUtils.IsOculusQuest)
+                    return OVRUtils.IsQuestControllerConnected;
+
+                return (OVRInput.GetActiveController() & GearVRController.AllHandControllersMask) != 0;
             }
         }
 
@@ -86,12 +96,13 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             mDevice.InputDeviceDisconnected += OnInputDeviceDisconnected;
             mAvatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
             SetupInitialControllerState();
+
             UpdateHandedness();
         }
 
         private void OnEnable()
         {
-            DetectAndUpdateControllerStates();
+            TrySetHandsActive(IsHandControllerActive);
         }
 
         private void OnDestroy()
@@ -122,8 +133,9 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 UpdateHandedness();
             }
 
-            DetectAndUpdateControllerStates();
             RecenterHmdIfRequired();
+
+            DetectAndUpdateControllerStates();
         }
 
         #endregion
@@ -170,10 +182,18 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 DisableAllControllers();
             }
         }
-        
+ 
         private void AttachControllerVisual(VRAvatarController avatarController)
         {
-            Debug.Log("attaching controller " + avatarController.name);
+            var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
+
+            // TODO Support Left Hand on the Oculus Quest.
+            // Presently we have decided to not support the left hand on the Oculus Quest, including it will mess up the pointers.
+            if (OVRUtils.IsOculusQuest && limb.LimbType == VRAvatarLimbType.LeftHand)
+            {
+                Debug.Log("Left hand not supported yet.");
+                return;
+            }
 
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
             prefab.gameObject.SetActive(false);
@@ -193,7 +213,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             mRemotes.Add(trackedRemote);
 
             // Assign the correct controller based on the limb type the controller is attached to
-            var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
             OVRInput.Controller controllerType = GetControllerTypeForLimb(limb);
             trackedRemote.m_controller = controllerType;
             trackedRemote.m_modelGearVrController.SetActive(true);
@@ -217,6 +236,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         #region Controllers
 
+        // TODO See if this method can be removed, it appears to not be used at all and it can be misleading when debugging.
         /// <summary>
         /// Instantiates a <see cref="VRControllerVisual"/> for a limb.
         /// </summary>
@@ -229,8 +249,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
             if (limb.LimbType == VRAvatarLimbType.Head)
                 return null;
-
-            Debug.LogFormat("GearVRAvatar.InstantiateControllerVisual() {0}", limb.LimbType);
 
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
             var instance = Instantiate(prefab);
@@ -249,18 +267,10 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             if (controller == null)
                 return;
 
-            Debug.LogFormat("GearVRAvatar.EnableController() {0}", controller.ControllerMask);
-
             // Find the visual for the hand that matches the controller
             var remote = mRemotes.FirstOrDefault(x => (x.m_controller & controller.ControllerMask) != 0);
             if (remote != null)
-            {
                 remote.gameObject.SetActive(true);
-            }
-            else
-            {
-                Debug.LogWarning("No controller visual found");
-            }
         }
 
         private void DisableAllControllers()
@@ -276,29 +286,17 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void UpdateHandedness()
         {
-            Debug.Log("[GearVR] UpdateHandedness()");
-
-            // GetActiveController seems to always return Touch and not TouchL or TouchR will be a problem when we support 2 hands.
             mCachedActiveController = OVRInput.GetActiveController();
 
-            // GearVR only supports a single controller, so the tracker for the currently active.
-            // controller is always assigned to the avatar's primary hand - the secondary hand is not tracked.
-            // and is always deactivated.
-            bool isHandController = ((mCachedActiveController & GearVRController.AllHandControllersMask) != 0);
-            mAvatar.PrimaryHand.TrackedObject = isHandController ? mControllerTracker : null;
-
-            if (isHandController)
-            {
-                mAvatar.PrimaryHand.TrackedObject = mControllerTracker;
-                foreach (var remote in mRemotes)
-                {
-                    remote.m_controller = GetControllerTypeForLimb(mAvatar.PrimaryHand);
-                }
-            }
+            var primary = mAvatar.PrimaryHand;
+            primary.TrackedObject = mControllerTracker;
+            primary.SetActive(true);
 
             var secondary = mAvatar.SecondaryHand;
             secondary.TrackedObject = null;
             secondary.SetActive(false);
+
+            VRDevice.Device.SetPrimaryPointerActive(true);
         }
 
         /// <summary>
@@ -306,47 +304,42 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         /// </summary>
         public void DetectAndUpdateControllerStates()
         {
-            if (IsHandControllerActive)
-            {
-                TrySetHandsActive(true);
-                TrySetGazeInputActive(false);
-            }
-            else
-            {
-                TrySetHandsActive(false);
-                TrySetGazeInputActive(true);
-            }
-        }
-
-        private bool IsHandControllerActive
-        {
-            get
-            {
-                return (OVRInput.GetActiveController() & GearVRController.AllHandControllersMask) != 0;
-            }
+            TrySetHandsActive(IsHandControllerActive);
+            TrySetGazeInputActive(!IsHandControllerActive);
         }
 
         private void TrySetHandsActive(bool active)
         {
             if (mAvatar != null)
             {
-                mAvatar.SetHandsActive(active);
+                if (OVRUtils.IsOculusQuest)
+                {
+                    mAvatar.PrimaryHand.SetActive(active);
+                    mAvatar.SecondaryHand.SetActive(false);
+                }
+                else
+                {
+                    // This is a specific case for gear vr
+                    if (OVRUtils.IsGearVRHeadset())
+                    {
+                        if (OVRInput.GetActiveController() == OVRInput.Controller.Touchpad)
+                            active = false;
+                    }
+
+                    mAvatar.SetHandsActive(active);
+                }
             }
         }
 
         private void TrySetGazeInputActive(bool active)
         {
-            //Ignore Always & Never Policy
-            if ((mGazeInput != null) && (mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers))
+            // Ignore Always & Never Policy
+            if (mGazeInput != null && mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
             {
                 if (active)
-                {
                     mGazeInput.Activate();
-                }
                 else
-                {
                     mGazeInput.Deactivate();
-                }
             }
         }
 
@@ -375,24 +368,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             }
 
             return OVRInput.Controller.None;
-
-            //TODO: Should be primary, rather than right hand.
-            if ((limb != null) && (limb.LimbType == VRAvatarLimbType.RightHand))
-            {
-                // TODO: What happens if no controller is connected during startup? If the Left Hand controller
-                // connects, will this get sorted out?
-                if ((OVRInput.GetConnectedControllers() & GearVRController.LeftHandControllerMask) != 0)
-                {
-                    return Application.isEditor ? OVRInput.Controller.LTouch : OVRInput.Controller.LTrackedRemote;
-                }
-                else
-                {
-                    return Application.isEditor ? OVRInput.Controller.RTouch : OVRInput.Controller.RTrackedRemote;
-                }                
-            }
-            else
-            {
-            }
         }
 
         #region Event Handlers
@@ -426,7 +401,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
                 mCameraRig.usePerEyeCameras = head.UsePerEyeCameras;
             }
         }
-
         #endregion
     }
 }

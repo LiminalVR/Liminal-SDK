@@ -23,10 +23,6 @@ namespace Liminal.SDK.Editor.Build
             public int Version;
         }
 
-        #region Static
-
-        #endregion
-
         /// <summary>
         /// Builds the application assembly with the specificed Assembly name, and writes it to the supplied output path.
         /// </summary>
@@ -52,15 +48,37 @@ namespace Liminal.SDK.Editor.Build
                 // Returning false here indicates that no assembly is required
                 return false;
             }
-            
-            // Setup the builder
+
             var buildSuccess = false;
+
+            // Usage of assembly definition generated assemblies outside of Unity in the UPM Packages that references UnityEngine.CoreModule, 
+            // will not pass the AssemblyBuilder process without us adding additional references to the builder.
+            // These assemblies will not be included in the Limapp Build.
+            var additionalReferences = new string[] 
+            {
+                GetAssemblyPath("UnityEngine"),
+                GetAssemblyPath("UnityEngine.CoreModule"),
+                GetAssemblyPath("UnityEngine.ParticleSystemModule"),
+                GetAssemblyPath("UnityEngine.TextRenderingModule"),
+                GetAssemblyPath("UnityEngine.AnimationModule"),
+                GetAssemblyPath("UnityEngine.AudioModule"),
+                GetAssemblyPath("UnityEngine.UIModule"),
+                GetAssemblyPath("UnityEngine.PhysicsModule"),
+                GetAssemblyPath("UnityEngine.UnityWebRequestWWWModule"),
+                GetAssemblyPath("UnityEngine.UnityWebRequestModule"),
+                GetAssemblyPath("UnityEngine.IMGUIModule"),
+                GetAssemblyPath("UnityEngine.XRModule"),
+                GetAssemblyPath("UnityEngine.VRModule"),
+                GetAssemblyPath("UnityEngine.DirectorModule"),
+            };
+
             var builder = new AssemblyBuilder(outputPath, scripts)
             {
                 buildTargetGroup = buildInfo.BuildTargetGroup,
                 buildTarget = buildInfo.BuildTarget,
+                additionalReferences = additionalReferences,
             };
-            
+
             // Hook in listeners
             builder.buildStarted += (path) => Debug.LogFormat("[Liminal.Build] Assembly build started: {0}", buildInfo.Name);
             builder.buildFinished += (path, messages) =>
@@ -276,6 +294,8 @@ namespace Liminal.SDK.Editor.Build
 
         private string[] GetAssemblyScripts()
         {
+            // This section is used to build the AppModule.dll so we only want scripts from the project that the Platform will not include.
+
             var list = new List<string>();
             var csFiles = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);
             foreach (var csFilePath in csFiles)
@@ -287,6 +307,12 @@ namespace Liminal.SDK.Editor.Build
                     continue;
 
                 if (relativePath.IndexOf($"/{BuildWindowConsts.PlatformViewerFolderName}/", StringComparison.OrdinalIgnoreCase) > -1)
+                    continue;
+
+                if (relativePath.IndexOf("/Oculus/VR/Scripts", StringComparison.OrdinalIgnoreCase) > -1)
+                    continue;
+
+                if (relativePath.IndexOf("/VR/Devices", StringComparison.OrdinalIgnoreCase) > -1)
                     continue;
 
                 var path = "Assets" + relativePath;
@@ -308,6 +334,12 @@ namespace Liminal.SDK.Editor.Build
         private string FormatCompilerMessage(CompilerMessage message)
         {
             return string.Format("{0}\nin {1}, Line {2}, Column {3}", message.message, message.file, message.line, message.column);
+        }
+
+        private string GetAssemblyPath(string name)
+        {
+            var asm = System.Reflection.Assembly.Load(name);
+            return asm.Location;
         }
 
         #endregion

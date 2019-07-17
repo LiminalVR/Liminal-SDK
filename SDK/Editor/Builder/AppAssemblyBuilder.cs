@@ -55,8 +55,14 @@ namespace Liminal.SDK.Editor.Build
             // will not pass the AssemblyBuilder process without us adding additional references to the builder.
             var additionalReferences = new string[] 
             {
-                GetAssemblyPath("UnityEngine.CoreModule"),
                 GetAssemblyPath("UnityEngine"),
+                GetAssemblyPath("UnityEngine.CoreModule"),
+                GetAssemblyPath("UnityEngine.ParticleSystemModule"),
+                GetAssemblyPath("UnityEngine.TextRenderingModule"),
+                GetAssemblyPath("UnityEngine.AnimationModule"),
+                GetAssemblyPath("UnityEngine.AudioModule"),
+                GetAssemblyPath("UnityEngine.UIModule"),
+                GetAssemblyPath("UnityEngine.PhysicsModule"),
             };
 
             var builder = new AssemblyBuilder(outputPath, scripts)

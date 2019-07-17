@@ -56,6 +56,7 @@ namespace Liminal.SDK.Editor.Build
             var additionalReferences = new string[] 
             {
                 GetAssemblyPath("UnityEngine"),
+                GetAssemblyPath("UnityEngine.XR"),
                 GetAssemblyPath("UnityEngine.CoreModule"),
                 GetAssemblyPath("UnityEngine.ParticleSystemModule"),
                 GetAssemblyPath("UnityEngine.TextRenderingModule"),
@@ -63,6 +64,10 @@ namespace Liminal.SDK.Editor.Build
                 GetAssemblyPath("UnityEngine.AudioModule"),
                 GetAssemblyPath("UnityEngine.UIModule"),
                 GetAssemblyPath("UnityEngine.PhysicsModule"),
+                GetAssemblyPath("UnityEngine.UnityWebRequestWWWModule"),
+                GetAssemblyPath("UnityEngine.UnityWebRequestModule"),
+                GetAssemblyPath("UnityEngine.IMGUIModule"),
+                GetAssemblyPath("UnityEngine.XRModule"),
             };
 
             var builder = new AssemblyBuilder(outputPath, scripts)

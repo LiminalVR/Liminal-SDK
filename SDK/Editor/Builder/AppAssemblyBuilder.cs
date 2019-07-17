@@ -294,7 +294,7 @@ namespace Liminal.SDK.Editor.Build
 
         private string[] GetAssemblyScripts()
         {
-            // Here we are building the AppModule.dll, we only want scripts from the project.
+            // This section is used to build the AppModule.dll so we only want scripts from the project that the Platform will not include.
 
             var list = new List<string>();
             var csFiles = Directory.GetFiles(Application.dataPath, "*.cs", SearchOption.AllDirectories);

@@ -1,7 +1,6 @@
 ﻿namespace Liminal.SDK.Editor
 {
     using System.IO;
-
     using UnityEditor;
     using UnityEngine;
 

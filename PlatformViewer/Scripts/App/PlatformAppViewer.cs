@@ -1,17 +1,22 @@
 ﻿using System.Collections;
 using System.IO;
+using UnityEngine;
+using UnityEngine.Assertions;
 using Liminal.Platform.Experimental.App.Experiences;
 using Liminal.Platform.Experimental.Utils;
 using Liminal.Platform.Experimental.VR;
 using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
-using UnityEngine;
-using UnityEngine.Assertions;
 
+// TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
 {
-    public class PlatformAppViewer : MonoBehaviour
+    /// <summary>
+    /// A component to view a limapp within the SDK based on the AppPreviewConfig.
+    /// </summary>
+    public class PlatformAppViewer 
+        : MonoBehaviour
     {
         public VRAvatar Avatar;
         public ExperienceAppPlayer ExperienceAppPlayer;

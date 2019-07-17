@@ -58,7 +58,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
             }
             catch(Exception e)
             {
-                // Ignored
+                // Ignored as an error here should not block the app.
             }
 
             return null;

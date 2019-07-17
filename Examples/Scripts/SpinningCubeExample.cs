@@ -1,9 +1,7 @@
 ﻿namespace Liminal.SDK.Examples
 {
     using System.Collections;
-
     using UnityEngine;
-
     using Core;
 
     /// <summary>

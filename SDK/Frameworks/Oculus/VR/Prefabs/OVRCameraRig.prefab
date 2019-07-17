@@ -165,7 +165,6 @@ GameObject:
   m_Component:
   - component: {fileID: 400004}
   - component: {fileID: 11400000}
-  - component: {fileID: 114473266101150724}
   - component: {fileID: 1777630081388213388}
   m_Layer: 0
   m_Name: OVRCameraRig
@@ -244,23 +243,6 @@ MonoBehaviour:
   resetTrackerOnLoad: 1
   AllowRecenter: 1
   _reorientHMDOnControllerRecenter: 1
---- !u!114 &114473266101150724
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 100004}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5178bc8574ce2bf4388e787a2e2af326, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  opMode: 1
-  resetHmdPoseOnRelease: 1
-  resetHmdPoseByMiddleMouseButton: 1
-  activateKeys: 3201000031010000
-  pitchKeys: 3401000033010000
 --- !u!114 &1777630081388213388
 MonoBehaviour:
   m_ObjectHideFlags: 0

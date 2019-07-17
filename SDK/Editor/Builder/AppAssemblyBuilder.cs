@@ -68,6 +68,7 @@ namespace Liminal.SDK.Editor.Build
                 GetAssemblyPath("UnityEngine.IMGUIModule"),
                 GetAssemblyPath("UnityEngine.XRModule"),
                 GetAssemblyPath("UnityEngine.VRModule"),
+                GetAssemblyPath("UnityEngine.DirectorModule"),
             };
 
             var builder = new AssemblyBuilder(outputPath, scripts)

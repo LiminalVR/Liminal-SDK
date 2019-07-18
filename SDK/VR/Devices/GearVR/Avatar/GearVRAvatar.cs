@@ -26,7 +26,8 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         private IVRAvatar mAvatar;
         private IVRDevice mDevice;
         private GearVRAvatarSettings mSettings;
-        private GearVRTrackedControllerProxy mControllerTracker;
+        private GearVRTrackedControllerProxy mPrimaryControllerTracker;
+        private GearVRTrackedControllerProxy mSecondaryControllerTracker;
 
         // OVR
         private OVRManager mManager;
@@ -67,9 +68,12 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void Awake()
         {
+            // #Quest
             mAvatar = GetComponentInParent<IVRAvatar>();
             mAvatar.InitializeExtensions();
-            mControllerTracker = new GearVRTrackedControllerProxy(mAvatar);
+
+            mPrimaryControllerTracker = new GearVRTrackedControllerProxy(mAvatar, VRAvatarLimbType.RightHand);
+            mSecondaryControllerTracker = new GearVRTrackedControllerProxy(mAvatar, VRAvatarLimbType.LeftHand);
 
             mDevice = VRDevice.Device;
             mSettings = gameObject.GetOrAddComponent<GearVRAvatarSettings>();
@@ -102,7 +106,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void OnEnable()
         {
-            TrySetHandsActive(IsHandControllerActive);
+            TrySetLimbsActive();
         }
 
         private void OnDestroy()
@@ -169,6 +173,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         
         private void SetupInitialControllerState()
         {
+            Debug.Log($"SetupInitialControllerState {mDevice.InputDevices.Count()}");
             if (mDevice.InputDevices.Any(x => x is GearVRController))
             {
                 foreach (var controller in mDevice.InputDevices)
@@ -187,13 +192,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
 
-            // TODO Support Left Hand on the Oculus Quest.
-            // Presently we have decided to not support the left hand on the Oculus Quest, including it will mess up the pointers.
-            if (OVRUtils.IsOculusQuest && limb.LimbType == VRAvatarLimbType.LeftHand)
-            {
-                Debug.Log("Left hand not supported yet.");
-                return;
-            }
+            // #Quest - Initially we were not attaching controller visual for left hand when it is the Oculus Quest.
 
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
             prefab.gameObject.SetActive(false);
@@ -220,6 +219,8 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             // Activate the controller
             var active = IsControllerConnected(controllerType);
             instance.gameObject.SetActive(active);
+
+            Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active}");
         }
 
         /// <summary>
@@ -289,12 +290,12 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             mCachedActiveController = OVRInput.GetActiveController();
 
             var primary = mAvatar.PrimaryHand;
-            primary.TrackedObject = mControllerTracker;
+            primary.TrackedObject = mPrimaryControllerTracker;
             primary.SetActive(true);
 
             var secondary = mAvatar.SecondaryHand;
-            secondary.TrackedObject = null;
-            secondary.SetActive(false);
+            secondary.TrackedObject = mSecondaryControllerTracker;
+            secondary.SetActive(true);
 
             VRDevice.Device.SetPrimaryPointerActive(true);
         }
@@ -304,30 +305,45 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         /// </summary>
         public void DetectAndUpdateControllerStates()
         {
-            TrySetHandsActive(IsHandControllerActive);
+            TrySetLimbsActive();
             TrySetGazeInputActive(!IsHandControllerActive);
+        }
+
+        /// <summary>
+        /// A temporary method to split Oculus Quest changes with the other devices. 
+        /// </summary>
+        private void TrySetLimbsActive()
+        {
+            if (OVRUtils.IsOculusQuest)
+            {
+                TrySetHandActive(VRAvatarLimbType.RightHand);
+                TrySetHandActive(VRAvatarLimbType.LeftHand);
+            }
+            else
+            {
+                TrySetHandsActive(IsHandControllerActive);
+            }
+        }
+        
+        private void TrySetHandActive(VRAvatarLimbType limbType)
+        {
+            var isLimbConnected = OVRUtils.IsLimbConnected(limbType);
+            var limb = mAvatar.GetLimb(limbType);
+
+            limb.SetActive(isLimbConnected);
         }
 
         private void TrySetHandsActive(bool active)
         {
             if (mAvatar != null)
             {
-                if (OVRUtils.IsOculusQuest)
+                if (OVRUtils.IsGearVRHeadset())
                 {
-                    mAvatar.PrimaryHand.SetActive(active);
-                    mAvatar.SecondaryHand.SetActive(false);
+                    if (OVRInput.GetActiveController() == OVRInput.Controller.Touchpad)
+                        active = false;
                 }
-                else
-                {
-                    // This is a specific case for gear vr
-                    if (OVRUtils.IsGearVRHeadset())
-                    {
-                        if (OVRInput.GetActiveController() == OVRInput.Controller.Touchpad)
-                            active = false;
-                    }
 
-                    mAvatar.SetHandsActive(active);
-                }
+                mAvatar.SetHandsActive(active);
             }
         }
 

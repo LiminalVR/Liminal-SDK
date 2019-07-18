@@ -34,17 +34,12 @@ namespace Liminal.SDK.VR.Devices.GearVR
             { VRButton.Back, OVRInput.Button.Back }
         };
 
-        public override VRInputDeviceHand Hand
-        {
-            get
-            {
-                var isLeftHand = (OVRInput.GetActiveController() & LeftHandControllerMask) != 0;
-                return isLeftHand ? VRInputDeviceHand.Left : VRInputDeviceHand.Right;
-            }
-        }
+        public override VRInputDeviceHand Hand => _hand;
+        private VRInputDeviceHand _hand;
 
-        public GearVRController() : base(AllHandControllersMask)
+        public GearVRController(VRInputDeviceHand hand) : base(AllHandControllersMask)
         {
+            _hand = hand;
         }
 
         protected override IVRPointer CreatePointer()

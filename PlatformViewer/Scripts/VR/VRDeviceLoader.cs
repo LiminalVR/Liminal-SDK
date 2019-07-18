@@ -24,8 +24,10 @@ namespace Liminal.Platform.Experimental.VR
 
         #endregion
 
-        public VRDeviceLoader()
+        public VRDeviceLoader(VREmulatorDevice deviceType)
         {
+            m_EmulatorDevice = deviceType;
+
             if (VRDevice.Device == null)
             {
                 var device = CreateDevice();
@@ -44,13 +46,17 @@ namespace Liminal.Platform.Experimental.VR
                 Debug.LogFormat("[VRDevice] XRDevice.model={0}", XRDevice.model);
             }
 
-            if (!Application.isEditor)
+            switch (m_EmulatorDevice)
             {
-                return new GearVRDevice();
-            }
+                case VREmulatorDevice.GearVR:
+                    return new GearVRDevice();
 
-            // Fallback to the emulator device
-            return new EmulatorDevice(m_EmulatorDevice);
+                case VREmulatorDevice.Daydream:
+                    return new EmulatorDevice(m_EmulatorDevice);
+
+                default:
+                    return new EmulatorDevice(m_EmulatorDevice);
+            }
         }
 
         private static IVRDevice FindConnectedDeviceByModel(string modelName)

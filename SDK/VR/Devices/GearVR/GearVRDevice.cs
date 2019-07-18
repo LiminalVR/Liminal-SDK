@@ -17,7 +17,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
             VRDeviceCapability.Controller | VRDeviceCapability.UserPrescenceDetection;
 
         private OVRInput.Controller mConnectedControllerMask;
-        private GearVRController mController;
+        private GearVRController mPrimaryController, mSecondaryController;
         private bool mHeadsetInputConnected;
         private OVRInput.Controller mCachedActiveController;
         private IVRInputDevice[] mInputDevices = new IVRInputDevice[0];
@@ -107,32 +107,61 @@ namespace Liminal.SDK.VR.Devices.GearVR
             var connectedList = new List<IVRInputDevice>();
 
             var ctrlMask = OVRInput.GetConnectedControllers();
-            Debug.LogFormat("[GearVRDevice] ConnectedControllers={0}", ctrlMask.ToString());
+            //Debug.LogFormat("[GearVRDevice] ConnectedControllers={0}", ctrlMask.ToString());
 
             // NOTE: Controller tests here are in order of priority. Active hand controllers take priority over headset
 
             #region Controller
-
-            // GearVR/Touch controller
-            var hasController = OVRUtils.IsOculusQuest
-                ? OVRUtils.IsQuestControllerConnected
-                : (ctrlMask & GearVRController.AllHandControllersMask) != 0;
-
-            if (hasController)
+            if (OVRUtils.IsOculusQuest)
             {
-                mController = mController ?? new GearVRController();
+                var leftHandConnected = OVRUtils.IsLimbConnected(VRAvatarLimbType.LeftHand);
+                var rightHandConnected = OVRUtils.IsLimbConnected(VRAvatarLimbType.RightHand);
 
-                // Add to the connected list if the device isn't already in the device list
-                if (!mInputDevices.Contains(mController))
+                Debug.Log($"Left Hand Connected: {leftHandConnected}");
+                Debug.Log($"Right Hand Connected: {rightHandConnected}");
+
+                // Make need to pass in the hand type for pointers to work correctly.
+                if (OVRUtils.IsLimbConnected(VRAvatarLimbType.RightHand))
                 {
-                    connectedList.Add(mController);
+                    mPrimaryController = mPrimaryController ?? new GearVRController(VRInputDeviceHand.Right);
+                    connectedList.Add(mPrimaryController);
+                    allControllers.Add(mPrimaryController);
                 }
-                allControllers.Add(mController);
+                else
+                {
+                    disconnectedList.Add(mPrimaryController);
+                }
+
+                if (OVRUtils.IsLimbConnected(VRAvatarLimbType.LeftHand))
+                {
+                    mSecondaryController = mSecondaryController ?? new GearVRController(VRInputDeviceHand.Left);
+                    connectedList.Add(mSecondaryController);
+                    allControllers.Add(mSecondaryController);
+                }
+                else
+                {
+                    disconnectedList.Add(mSecondaryController);
+                }
             }
-            else if (mController != null)
+            else
             {
-                // Controller disconnected
-                disconnectedList.Add(mController);
+                var hasController = (ctrlMask & GearVRController.AllHandControllersMask) != 0;
+
+                if (hasController)
+                {
+                    mPrimaryController = mPrimaryController ?? new GearVRController(VRInputDeviceHand.Right);
+
+                    // Add to the connected list if the device isn't already in the device list
+                    if (!mInputDevices.Contains(mPrimaryController))
+                        connectedList.Add(mPrimaryController);
+
+                    allControllers.Add(mPrimaryController);
+                }
+                else if (mPrimaryController != null)
+                {
+                    // Controller disconnected
+                    disconnectedList.Add(mPrimaryController);
+                }
             }
 
             #endregion            
@@ -165,18 +194,21 @@ namespace Liminal.SDK.VR.Devices.GearVR
             mInputDevices = allControllers.ToArray();
             mConnectedControllerMask = ctrlMask;
 
-            // Dispatch disconnected events
-            foreach (var device in disconnectedList)
+            Debug.Log($"All Controllers Count: {allControllers.Count}");
+
+            foreach (var controller in allControllers)
             {
-                if (InputDeviceDisconnected != null)
-                    InputDeviceDisconnected(this, device);
+                Debug.Log($"Connected: {controller.Hand}");
             }
 
-            // Dispatch connected events
+            foreach (var device in disconnectedList)
+            {
+                InputDeviceDisconnected?.Invoke(this, device);
+            }
+
             foreach (var device in connectedList)
             {
-                if (InputDeviceConnected != null)
-                    InputDeviceConnected(this, device);
+                InputDeviceConnected?.Invoke(this, device);
             }
 
             // Force an update of input devices
@@ -192,10 +224,12 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 (mCachedActiveController & GearVRController.AllHandControllersMask) != 0;
 
             Debug.Log("GearVRDevice HasController " + hasController);
+            
+            // #Quest - The SecondaryInputDevice need to be the Left Hand and not the Headset.
 
             if (hasController)
             {
-                PrimaryInputDevice = mController;
+                PrimaryInputDevice = mPrimaryController;
                 SecondaryInputDevice = Headset as GearVRInputDevice;
             }
             else
@@ -203,37 +237,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 PrimaryInputDevice = Headset as GearVRInputDevice;
                 SecondaryInputDevice = null;
             }
-            
-            // Raise change event
-            if (PrimaryInputDeviceChanged != null)
-                PrimaryInputDeviceChanged(this);
-        }
-    }
-}
 
-public static class OVRUtils
-{
-    public static bool IsOculusQuest => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest;
-    public static bool IsOculusGo => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go;
-
-    public static bool IsQuestControllerConnected 
-        => OVRInput.IsControllerConnected(OVRInput.Controller.Touch) || 
-           OVRInput.IsControllerConnected(OVRInput.Controller.RTouch);
-
-    public static bool IsGearVRHeadset()
-    {
-        OVRPlugin.SystemHeadset headsetType = OVRPlugin.GetSystemHeadsetType();
-        switch (headsetType)
-        {
-            case OVRPlugin.SystemHeadset.GearVR_R320:
-            case OVRPlugin.SystemHeadset.GearVR_R321:
-            case OVRPlugin.SystemHeadset.GearVR_R322:
-            case OVRPlugin.SystemHeadset.GearVR_R323:
-            case OVRPlugin.SystemHeadset.GearVR_R324:
-            case OVRPlugin.SystemHeadset.GearVR_R325:
-                return true;
-            default:
-                return false;
+            PrimaryInputDeviceChanged?.Invoke(this);
         }
     }
 }

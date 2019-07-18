@@ -8,6 +8,7 @@ using Liminal.Platform.Experimental.VR;
 using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
+using Liminal.SDK.VR.Devices.Emulator;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
@@ -23,6 +24,8 @@ namespace Liminal.Platform.Experimental.App
         public AppPreviewConfig PreviewConfig;
         public BaseLoadingBar LoadingBar;
         public GameObject SceneContainer;
+
+        public VREmulatorDevice DeviceType = VREmulatorDevice.Daydream;
 
         private VRDeviceLoader _deviceLoader;
         private byte[] _limappData;
@@ -40,7 +43,7 @@ namespace Liminal.Platform.Experimental.App
 
         private void SetupVRDevice()
         {
-            _deviceLoader = new VRDeviceLoader();
+            _deviceLoader = new VRDeviceLoader(DeviceType);
             VRDevice.Device.SetupAvatar(Avatar);
         }
 

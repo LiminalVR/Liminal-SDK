@@ -26,6 +26,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
         protected GearVRInputDevice(OVRInput.Controller controllerMask)
         {
             ControllerMask = controllerMask;
+
             Pointer = CreatePointer();
             Pointer?.Activate();
         }

@@ -25,17 +25,12 @@ namespace Liminal.SDK.VR.Devices.GearVR
             VRInputDeviceCapability.Touch |
             VRInputDeviceCapability.TriggerButton;
 
-        private static readonly Dictionary<string, OVRInput.Button> vrButtonToOVRButton = new Dictionary<string, OVRInput.Button>()
-        {
-            { VRButton.One, OVRInput.Button.PrimaryIndexTrigger | OVRInput.Button.SecondaryIndexTrigger},
-            { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger | OVRInput.Button.SecondaryIndexTrigger},
-            { VRButton.Two, OVRInput.Button.PrimaryTouchpad },
-            { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
-            { VRButton.Back, OVRInput.Button.Back }
-        };
-
         public override VRInputDeviceHand Hand => _hand;
         private VRInputDeviceHand _hand;
+
+        private OVRInput.Controller Controller => _hand == VRInputDeviceHand.Right
+            ? OVRInput.Controller.RTouch
+            : OVRInput.Controller.LTouch;
 
         public GearVRController(VRInputDeviceHand hand) : base(AllHandControllersMask)
         {
@@ -85,20 +80,20 @@ namespace Liminal.SDK.VR.Devices.GearVR
         // TODO: Add Controller masks to detect between left or right hand.
         public override bool GetButton(string button)
         {
-            vrButtonToOVRButton.TryGetValue(button, out var ovrButton);
-            return (ovrButton != OVRInput.Button.None) && OVRInput.Get(ovrButton);
+            GetControllerButtonMapping(Controller).TryGetValue(button, out var ovrButton);
+            return (ovrButton != OVRInput.Button.None) && OVRInput.Get(ovrButton, Controller);
         }
 
         public override bool GetButtonDown(string button)
         {
-            vrButtonToOVRButton.TryGetValue(button, out var ovrButton);
-            return (ovrButton != OVRInput.Button.None) && OVRInput.GetDown(ovrButton);
+            GetControllerButtonMapping(Controller).TryGetValue(button, out var ovrButton);
+            return (ovrButton != OVRInput.Button.None) && OVRInput.GetDown(ovrButton, Controller);
         }
 
         public override bool GetButtonUp(string button)
         {
-            vrButtonToOVRButton.TryGetValue(button, out var ovrButton);
-            return (ovrButton != OVRInput.Button.None) && OVRInput.GetUp(ovrButton);            
+            GetControllerButtonMapping(Controller).TryGetValue(button, out var ovrButton);
+            return (ovrButton != OVRInput.Button.None) && OVRInput.GetUp(ovrButton, Controller);            
         }
 
         public override bool HasAxis1D(string axis)
@@ -121,12 +116,41 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         public override bool HasButton(string button)
         {
-            return vrButtonToOVRButton.ContainsKey(button);
+            return GetControllerButtonMapping(Controller).ContainsKey(button);
         }
 
         public override bool HasCapabilities(VRInputDeviceCapability capabilities)
         {
             return ((_capabilities & capabilities) == capabilities);
+        }
+
+        public Dictionary<string, OVRInput.Button> GetControllerButtonMapping(OVRInput.Controller controller)
+        {
+            switch (controller)
+            {
+                case OVRInput.Controller.RTouch:
+                    return new Dictionary<string, OVRInput.Button>()
+                    {
+                        { VRButton.One, OVRInput.Button.PrimaryIndexTrigger},
+                        { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger},
+                        { VRButton.Two, OVRInput.Button.PrimaryTouchpad },
+                        { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
+                        { VRButton.Back, OVRInput.Button.Back }
+                    };
+
+                case OVRInput.Controller.LTouch:
+                    return new Dictionary<string, OVRInput.Button>()
+                    {
+                        { VRButton.One, OVRInput.Button.SecondaryIndexTrigger},
+                        { VRButton.Trigger, OVRInput.Button.SecondaryIndexTrigger},
+                        { VRButton.Two, OVRInput.Button.SecondaryTouchpad },
+                        { VRButton.Touch, OVRInput.Button.SecondaryTouchpad },
+                        { VRButton.Back, OVRInput.Button.Back }
+                    };
+
+                default:
+                    return null;
+            }
         }
     }
 }

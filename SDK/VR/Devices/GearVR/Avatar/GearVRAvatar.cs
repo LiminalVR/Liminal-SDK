@@ -173,7 +173,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         
         private void SetupInitialControllerState()
         {
-            Debug.Log($"SetupInitialControllerState {mDevice.InputDevices.Count()}");
             if (mDevice.InputDevices.Any(x => x is GearVRController))
             {
                 foreach (var controller in mDevice.InputDevices)

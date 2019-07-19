@@ -123,12 +123,13 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
                 // The order the controllers are added currently determines the PrimaryInput however, 
                 // It does not seem to determine the primary pointer.
-
-                // Make need to pass in the hand type for pointers to work correctly.
                 if (rightHandConnected)
                 {
                     mPrimaryController = mPrimaryController ?? new GearVRController(VRInputDeviceHand.Right);
-                    connectedList.Add(mPrimaryController);
+
+                    if (!mInputDevices.Contains(mPrimaryController))
+                        connectedList.Add(mPrimaryController);
+
                     allControllers.Add(mPrimaryController);
                 }
                 else
@@ -139,7 +140,10 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 if (leftHandConnected)
                 {
                     mSecondaryController = mSecondaryController ?? new GearVRController(VRInputDeviceHand.Left);
-                    connectedList.Add(mSecondaryController);
+
+                    if (!mInputDevices.Contains(mSecondaryController))
+                        connectedList.Add(mSecondaryController);
+
                     allControllers.Add(mSecondaryController);
                 }
                 else
@@ -219,6 +223,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
             var hasController = OVRUtils.IsOculusQuest ?
                 OVRUtils.IsQuestControllerConnected :
                 (mCachedActiveController & GearVRController.AllHandControllersMask) != 0;
+
+            Debug.Log($"UpdateInputDevices: HasController: {hasController}");
 
             if (hasController)
             {

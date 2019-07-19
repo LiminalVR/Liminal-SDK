@@ -32,7 +32,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
             ? OVRInput.Controller.RTouch
             : OVRInput.Controller.LTouch;
 
-        public GearVRController(VRInputDeviceHand hand) : base(AllHandControllersMask)
+        public GearVRController(VRInputDeviceHand hand) : base(OVRUtils.GetControllerType(hand))
         {
             _hand = hand;
         }

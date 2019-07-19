@@ -1,4 +1,5 @@
 ﻿using Liminal.SDK.VR.Avatars;
+using Liminal.SDK.VR.Input;
 
 /// <summary>
 /// A wrapper utility to interface with OVRInput and OVRPlugin for common OVR Usages.
@@ -48,6 +49,24 @@ public static class OVRUtils
             case VRAvatarLimbType.LeftHand:
                 return OVRInput.Controller.LTouch;
             case VRAvatarLimbType.RightHand:
+                return OVRInput.Controller.RTouch;
+            default:
+                return OVRInput.Controller.None;
+        }
+    }
+
+    /// <summary>
+    /// OVRInput.Controller will return it as an enum and not a mask.
+    /// </summary>
+    /// <param name="limbType"></param>
+    /// <returns></returns>
+    public static OVRInput.Controller GetControllerType(VRInputDeviceHand hand)
+    {
+        switch (hand)
+        {
+            case VRInputDeviceHand.Left:
+                return OVRInput.Controller.LTouch;
+            case VRInputDeviceHand.Right:
                 return OVRInput.Controller.RTouch;
             default:
                 return OVRInput.Controller.None;

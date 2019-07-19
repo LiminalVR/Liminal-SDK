@@ -215,10 +215,10 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
             // Activate the controller
             // TODO Do we need to set active here? 
-            var active = IsControllerConnected(controllerType);
+            var active = OVRUtils.IsLimbConnected(limb.LimbType);
             instance.gameObject.SetActive(active);
 
-            Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active}");
+            Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active} Controller Type set to: {controllerType}");
         }
 
         /// <summary>
@@ -370,14 +370,10 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         private OVRInput.Controller GetControllerTypeForLimb(IVRAvatarLimb limb)
         {
             if (limb.LimbType == VRAvatarLimbType.LeftHand)
-            {
-                // if you're on the quest return Touch
                 return OVRInput.Controller.LTouch;
-            }
+
             if (limb.LimbType == VRAvatarLimbType.RightHand)
-            {
                 return OVRInput.Controller.RTouch;
-            }
 
             return OVRInput.Controller.None;
         }

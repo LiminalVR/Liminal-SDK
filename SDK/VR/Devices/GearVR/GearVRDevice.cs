@@ -108,70 +108,44 @@ namespace Liminal.SDK.VR.Devices.GearVR
             var connectedList = new List<IVRInputDevice>();
 
             var ctrlMask = OVRInput.GetConnectedControllers();
-            //Debug.LogFormat("[GearVRDevice] ConnectedControllers={0}", ctrlMask.ToString());
-
             // NOTE: Controller tests here are in order of priority. Active hand controllers take priority over headset
 
             #region Controller
-            if (OVRUtils.IsOculusQuest)
+            var leftHandConnected = OVRUtils.IsLimbConnected(VRAvatarLimbType.LeftHand);
+            var rightHandConnected = OVRUtils.IsLimbConnected(VRAvatarLimbType.RightHand);
+
+            Debug.Log($"Left Hand Connected: {leftHandConnected}");
+            Debug.Log($"Right Hand Connected: {rightHandConnected}");
+
+            // The order the controllers are added currently determines the PrimaryInput however, 
+            // It does not seem to determine the primary pointer.
+            if (rightHandConnected)
             {
-                var leftHandConnected = OVRUtils.IsLimbConnected(VRAvatarLimbType.LeftHand);
-                var rightHandConnected = OVRUtils.IsLimbConnected(VRAvatarLimbType.RightHand);
+                mPrimaryController = mPrimaryController ?? new GearVRController(VRInputDeviceHand.Right);
 
-                Debug.Log($"Left Hand Connected: {leftHandConnected}");
-                Debug.Log($"Right Hand Connected: {rightHandConnected}");
+                if (!mInputDevices.Contains(mPrimaryController))
+                    connectedList.Add(mPrimaryController);
 
-                // The order the controllers are added currently determines the PrimaryInput however, 
-                // It does not seem to determine the primary pointer.
-                if (rightHandConnected)
-                {
-                    mPrimaryController = mPrimaryController ?? new GearVRController(VRInputDeviceHand.Right);
-
-                    if (!mInputDevices.Contains(mPrimaryController))
-                        connectedList.Add(mPrimaryController);
-
-                    allControllers.Add(mPrimaryController);
-                }
-                else
-                {
-                    disconnectedList.Add(mPrimaryController);
-                }
-
-                if (leftHandConnected)
-                {
-                    mSecondaryController = mSecondaryController ?? new GearVRController(VRInputDeviceHand.Left);
-
-                    if (!mInputDevices.Contains(mSecondaryController))
-                        connectedList.Add(mSecondaryController);
-
-                    allControllers.Add(mSecondaryController);
-                }
-                else
-                {
-                    disconnectedList.Add(mSecondaryController);
-                }
+                allControllers.Add(mPrimaryController);
             }
             else
             {
-                var hasController = (ctrlMask & GearVRController.AllHandControllersMask) != 0;
-
-                if (hasController)
-                {
-                    mPrimaryController = mPrimaryController ?? new GearVRController(VRInputDeviceHand.Right);
-
-                    // Add to the connected list if the device isn't already in the device list
-                    if (!mInputDevices.Contains(mPrimaryController))
-                        connectedList.Add(mPrimaryController);
-
-                    allControllers.Add(mPrimaryController);
-                }
-                else if (mPrimaryController != null)
-                {
-                    // Controller disconnected
-                    disconnectedList.Add(mPrimaryController);
-                }
+                disconnectedList.Add(mPrimaryController);
             }
 
+            if (leftHandConnected)
+            {
+                mSecondaryController = mSecondaryController ?? new GearVRController(VRInputDeviceHand.Left);
+
+                if (!mInputDevices.Contains(mSecondaryController))
+                    connectedList.Add(mSecondaryController);
+
+                allControllers.Add(mSecondaryController);
+            }
+            else
+            {
+                disconnectedList.Add(mSecondaryController);
+            }
             #endregion            
 
             #region Headset (Swipe-pad)
@@ -224,12 +198,19 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 OVRUtils.IsQuestControllerConnected :
                 (mCachedActiveController & GearVRController.AllHandControllersMask) != 0;
 
-            Debug.Log($"UpdateInputDevices: HasController: {hasController}");
-
+            // TODO Introduce ActiveInputDevice, presently PrimaryInputDevice is treated as Active and it should be Left or Right, not Primary or Secondary.
             if (hasController)
             {
-                PrimaryInputDevice = mPrimaryController;
-                SecondaryInputDevice = OVRUtils.IsOculusQuest ? mSecondaryController : Headset as GearVRInputDevice;
+                if (OVRUtils.IsOculusQuest)
+                {
+                    PrimaryInputDevice = mPrimaryController;
+                    SecondaryInputDevice = mSecondaryController;
+                }
+                else
+                {
+                    PrimaryInputDevice = OVRInput.GetActiveController() == OVRInput.Controller.RTrackedRemote ? mPrimaryController : mSecondaryController;
+                    SecondaryInputDevice = Headset as GearVRInputDevice;
+                }
             }
             else
             {

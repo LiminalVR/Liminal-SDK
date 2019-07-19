@@ -47,9 +47,9 @@ public static class OVRUtils
         switch (limbType)
         {
             case VRAvatarLimbType.LeftHand:
-                return OVRInput.Controller.LTouch;
+                return IsOculusQuest ? OVRInput.Controller.LTouch : OVRInput.Controller.LTrackedRemote;
             case VRAvatarLimbType.RightHand:
-                return OVRInput.Controller.RTouch;
+                return IsOculusQuest ? OVRInput.Controller.RTouch : OVRInput.Controller.RTrackedRemote;
             default:
                 return OVRInput.Controller.None;
         }
@@ -65,9 +65,9 @@ public static class OVRUtils
         switch (hand)
         {
             case VRInputDeviceHand.Left:
-                return OVRInput.Controller.LTouch;
+                return IsOculusQuest ? OVRInput.Controller.LTouch : OVRInput.Controller.LTrackedRemote;
             case VRInputDeviceHand.Right:
-                return OVRInput.Controller.RTouch;
+                return IsOculusQuest ? OVRInput.Controller.RTouch : OVRInput.Controller.RTrackedRemote;
             default:
                 return OVRInput.Controller.None;
         }

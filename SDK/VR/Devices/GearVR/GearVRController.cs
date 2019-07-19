@@ -28,7 +28,6 @@ namespace Liminal.SDK.VR.Devices.GearVR
         public override VRInputDeviceHand Hand => _hand;
         private VRInputDeviceHand _hand;
 
-        // TODO On the Quest, it is RTouch and LTouch. On the OculusGo it's not.
         private OVRInput.Controller Controller
         {
             get

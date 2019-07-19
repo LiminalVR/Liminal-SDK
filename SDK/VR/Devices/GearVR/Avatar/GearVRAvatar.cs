@@ -150,6 +150,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         private void DetectPointerState()
         {
             var device = VRDevice.Device;
+            var activeController = mQuestActiveController;
 
             // This block of code has a lot of Null-Coalescing, which usually is dangerous but in this case we do not want to block the app.
             // A controller may disconnect and reconnect anytime.
@@ -157,20 +158,29 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             {
                 case EPointerActivationType.ActiveController:
                 {
-                    if (OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.RTouch))
+                    if (OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.RTouch) ||
+                        OVRInput.GetUp(OVRInput.Button.Any, OVRInput.Controller.RTouch))
                     {
                         mQuestActiveController = OVRInput.Controller.RTouch;
 
-                        device?.PrimaryInputDevice?.Pointer?.Activate();
-                        device?.SecondaryInputDevice?.Pointer?.Deactivate();
+                        if (activeController != mQuestActiveController)
+                        {
+                            device?.PrimaryInputDevice?.Pointer?.Activate();
+                            device?.SecondaryInputDevice?.Pointer?.Deactivate();
+                        }
                     }
 
-                    if (OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.LTouch))
+                    if (OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.LTouch) ||
+                        OVRInput.GetUp(OVRInput.Button.Any, OVRInput.Controller.LTouch))
                     {
-                        device?.SecondaryInputDevice?.Pointer?.Activate();
-                        device?.PrimaryInputDevice?.Pointer?.Deactivate();
-                    }
+                        mQuestActiveController = OVRInput.Controller.LTouch;
 
+                        if (activeController != mQuestActiveController)
+                        {
+                            device?.SecondaryInputDevice?.Pointer?.Activate();
+                            device?.PrimaryInputDevice?.Pointer?.Deactivate();
+                        }
+                    }
                     break;
                 }
 

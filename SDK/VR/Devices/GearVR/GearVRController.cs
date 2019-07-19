@@ -29,9 +29,22 @@ namespace Liminal.SDK.VR.Devices.GearVR
         private VRInputDeviceHand _hand;
 
         // TODO On the Quest, it is RTouch and LTouch. On the OculusGo it's not.
-        private OVRInput.Controller Controller => _hand == VRInputDeviceHand.Right
-            ? OVRInput.Controller.RTouch
-            : OVRInput.Controller.LTouch;
+        private OVRInput.Controller Controller
+        {
+            get
+            {
+                if (OVRUtils.IsOculusQuest)
+                {
+                    return _hand == VRInputDeviceHand.Right
+                        ? OVRInput.Controller.RTouch
+                        : OVRInput.Controller.LTouch;
+                }
+                else
+                {
+                    return OVRInput.Controller.RTrackedRemote | OVRInput.Controller.LTrackedRemote;
+                }
+            }
+        }
 
         public GearVRController(VRInputDeviceHand hand) : base(OVRUtils.GetControllerType(hand))
         {
@@ -79,19 +92,19 @@ namespace Liminal.SDK.VR.Devices.GearVR
         // TODO: Consider how Oculus Go would work.
         public override bool GetButton(string button)
         {
-            QuestButtonMapping().TryGetValue(button, out var ovrButton);
+            ButtonMapping().TryGetValue(button, out var ovrButton);
             return (ovrButton != OVRInput.Button.None) && OVRInput.Get(ovrButton, Controller);
         }
 
         public override bool GetButtonDown(string button)
         {
-            QuestButtonMapping().TryGetValue(button, out var ovrButton);
+            ButtonMapping().TryGetValue(button, out var ovrButton);
             return (ovrButton != OVRInput.Button.None) && OVRInput.GetDown(ovrButton, Controller);
         }
 
         public override bool GetButtonUp(string button)
         {
-            QuestButtonMapping().TryGetValue(button, out var ovrButton);
+            ButtonMapping().TryGetValue(button, out var ovrButton);
             return (ovrButton != OVRInput.Button.None) && OVRInput.GetUp(ovrButton, Controller);            
         }
 
@@ -121,6 +134,11 @@ namespace Liminal.SDK.VR.Devices.GearVR
         public override bool HasCapabilities(VRInputDeviceCapability capabilities)
         {
             return ((_capabilities & capabilities) == capabilities);
+        }
+
+        public Dictionary<string, OVRInput.Button> ButtonMapping()
+        {
+            return OVRUtils.IsOculusQuest ? QuestButtonMapping() : GearAndGoButtonMapping();
         }
 
         public Dictionary<string, OVRInput.Button> GearAndGoButtonMapping()

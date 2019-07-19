@@ -191,8 +191,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
 
-            // #Quest - Initially we were not attaching controller visual for left hand when it is the Oculus Quest.
-
             var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
             prefab.gameObject.SetActive(false);
 
@@ -216,6 +214,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             trackedRemote.m_modelGearVrController.SetActive(true);
 
             // Activate the controller
+            // TODO Do we need to set active here? 
             var active = IsControllerConnected(controllerType);
             instance.gameObject.SetActive(active);
 
@@ -295,8 +294,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             var secondary = mAvatar.SecondaryHand;
             secondary.TrackedObject = mSecondaryControllerTracker;
             secondary.SetActive(true);
-
-            VRDevice.Device.SetPrimaryPointerActive(true);
         }
 
         /// <summary>

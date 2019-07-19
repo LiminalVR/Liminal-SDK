@@ -21,7 +21,21 @@ namespace Liminal.SDK.VR.Devices.GearVR
         /// bitfield masks, sometimes as simple enum values.
         /// </summary>
         public OVRInput.Controller ControllerMask { get; private set; }
-        public bool IsTouching => OVRInput.Get(OVRInput.Touch.One);
+
+        public bool IsTouching
+        {
+            get
+            {
+                if (OVRUtils.IsOculusQuest)
+                {
+                    return OVRInput.Get(OVRInput.Touch.PrimaryThumbstick, ControllerMask);
+                }
+                else
+                {
+                    return OVRInput.Get(OVRInput.Touch.One);
+                }
+            }
+        }
 
         protected GearVRInputDevice(OVRInput.Controller controllerMask)
         {

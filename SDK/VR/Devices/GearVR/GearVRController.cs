@@ -28,6 +28,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
         public override VRInputDeviceHand Hand => _hand;
         private VRInputDeviceHand _hand;
 
+        // TODO On the Quest, it is RTouch and LTouch. On the OculusGo it's not.
         private OVRInput.Controller Controller => _hand == VRInputDeviceHand.Right
             ? OVRInput.Controller.RTouch
             : OVRInput.Controller.LTouch;
@@ -42,57 +43,55 @@ namespace Liminal.SDK.VR.Devices.GearVR
             return new InputDevicePointer(this);
         }
 
-        // TODO: Add HandTrigger support and IndexTrigger support since Oculus Quest can provide an Axis.
         // Note, on the Touch Controllers (Oculus Quest controllers), there are two triggers that provide 1Axis.
         // The HandTrigger is the Grip on the side of the controller.
         // The IndexTrigger is the common trigger, like firing a gun.
         public override float GetAxis1D(string axis)
         {
+            if (OVRUtils.IsOculusQuest)
+            {
+                // TODO: Add HandTrigger support and IndexTrigger support since Oculus Quest can provide an Axis.
+            }
+
             // No 1D axes on the GearVR controller.
             return 0;
         }
 
-        // TODO: Add Controller masks to detect between left or right hand.
+        // TODO: Oculus Go
         public override Vector2 GetAxis2D(string axis)
         {
             switch (axis)
             {
                 case VRAxis.OneRaw:
-                    var allRawAxis =
-                        OVRInput.RawAxis2D.LTouchpad |
-                        OVRInput.RawAxis2D.LThumbstick |
-                        OVRInput.RawAxis2D.RTouchpad |
-                        OVRInput.RawAxis2D.RThumbstick;
-
-                    return OVRInput.Get(allRawAxis, base.ControllerMask);
+                    var rawAxis = Controller == OVRInput.Controller.LTouch ?
+                        OVRInput.RawAxis2D.LTouchpad | OVRInput.RawAxis2D.LThumbstick :
+                        OVRInput.RawAxis2D.RTouchpad | OVRInput.RawAxis2D.RThumbstick;
+                    return OVRInput.Get(rawAxis, base.ControllerMask);
                 case VRAxis.One:
                     var allAxis = OVRInput.Axis2D.PrimaryTouchpad |
-                                 OVRInput.Axis2D.SecondaryTouchpad |
-                                 OVRInput.Axis2D.PrimaryThumbstick |
-                                 OVRInput.Axis2D.SecondaryThumbstick;
-
-                    return OVRInput.Get(allAxis);
+                                  OVRInput.Axis2D.PrimaryThumbstick;
+                    return OVRInput.Get(allAxis, Controller);
                 default:
                     return Vector2.zero;
             }
         }
 
-        // TODO: Add Controller masks to detect between left or right hand.
+        // TODO: Consider how Oculus Go would work.
         public override bool GetButton(string button)
         {
-            GetControllerButtonMapping(Controller).TryGetValue(button, out var ovrButton);
+            QuestButtonMapping().TryGetValue(button, out var ovrButton);
             return (ovrButton != OVRInput.Button.None) && OVRInput.Get(ovrButton, Controller);
         }
 
         public override bool GetButtonDown(string button)
         {
-            GetControllerButtonMapping(Controller).TryGetValue(button, out var ovrButton);
+            QuestButtonMapping().TryGetValue(button, out var ovrButton);
             return (ovrButton != OVRInput.Button.None) && OVRInput.GetDown(ovrButton, Controller);
         }
 
         public override bool GetButtonUp(string button)
         {
-            GetControllerButtonMapping(Controller).TryGetValue(button, out var ovrButton);
+            QuestButtonMapping().TryGetValue(button, out var ovrButton);
             return (ovrButton != OVRInput.Button.None) && OVRInput.GetUp(ovrButton, Controller);            
         }
 
@@ -116,7 +115,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         public override bool HasButton(string button)
         {
-            return GetControllerButtonMapping(Controller).ContainsKey(button);
+            return QuestButtonMapping().ContainsKey(button);
         }
 
         public override bool HasCapabilities(VRInputDeviceCapability capabilities)
@@ -124,33 +123,33 @@ namespace Liminal.SDK.VR.Devices.GearVR
             return ((_capabilities & capabilities) == capabilities);
         }
 
-        public Dictionary<string, OVRInput.Button> GetControllerButtonMapping(OVRInput.Controller controller)
+        public Dictionary<string, OVRInput.Button> GearAndGoButtonMapping()
         {
-            switch (controller)
+            return new Dictionary<string, OVRInput.Button>()
             {
-                case OVRInput.Controller.RTouch:
-                    return new Dictionary<string, OVRInput.Button>()
-                    {
-                        { VRButton.One, OVRInput.Button.PrimaryIndexTrigger},
-                        { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger},
-                        { VRButton.Two, OVRInput.Button.PrimaryTouchpad },
-                        { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
-                        { VRButton.Back, OVRInput.Button.Back }
-                    };
+                { VRButton.One, OVRInput.Button.PrimaryIndexTrigger},
+                { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger},
+                { VRButton.Two, OVRInput.Button.PrimaryTouchpad },
+                { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
+                { VRButton.Back, OVRInput.Button.Back}
+            };
+        }
 
-                case OVRInput.Controller.LTouch:
-                    return new Dictionary<string, OVRInput.Button>()
-                    {
-                        { VRButton.One, OVRInput.Button.SecondaryIndexTrigger},
-                        { VRButton.Trigger, OVRInput.Button.SecondaryIndexTrigger},
-                        { VRButton.Two, OVRInput.Button.SecondaryTouchpad },
-                        { VRButton.Touch, OVRInput.Button.SecondaryTouchpad },
-                        { VRButton.Back, OVRInput.Button.Back }
-                    };
-
-                default:
-                    return null;
-            }
+        /// <summary>
+        /// When accessing Oculus input with the controller mask passed in, do not use Secondary keyword such as SecondaryIndexTrigger
+        /// as they do not have a mapping for and is intended for use without supplying the controller mask.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, OVRInput.Button> QuestButtonMapping()
+        {
+            return new Dictionary<string, OVRInput.Button>()
+            {
+                { VRButton.One, OVRInput.Button.PrimaryIndexTrigger},
+                { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger},
+                { VRButton.Two, OVRInput.Button.PrimaryTouchpad },
+                { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
+                { VRButton.Back, OVRInput.Button.Back | OVRInput.Button.Two}
+            };
         }
     }
 }

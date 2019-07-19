@@ -9,6 +9,10 @@ public static class OVRUtils
     public static bool IsOculusQuest => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest;
     public static bool IsOculusGo => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go;
 
+    /// <summary>
+    /// When both controllers are connected, Controller.Touch is used.
+    /// When one controller is connected, the individual Controller.RTouch is used.
+    /// </summary>
     public static bool IsQuestControllerConnected 
         => OVRInput.IsControllerConnected(OVRInput.Controller.Touch) || 
            OVRInput.IsControllerConnected(OVRInput.Controller.RTouch) ||

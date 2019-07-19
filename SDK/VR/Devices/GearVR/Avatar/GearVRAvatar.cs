@@ -68,7 +68,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         private void Awake()
         {
-            // #Quest
             mAvatar = GetComponentInParent<IVRAvatar>();
             mAvatar.InitializeExtensions();
 

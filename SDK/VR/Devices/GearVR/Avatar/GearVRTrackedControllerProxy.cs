@@ -58,13 +58,8 @@
         {
             OVRInput.Controller controller = OVRInput.GetActiveController();
 
-            // #Quest
-            // In Editor, active controller is Touch, representing both hand controllers.
-            // But for querying position/rotation we need to specify
             if (OVRUtils.IsQuestControllerConnected)
-            {
                 controller = OVRUtils.GetControllerType(mLimbType);
-            }
 
             return controller;
         }

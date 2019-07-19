@@ -28,7 +28,7 @@ public class BuildWindowConfig
             "UnityEngine.XRModule",
             "UnityEngine.VRModule",
             "UnityEngine.DirectorModule",
-            //"UnityEngine.WindModule",
+            "UnityEngine.WindModule",
         };
 
     public BuildPlatform SelectedPlatform = BuildPlatform.Current;

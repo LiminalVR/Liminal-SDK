@@ -66,6 +66,7 @@ namespace Liminal.SDK.Build
                         if (config.DefaultAdditionalReferences.Contains(_referenceInput))
                         {
                             Debug.Log($"The default references already included {_referenceInput}");
+                            return;
                         }
 
                         var refAsm = Assembly.Load(_referenceInput);

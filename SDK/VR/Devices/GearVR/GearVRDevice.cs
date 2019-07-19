@@ -99,6 +99,16 @@ namespace Liminal.SDK.VR.Devices.GearVR
             deviceAv.hideFlags = HideFlags.NotEditable;
 
             UpdateConnectedControllers();
+            SetDefaultPointerActivation();
+        }
+
+        /// <summary>
+        /// By default the Primary Controller will have a pointer and Secondary will be deactivated.
+        /// </summary>
+        private void SetDefaultPointerActivation()
+        {
+            mPrimaryController.Pointer.Activate();
+            mSecondaryController.Pointer.Deactivate();
         }
 
         private void UpdateConnectedControllers()

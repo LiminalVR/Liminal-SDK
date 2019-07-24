@@ -12,7 +12,7 @@ namespace Liminal.SDK.Build
     public class BuildSettingsWindow : EditorWindow
     {
         private const int _width = 500;
-        private const int _height = 200;
+        private const int _height = 300;
 
         public static EditorWindow Window;
         public static Dictionary<BuildSettingMenus, BaseWindowDrawer> BuildSettingLookup = new Dictionary<BuildSettingMenus, BaseWindowDrawer>();

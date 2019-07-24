@@ -1,4 +1,7 @@
-﻿using Liminal.SDK.Editor.Build;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using Liminal.SDK.Editor.Build;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -10,6 +13,8 @@ namespace Liminal.SDK.Build
     /// </summary>
     public class BuildWindow : BaseWindowDrawer
     {
+        private string _referenceInput;
+
         public override void Draw(BuildWindowConfig config)
         {
             EditorGUILayout.BeginVertical("Box");
@@ -27,8 +32,60 @@ namespace Liminal.SDK.Build
                 _selectedPlatform = (BuildPlatform)EditorGUILayout.EnumPopup("Select Platform", _selectedPlatform);
                 config.SelectedPlatform = _selectedPlatform;
 
-                GUILayout.FlexibleSpace();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                EditorGUILayout.LabelField("Additional References");
+                EditorGUI.indentLevel++;
 
+                var toRemove = new List<string>();
+                foreach (var reference in config.AdditionalReferences)
+                {
+                    GUILayout.BeginHorizontal();
+                    {
+                        EditorGUILayout.LabelField(reference);
+                        if (GUILayout.Button("X"))
+                        {
+                            toRemove.Add(reference);
+                        }
+                    }
+                    GUILayout.EndHorizontal();
+                }
+
+                foreach (var reference in toRemove)
+                {
+                    config.AdditionalReferences.Remove(reference);
+                }
+
+                GUILayout.BeginHorizontal();
+                {
+                    _referenceInput = EditorGUILayout.TextField("Reference: ", _referenceInput);
+                    if (GUILayout.Button("+"))
+                    {
+                        if (string.IsNullOrEmpty(_referenceInput))
+                            return;
+
+                        if (config.DefaultAdditionalReferences.Contains(_referenceInput))
+                        {
+                            Debug.Log($"The default references already included {_referenceInput}");
+                            return;
+                        }
+
+                        var refAsm = Assembly.Load(_referenceInput);
+                        if (refAsm == null)
+                        {
+                            Debug.LogError($"Assembly: {_referenceInput} does not exist.");
+                            return;
+                        }
+
+                        if (!config.AdditionalReferences.Contains(_referenceInput))
+                            config.AdditionalReferences.Add(_referenceInput);
+
+                        _referenceInput = "";
+                    }
+                }
+                GUILayout.EndHorizontal();
+                EditorGUI.indentLevel--;
+
+                GUILayout.FlexibleSpace();
                 GUI.enabled = !_scenePath.Equals(string.Empty);
 
                 if (GUILayout.Button("Build"))

@@ -1,7 +1,7 @@
 {
     "name": "com.liminal.sdk",
     "displayName": "Liminal",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "unity": "2018.3",
     "description": "Liminal SDK",
     "keywords": [

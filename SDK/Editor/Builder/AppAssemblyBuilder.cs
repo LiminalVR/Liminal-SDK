@@ -51,26 +51,22 @@ namespace Liminal.SDK.Editor.Build
 
             var buildSuccess = false;
 
-            // Usage of assembly definition generated assemblies outside of Unity in the UPM Packages that references UnityEngine.CoreModule, 
-            // will not pass the AssemblyBuilder process without us adding additional references to the builder.
-            // These assemblies will not be included in the Limapp Build.
-            var additionalReferences = new string[] 
+            var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
+            var config = JsonUtility.FromJson<BuildWindowConfig>(json);
+
+            var configAdditionalReferences = config.DefaultAdditionalReferences;
+            configAdditionalReferences.AddRange(config.AdditionalReferences);
+
+            foreach (var additionalReference in configAdditionalReferences)
             {
-                GetAssemblyPath("UnityEngine"),
-                GetAssemblyPath("UnityEngine.CoreModule"),
-                GetAssemblyPath("UnityEngine.ParticleSystemModule"),
-                GetAssemblyPath("UnityEngine.TextRenderingModule"),
-                GetAssemblyPath("UnityEngine.AnimationModule"),
-                GetAssemblyPath("UnityEngine.AudioModule"),
-                GetAssemblyPath("UnityEngine.UIModule"),
-                GetAssemblyPath("UnityEngine.PhysicsModule"),
-                GetAssemblyPath("UnityEngine.UnityWebRequestWWWModule"),
-                GetAssemblyPath("UnityEngine.UnityWebRequestModule"),
-                GetAssemblyPath("UnityEngine.IMGUIModule"),
-                GetAssemblyPath("UnityEngine.XRModule"),
-                GetAssemblyPath("UnityEngine.VRModule"),
-                GetAssemblyPath("UnityEngine.DirectorModule"),
-            };
+                Debug.Log(additionalReference);
+            }
+
+            var additionalReferences = new string[configAdditionalReferences.Count];
+            for (var i = 0; i < additionalReferences.Length; i++)
+            {
+                additionalReferences[i] = GetAssemblyPath(configAdditionalReferences[i]);
+            }
 
             var builder = new AssemblyBuilder(outputPath, scripts)
             {

@@ -99,6 +99,20 @@ namespace Liminal.SDK.VR.Devices.GearVR
             deviceAv.hideFlags = HideFlags.NotEditable;
 
             UpdateConnectedControllers();
+            SetDefaultPointerActivation();
+        }
+
+        /// <summary>
+        /// By default the Primary Controller will have a pointer and Secondary will be deactivated.
+        /// </summary>
+        private void SetDefaultPointerActivation()
+        {
+            // Usually null-coalescing is a dangerous way to hide an issue but in this case,
+            // Not all headsets have two controllers and some users may even open the app without a controller.
+            // The app should not stop because of a lack of controllers as there is always gaze input to fall back on.
+
+            mPrimaryController?.Pointer?.Activate();
+            mSecondaryController?.Pointer?.Deactivate();
         }
 
         private void UpdateConnectedControllers()

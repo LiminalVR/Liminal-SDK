@@ -17,6 +17,8 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
     [AddComponentMenu("")]
     public class GearVRAvatar : MonoBehaviour, IVRDeviceAvatar
     {
+        public static EPointerActivationType PointerActivationType = EPointerActivationType.ActiveController;
+
         private GazeInput mGazeInput = null;
 
         private const string ControllerVisualPrefabName = "GearVRController";
@@ -35,6 +37,10 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
         // Cached state values
         private OVRInput.Controller mCachedActiveController;
+
+        // This is essentially mCachedActiveController, however that is being used a different way and 
+        // Oculus Quest report active Controller as Controller.Touch instead of Controller.RTouch.
+        private OVRInput.Controller mQuestActiveController = OVRInput.Controller.RTouch;
 
         #region Properties
         /// <summary>
@@ -132,13 +138,57 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         private void Update()
         {
             if (mCachedActiveController != OVRInput.GetActiveController())
-            {
                 UpdateHandedness();
-            }
 
             RecenterHmdIfRequired();
-
             DetectAndUpdateControllerStates();
+
+            if (OVRUtils.IsOculusQuest)
+                DetectPointerState();
+        }
+
+        private void DetectPointerState()
+        {
+            var device = VRDevice.Device;
+            var activeController = mQuestActiveController;
+
+            // This block of code has a lot of Null-Coalescing, which usually is dangerous but in this case we do not want to block the app.
+            // A controller may disconnect and reconnect anytime.
+            switch (PointerActivationType)
+            {
+                case EPointerActivationType.ActiveController:
+                {
+                    if (OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.RTouch) ||
+                        OVRInput.GetUp(OVRInput.Button.Any, OVRInput.Controller.RTouch))
+                    {
+                        mQuestActiveController = OVRInput.Controller.RTouch;
+
+                        if (activeController != mQuestActiveController)
+                        {
+                            device?.PrimaryInputDevice?.Pointer?.Activate();
+                            device?.SecondaryInputDevice?.Pointer?.Deactivate();
+                        }
+                    }
+
+                    if (OVRInput.GetDown(OVRInput.Button.Any, OVRInput.Controller.LTouch) ||
+                        OVRInput.GetUp(OVRInput.Button.Any, OVRInput.Controller.LTouch))
+                    {
+                        mQuestActiveController = OVRInput.Controller.LTouch;
+
+                        if (activeController != mQuestActiveController)
+                        {
+                            device?.SecondaryInputDevice?.Pointer?.Activate();
+                            device?.PrimaryInputDevice?.Pointer?.Deactivate();
+                        }
+                    }
+                    break;
+                }
+
+                case EPointerActivationType.Both:
+                    device?.PrimaryInputDevice?.Pointer?.Activate();
+                    device?.SecondaryInputDevice?.Pointer?.Activate();
+                    break;
+            }
         }
 
         #endregion

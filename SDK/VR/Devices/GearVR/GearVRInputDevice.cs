@@ -21,11 +21,31 @@ namespace Liminal.SDK.VR.Devices.GearVR
         /// bitfield masks, sometimes as simple enum values.
         /// </summary>
         public OVRInput.Controller ControllerMask { get; private set; }
-        public bool IsTouching => OVRInput.Get(OVRInput.Touch.One);
+
+        /// <summary>
+        /// For GearVR and OculusGo, this means if TouchPad is Touched (whether it is pressed or not.
+        /// For Oculus Quest, this means if a user has placed their finder on the thumbstick.
+        /// This should not be renamed in case it has been used by other limapps.
+        /// </summary>
+        public bool IsTouching
+        {
+            get
+            {
+                if (OVRUtils.IsOculusQuest)
+                {
+                    return OVRInput.Get(OVRInput.Touch.PrimaryThumbstick, ControllerMask);
+                }
+                else
+                {
+                    return OVRInput.Get(OVRInput.Touch.One);
+                }
+            }
+        }
 
         protected GearVRInputDevice(OVRInput.Controller controllerMask)
         {
             ControllerMask = controllerMask;
+
             Pointer = CreatePointer();
             Pointer?.Activate();
         }

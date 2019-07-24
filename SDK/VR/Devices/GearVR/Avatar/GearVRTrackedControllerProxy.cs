@@ -1,12 +1,8 @@
-﻿using Liminal.SDK.VR.Avatars;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-
-namespace Liminal.SDK.VR.Devices.GearVR.Avatar
+﻿namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 {
+    using UnityEngine;
+    using Avatars;
+
     /// <summary>
     /// A concrete implementation of <see cref="IVRTrackedObjectProxy"/> for wrapping around a tracked GearVR controller.
     /// </summary>
@@ -14,9 +10,12 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
     [AddComponentMenu("")]
     public class GearVRTrackedControllerProxy : IVRTrackedObjectProxy
     {
+        private VRAvatarLimbType mLimbType;
+
         private IVRAvatar mAvatar;
         private Transform mAvatarTransform;
         private Transform mHeadTransform;
+
         #region Properties
 
         public bool IsActive { get { return true; } }
@@ -47,21 +46,20 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         /// </summary>
         /// <param name="avatar">The avatar that owns the controller.</param>
         /// <param name="controllerType">The controller type the proxy wraps.</param>
-        public GearVRTrackedControllerProxy(IVRAvatar avatar)
+        public GearVRTrackedControllerProxy(IVRAvatar avatar, VRAvatarLimbType limbType)
         {
             mAvatar = avatar;
             mAvatarTransform = mAvatar.Transform;
             mHeadTransform = mAvatar.Head.Transform;
+            mLimbType = limbType;
         }
 
-        private static OVRInput.Controller ActiveController()
+        private OVRInput.Controller ActiveController()
         {
             OVRInput.Controller controller = OVRInput.GetActiveController();
 
-            // In Editor, active controller is Touch, representing both hand controllers.
-            // But for querying position/rotation we need to specify
             if (OVRUtils.IsQuestControllerConnected)
-                controller = OVRInput.Controller.RTouch;
+                controller = OVRUtils.GetControllerType(mLimbType);
 
             return controller;
         }

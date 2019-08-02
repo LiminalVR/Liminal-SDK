@@ -116,6 +116,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
                     Debug.Log("[BundleLoader] Unpack complete");
                     mAppPack = unpacker.Data;
 
+                    /*
                     if (mAppPack.ApplicationId != mExperience.Id)
                     {
                         var message = string.Format("[BundleLoader] Bundle Application Id {0} did not match Experience Id {1}", mAppPack.ApplicationId, mExperience.Id);
@@ -123,6 +124,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
                         Cancel();
                         yield break;
                     }
+                    */
                 }
             }
         }

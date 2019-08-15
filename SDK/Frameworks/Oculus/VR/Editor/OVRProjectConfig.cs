@@ -19,17 +19,13 @@ limitations under the License.
 
 ************************************************************************************/
 
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System;
 
-/// <summary>
-/// This class has been modified.
-/// Due to Liminal including OVR as a package, creating a config inside the package is not possible so instead
-/// this script has been modifed to create and read from Liminal/Resources.
-/// </summary>
 [System.Serializable]
 public class OVRProjectConfig : ScriptableObject
 {
@@ -59,23 +55,15 @@ public class OVRProjectConfig : ScriptableObject
 		return relativeUri.ToString();
 	}
 
-    private static string ProjectConfigPath => "Assets/Liminal/Resources/OculusProjectConfig.asset";
-
 	public static OVRProjectConfig GetProjectConfig()
 	{
 		OVRProjectConfig projectConfig = null;
-
-        // #Changed. 
-        // GetOculusProjectConfigAssetPath points to the Package cache path and we cannot create an asset inside a remote package.
-        // string oculusProjectConfigAssetPath = GetOculusProjectConfigAssetPath();
-
-        var oculusProjectConfigAssetPath = ProjectConfigPath;
-
-        try
-        {
-            projectConfig = AssetDatabase.LoadAssetAtPath(oculusProjectConfigAssetPath, typeof(OVRProjectConfig)) as OVRProjectConfig;
-        }
-        catch (System.Exception e)
+		string oculusProjectConfigAssetPath = GetOculusProjectConfigAssetPath();
+		try
+		{
+			projectConfig = AssetDatabase.LoadAssetAtPath(oculusProjectConfigAssetPath, typeof(OVRProjectConfig)) as OVRProjectConfig;
+		}
+		catch (System.Exception e)
 		{
 			Debug.LogWarningFormat("Unable to load ProjectConfig from {0}, error {1}", oculusProjectConfigAssetPath, e.Message);
 		}
@@ -84,14 +72,8 @@ public class OVRProjectConfig : ScriptableObject
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
 			projectConfig.targetDeviceTypes.Add(DeviceType.GearVrOrGo);
-
-            // #Changed.
-            // By default, Liminal will be supporting Oculus Quest.
-            projectConfig.targetDeviceTypes.Add(DeviceType.Quest);
-
-            AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
+			AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
 		}
-
 		return projectConfig;
 	}
 

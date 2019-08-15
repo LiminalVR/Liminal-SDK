@@ -1308,7 +1308,7 @@ public static class OVRInput
 	/// Returns the current active controller type.
 	/// </summary>
 	public static Controller GetActiveController()
-    {
+	{
 		return activeControllerType;
 	}
 

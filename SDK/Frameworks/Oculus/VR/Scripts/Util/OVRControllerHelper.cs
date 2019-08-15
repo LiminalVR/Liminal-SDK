@@ -127,7 +127,7 @@ public class OVRControllerHelper : MonoBehaviour
 	}
 
 	void Update()
-    {
+	{
 		bool controllerConnected = OVRInput.IsControllerConnected(m_controller);
 
 		if ((controllerConnected != m_prevControllerConnected) || !m_prevControllerConnectedCached)
@@ -145,8 +145,7 @@ public class OVRControllerHelper : MonoBehaviour
 			{
 				m_modelOculusGoController.SetActive(false);
 				m_modelGearVrController.SetActive(false);
-
-                m_modelOculusTouchQuestAndRiftSLeftController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.LTouch));
+				m_modelOculusTouchQuestAndRiftSLeftController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.LTouch));
 				m_modelOculusTouchQuestAndRiftSRightController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.RTouch));
 				m_modelOculusTouchRiftLeftController.SetActive(false);
 				m_modelOculusTouchRiftRightController.SetActive(false);
@@ -165,7 +164,7 @@ public class OVRControllerHelper : MonoBehaviour
 			m_prevControllerConnectedCached = true;
 		}
 
-        if (!controllerConnected)
+		if (!controllerConnected)
 		{
 			return;
 		}

@@ -519,10 +519,7 @@ class OVRPluginUpdater
 	}
 
 	private static void AttemptPluginUpdate(bool triggeredByAutoUpdate)
-    {
-        // Presently our application is in 2018.3 which does not have OculusPlugin 1.3.8 but OculusPlugin Updater expects it to be 1.3.8
-        return;
-
+	{
 		OVRPlugin.SendEvent("attempt_plugin_update_auto", triggeredByAutoUpdate.ToString());
 
 		PluginPackage bundledPluginPkg = GetBundledPluginPackage();

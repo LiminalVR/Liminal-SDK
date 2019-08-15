@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.IO;
+using Liminal.Core.Fader;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Liminal.Platform.Experimental.App.Experiences;
@@ -73,6 +74,15 @@ namespace Liminal.Platform.Experimental.App
             ExperienceAppPlayer.Begin();
 
             ExperienceApp.OnComplete += OnExperienceComplete;
+            ExperienceApp.Initializing += SetScreenfaderActive;
+        }
+
+        private void SetScreenfaderActive()
+        {
+
+            var avatar = (VRAvatar)FindObjectOfType(typeof(VRAvatar));
+            print($"<color=green>{avatar.Transform.parent}</color>");
+            avatar.GetComponentInChildren<CompoundScreenFader>().enabled = true;
         }
 
         private void OnExperienceComplete(bool completed)

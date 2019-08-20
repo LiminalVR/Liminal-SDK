@@ -8,6 +8,7 @@ using Liminal.Platform.Experimental.VR;
 using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
+using Liminal.Core.Fader;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
@@ -73,6 +74,13 @@ namespace Liminal.Platform.Experimental.App
             ExperienceAppPlayer.Begin();
 
             ExperienceApp.OnComplete += OnExperienceComplete;
+            ExperienceApp.Initializing += SetScreenfaderActive;
+        }
+
+        private void SetScreenfaderActive()
+        {
+            var avatar = (VRAvatar)FindObjectOfType(typeof(VRAvatar));
+            avatar.GetComponentInChildren<CompoundScreenFader>().enabled = true;
         }
 
         private void OnExperienceComplete(bool completed)

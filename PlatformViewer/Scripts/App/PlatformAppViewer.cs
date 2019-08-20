@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.IO;
-using Liminal.Core.Fader;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Liminal.Platform.Experimental.App.Experiences;
@@ -9,6 +8,7 @@ using Liminal.Platform.Experimental.VR;
 using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
+using Liminal.Core.Fader;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
@@ -79,9 +79,7 @@ namespace Liminal.Platform.Experimental.App
 
         private void SetScreenfaderActive()
         {
-
             var avatar = (VRAvatar)FindObjectOfType(typeof(VRAvatar));
-            print($"<color=green>{avatar.Transform.parent}</color>");
             avatar.GetComponentInChildren<CompoundScreenFader>().enabled = true;
         }
 

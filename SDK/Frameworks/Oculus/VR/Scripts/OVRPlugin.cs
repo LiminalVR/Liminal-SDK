@@ -39,7 +39,7 @@ public static class OVRPlugin
 #if OVRPLUGIN_UNSUPPORTED_PLATFORM
 	public static readonly System.Version wrapperVersion = _versionZero;
 #else
-	public static readonly System.Version wrapperVersion = OVRP_1_39_0.version;
+	public static readonly System.Version wrapperVersion = OVRP_1_40_0.version;
 #endif
 
 #if !OVRPLUGIN_UNSUPPORTED_PLATFORM
@@ -4724,6 +4724,11 @@ public static class OVRPlugin
 	private static class OVRP_1_39_0
 	{
 		public static readonly System.Version version = new System.Version(1, 39, 0);
+	}
+
+	private static class OVRP_1_40_0
+	{
+		public static readonly System.Version version = new System.Version(1, 40, 0);
 	}
 
 #endif // !OVRPLUGIN_UNSUPPORTED_PLATFORM

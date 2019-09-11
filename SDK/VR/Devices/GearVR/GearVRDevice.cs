@@ -221,34 +221,41 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         private void UpdateToLWRPMaterial()
         {
-            try
-            {
-                var hands = VRAvatar.Active.Hands;
+            var hands = VRAvatar.Active.Hands;
 
-                foreach (var hand in hands)
+            if (hands == null)
+                return;
+
+            foreach (var hand in hands)
+            {
+                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+
+                if (meshes == null)
+                    return;
+
+                foreach (var mesh in meshes)
                 {
-                    var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+                    if (mesh.material == null)
+                        return;
 
-                    foreach (var mesh in meshes)
+                    var oldMat = mesh.material;
+                    if (oldMat == null)
+                        return;
+
+                    var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
+                    if (newMat == null)
+                        return;
+
+                    if (oldMat.shader == newMat.shader)
                     {
-                        var oldMat = mesh.material;
-                        var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
-
-                        if (oldMat.shader == newMat.shader)
-                        {
-                            continue;
-                        }
-
-                        newMat.SetTexture("_BaseMap", oldMat.mainTexture);
-                        newMat.SetColor("_BaseColor", oldMat.color);
-                        newMat.SetFloat("_SmoothnessTextureChannel", oldMat.GetFloat("_Glossiness"));
-                        mesh.material = newMat;
+                        continue;
                     }
+
+                    newMat.SetTexture("_BaseMap", oldMat.mainTexture);
+                    newMat.SetColor("_BaseColor", oldMat.color);
+                    newMat.SetFloat("_SmoothnessTextureChannel", oldMat.GetFloat("_Glossiness"));
+                    mesh.material = newMat;
                 }
-            }
-            catch (NullReferenceException e)
-            {
-                Debug.Log(e.Message);
             }
         }
 

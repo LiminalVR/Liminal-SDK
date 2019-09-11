@@ -201,7 +201,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 InputDeviceConnected?.Invoke(this, device);
             }
 
-            //CheckUsedRenderPipeline();
+            CheckUsedRenderPipeline();
 
             // Force an update of input devices
             UpdateInputDevices();
@@ -221,29 +221,35 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         private void UpdateToLWRPMaterial()
         {
-            var hands = VRAvatar.Active.Hands;
-
-            foreach (var hand in hands)
+            try
             {
-                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+                var hands = VRAvatar.Active.Hands;
 
-                foreach (var mesh in meshes)
+                foreach (var hand in hands)
                 {
-                    var oldMat = mesh.material;
-                    var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
+                    var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
 
-                    if (oldMat.shader == newMat.shader)
+                    foreach (var mesh in meshes)
                     {
-                        continue;
-                    }
+                        var oldMat = mesh.material;
+                        var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
 
-                    newMat.SetTexture("_BaseMap", oldMat.mainTexture);
-                    newMat.SetColor("_BaseColor", oldMat.color);
-                    newMat.SetFloat("_SmoothnessTextureChannel", oldMat.GetFloat("_Glossiness"));
-                    mesh.material = newMat;
+                        if (oldMat.shader == newMat.shader)
+                        {
+                            continue;
+                        }
+
+                        newMat.SetTexture("_BaseMap", oldMat.mainTexture);
+                        newMat.SetColor("_BaseColor", oldMat.color);
+                        newMat.SetFloat("_SmoothnessTextureChannel", oldMat.GetFloat("_Glossiness"));
+                        mesh.material = newMat;
+                    }
                 }
             }
-            
+            catch (NullReferenceException e)
+            {
+                Debug.Log(e.Message);
+            }
         }
 
         private void UpdateToStandardMaterial()

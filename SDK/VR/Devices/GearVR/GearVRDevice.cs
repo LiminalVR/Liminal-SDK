@@ -201,7 +201,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 InputDeviceConnected?.Invoke(this, device);
             }
 
-            CheckUsedRenderPipeline();
+            //CheckUsedRenderPipeline();
 
             // Force an update of input devices
             UpdateInputDevices();

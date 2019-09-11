@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Liminal.SDK.VR.Devices.GearVR
 {
@@ -200,8 +201,76 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 InputDeviceConnected?.Invoke(this, device);
             }
 
+            CheckUsedRenderPipeline();
+
             // Force an update of input devices
             UpdateInputDevices();
+        }
+
+        private void CheckUsedRenderPipeline()
+        {
+            if (GraphicsSettings.renderPipelineAsset == null)
+            {
+                UpdateToStandardMaterial();
+            }
+            else
+            {
+                UpdateToLWRPMaterial();
+            }
+        }
+
+        private void UpdateToLWRPMaterial()
+        {
+            var hands = VRAvatar.Active.Hands;
+
+            foreach (var hand in hands)
+            {
+                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+
+                foreach (var mesh in meshes)
+                {
+                    var oldMat = mesh.material;
+                    var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
+
+                    if (oldMat.shader == newMat.shader)
+                    {
+                        continue;
+                    }
+
+                    newMat.SetTexture("_BaseMap", oldMat.mainTexture);
+                    newMat.SetColor("_BaseColor", oldMat.color);
+                    newMat.SetFloat("_SmoothnessTextureChannel", oldMat.GetFloat("_Glossiness"));
+                    mesh.material = newMat;
+                }
+            }
+            
+        }
+
+        private void UpdateToStandardMaterial()
+        {
+            var hands = VRAvatar.Active.Hands;
+
+            foreach (var hand in hands)
+            {
+                Debug.Log($"Hand: {hand.Transform.gameObject}");
+                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+
+                foreach (var mesh in meshes)
+                {
+                    var oldMat = mesh.material;
+                    var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
+
+                    if (oldMat.shader == newMat.shader)
+                    {
+                        continue;
+                    }
+
+                    newMat.mainTexture = oldMat.GetTexture("_BaseMap");
+                    newMat.color = oldMat.GetColor("_BaseColor");
+                    newMat.SetFloat("_Glossiness", oldMat.GetFloat("_Smoothness"));
+                    mesh.material = newMat;
+                }
+            }
         }
 
         private void UpdateInputDevices()

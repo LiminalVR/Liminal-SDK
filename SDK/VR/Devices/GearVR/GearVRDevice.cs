@@ -82,6 +82,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 // Active controller has changed
                 UpdateInputDevices();
             }
+
+            CheckUsedRenderPipeline();
         }
         
         bool IVRDevice.HasCapabilities(VRDeviceCapability capabilities)
@@ -201,8 +203,6 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 InputDeviceConnected?.Invoke(this, device);
             }
 
-            CheckUsedRenderPipeline();
-
             // Force an update of input devices
             UpdateInputDevices();
         }
@@ -221,35 +221,26 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         private void UpdateToLWRPMaterial()
         {
-            var hands = VRAvatar.Active.Hands;
-
-            if (hands == null)
+            if (VRAvatar.Active == null)
                 return;
+
+            var hands = VRAvatar.Active.Hands;
 
             foreach (var hand in hands)
             {
                 var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
 
-                if (meshes == null)
-                    return;
-
                 foreach (var mesh in meshes)
                 {
-                    if (mesh.material == null)
+                    if (mesh.material.shader == Shader.Find("Lightweight Render Pipeline/Lit"))
+                    {
                         return;
+                    }
+
+                    Debug.Log("<color=green>Adding LWRP shaders!</color>");
 
                     var oldMat = mesh.material;
-                    if (oldMat == null)
-                        return;
-
                     var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
-                    if (newMat == null)
-                        return;
-
-                    if (oldMat.shader == newMat.shader)
-                    {
-                        continue;
-                    }
 
                     newMat.SetTexture("_BaseMap", oldMat.mainTexture);
                     newMat.SetColor("_BaseColor", oldMat.color);
@@ -257,26 +248,32 @@ namespace Liminal.SDK.VR.Devices.GearVR
                     mesh.material = newMat;
                 }
             }
+
         }
 
         private void UpdateToStandardMaterial()
         {
+            if (VRAvatar.Active == null)
+                return;
+
             var hands = VRAvatar.Active.Hands;
 
             foreach (var hand in hands)
             {
-                Debug.Log($"Hand: {hand.Transform.gameObject}");
                 var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
 
                 foreach (var mesh in meshes)
                 {
-                    var oldMat = mesh.material;
-                    var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
-
-                    if (oldMat.shader == newMat.shader)
+                    if (mesh.material.shader == Shader.Find("Standard"))
                     {
-                        continue;
+                        return;
                     }
+
+                    Debug.Log("<color=green>Adding standard shaders!</color>");
+
+                    var oldMat = mesh.material;
+                    var newMat = new Material(Shader.Find("Standard"));
+
 
                     newMat.mainTexture = oldMat.GetTexture("_BaseMap");
                     newMat.color = oldMat.GetColor("_BaseColor");

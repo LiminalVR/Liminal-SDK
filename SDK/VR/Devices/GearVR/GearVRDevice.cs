@@ -23,6 +23,10 @@ namespace Liminal.SDK.VR.Devices.GearVR
         private bool mHeadsetInputConnected;
         private OVRInput.Controller mCachedActiveController;
         private IVRInputDevice[] mInputDevices = new IVRInputDevice[0];
+        private static readonly int BaseMap = Shader.PropertyToID("_BaseMap");
+        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        private static readonly int SmoothnessTextureChannel = Shader.PropertyToID("_SmoothnessTextureChannel");
+        private static readonly int Glossiness = Shader.PropertyToID("_Glossiness");
 
         #region Properties
 
@@ -237,18 +241,15 @@ namespace Liminal.SDK.VR.Devices.GearVR
                         return;
                     }
 
-                    Debug.Log("<color=green>Adding LWRP shaders!</color>");
-
                     var oldMat = mesh.material;
                     var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
 
-                    newMat.SetTexture("_BaseMap", oldMat.mainTexture);
-                    newMat.SetColor("_BaseColor", oldMat.color);
-                    newMat.SetFloat("_SmoothnessTextureChannel", oldMat.GetFloat("_Glossiness"));
+                    newMat.SetTexture(BaseMap, oldMat.mainTexture);
+                    newMat.SetColor(BaseColor, oldMat.color);
+                    newMat.SetFloat(SmoothnessTextureChannel, oldMat.GetFloat(Glossiness));
                     mesh.material = newMat;
                 }
             }
-
         }
 
         private void UpdateToStandardMaterial()
@@ -269,15 +270,12 @@ namespace Liminal.SDK.VR.Devices.GearVR
                         return;
                     }
 
-                    Debug.Log("<color=green>Adding standard shaders!</color>");
-
                     var oldMat = mesh.material;
                     var newMat = new Material(Shader.Find("Standard"));
 
-
-                    newMat.mainTexture = oldMat.GetTexture("_BaseMap");
-                    newMat.color = oldMat.GetColor("_BaseColor");
-                    newMat.SetFloat("_Glossiness", oldMat.GetFloat("_Smoothness"));
+                    newMat.mainTexture = oldMat.GetTexture(BaseMap);
+                    newMat.color = oldMat.GetColor(BaseColor);
+                    newMat.SetFloat(Glossiness, oldMat.GetFloat(SmoothnessTextureChannel));
                     mesh.material = newMat;
                 }
             }

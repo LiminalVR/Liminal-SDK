@@ -5,23 +5,15 @@ using UnityEngine;
 using System.IO;
 using System.Linq;
 
+[InitializeOnLoad]
 public class LiminalSDKResources : EditorWindow
 {
-    [MenuItem("Examples/GUILayout TextField")]
-    static void Init()
+    static LiminalSDKResources()
     {
-        EditorWindow window = GetWindow(typeof(LiminalSDKResources));
-        window.Show();
-    }
-    void OnGUI()
-    {
-        if (GUILayout.Button("Test"))
-        {
-            SetupLightweightShaders();
-        }
+        SetupLightweightShaders();
     }
 
-    private void SetupLightweightShaders()
+    static void SetupLightweightShaders()
     {
         if (!Directory.Exists(SDKResourcesConsts.LiminalSDKResourcesPath))
             Directory.CreateDirectory(SDKResourcesConsts.LiminalSDKResourcesPath);
@@ -29,21 +21,26 @@ public class LiminalSDKResources : EditorWindow
         if (!Directory.Exists(SDKResourcesConsts.LWRPShaderResourcesPath))
             Directory.CreateDirectory(SDKResourcesConsts.LWRPShaderResourcesPath);
 
-        var shadersPath = $"{UnityPackageManagerUtils.FullPackageLocation}{SDKResourcesConsts.PackageLWRPShaders}";
+        if (!Directory.Exists(SDKResourcesConsts.GVRShaderResourcesPath))
+            Directory.CreateDirectory(SDKResourcesConsts.GVRShaderResourcesPath);
 
-        var files = Directory.GetFiles(shadersPath).Where(name => !name.EndsWith(".meta"));
+        var lwrpShadersPath = $"{UnityPackageManagerUtils.FullPackageLocation}{SDKResourcesConsts.PackageLWRPShaders}";
+        var gvrShadersPath = $"{UnityPackageManagerUtils.FullPackageLocation}{SDKResourcesConsts.PackageGVRShaders}";
 
+        var lwrpFiles = Directory.GetFiles(lwrpShadersPath).Where(name => !name.EndsWith(".meta")).ToList();
+        var gvrFiles = Directory.GetFiles(gvrShadersPath).Where(name => !name.EndsWith(".meta")).ToList();
+
+        CopyShaders(SDKResourcesConsts.LWRPShaderResourcesPath, lwrpFiles);
+        CopyShaders(SDKResourcesConsts.GVRShaderResourcesPath, gvrFiles);
+
+        AssetDatabase.Refresh();
+    }
+
+    static void CopyShaders(string location, List<string> files)
+    {
         foreach (var file in files)
         {
-            File.Copy(file, SDKResourcesConsts.LWRPShaderResourcesPath + $"/{Path.GetFileName(file)}");
+            File.Copy(file, location + $"/{Path.GetFileName(file)}");
         }
-
-
-        //check if shaders exist
-
-
-        //Debug.Log(shadersPath);
-        //File.Copy(shadersPath, BuildWindowConsts.PreviewAppScenePath);
-        AssetDatabase.Refresh();
     }
 }

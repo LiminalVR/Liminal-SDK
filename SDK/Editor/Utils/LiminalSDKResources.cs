@@ -15,14 +15,9 @@ public class LiminalSDKResources : EditorWindow
 
     static void SetupLightweightShaders()
     {
-        if (!Directory.Exists(SDKResourcesConsts.LiminalSDKResourcesPath))
-            Directory.CreateDirectory(SDKResourcesConsts.LiminalSDKResourcesPath);
-
-        if (!Directory.Exists(SDKResourcesConsts.LWRPShaderResourcesPath))
-            Directory.CreateDirectory(SDKResourcesConsts.LWRPShaderResourcesPath);
-
-        if (!Directory.Exists(SDKResourcesConsts.GVRShaderResourcesPath))
-            Directory.CreateDirectory(SDKResourcesConsts.GVRShaderResourcesPath);
+        Directory.CreateDirectory(SDKResourcesConsts.LiminalSDKResourcesPath);
+        Directory.CreateDirectory(SDKResourcesConsts.LWRPShaderResourcesPath);
+        Directory.CreateDirectory(SDKResourcesConsts.GVRShaderResourcesPath);
 
         var lwrpShadersPath = $"{UnityPackageManagerUtils.FullPackageLocation}{SDKResourcesConsts.PackageLWRPShaders}";
         var gvrShadersPath = $"{UnityPackageManagerUtils.FullPackageLocation}{SDKResourcesConsts.PackageGVRShaders}";

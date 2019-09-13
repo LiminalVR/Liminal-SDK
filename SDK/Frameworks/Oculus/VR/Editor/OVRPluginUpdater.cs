@@ -29,7 +29,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using System.Diagnostics;
 
-[InitializeOnLoad]
+//[InitializeOnLoad]
 class OVRPluginUpdater
 {
 	enum PluginPlatform

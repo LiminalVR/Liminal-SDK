@@ -40,6 +40,9 @@ public class LiminalSDKResources : EditorWindow
     {
         foreach (var file in files)
         {
+            if (File.Exists(location + $"/{Path.GetFileName(file)}"))
+                continue;
+
             File.Copy(file, location + $"/{Path.GetFileName(file)}");
         }
     }

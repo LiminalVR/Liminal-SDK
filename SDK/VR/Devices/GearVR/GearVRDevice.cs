@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace Liminal.SDK.VR.Devices.GearVR
 {
@@ -22,6 +23,10 @@ namespace Liminal.SDK.VR.Devices.GearVR
         private bool mHeadsetInputConnected;
         private OVRInput.Controller mCachedActiveController;
         private IVRInputDevice[] mInputDevices = new IVRInputDevice[0];
+        private static readonly int BaseMap = Shader.PropertyToID("_BaseMap");
+        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        private static readonly int SmoothnessTextureChannel = Shader.PropertyToID("_SmoothnessTextureChannel");
+        private static readonly int Glossiness = Shader.PropertyToID("_Glossiness");
 
         #region Properties
 
@@ -81,6 +86,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
                 // Active controller has changed
                 UpdateInputDevices();
             }
+
+            CheckUsedRenderPipeline();
         }
         
         bool IVRDevice.HasCapabilities(VRDeviceCapability capabilities)
@@ -202,6 +209,76 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
             // Force an update of input devices
             UpdateInputDevices();
+        }
+
+        private void CheckUsedRenderPipeline()
+        {
+            if (GraphicsSettings.renderPipelineAsset == null)
+            {
+                UpdateToStandardMaterial();
+            }
+            else
+            {
+                UpdateToLWRPMaterial();
+            }
+        }
+
+        private void UpdateToLWRPMaterial()
+        {
+            if (VRAvatar.Active == null)
+                return;
+
+            var hands = VRAvatar.Active.Hands;
+
+            foreach (var hand in hands)
+            {
+                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+
+                foreach (var mesh in meshes)
+                {
+                    if (mesh.material.shader == Shader.Find("Lightweight Render Pipeline/Lit"))
+                    {
+                        return;
+                    }
+
+                    var oldMat = mesh.material;
+                    var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
+
+                    newMat.SetTexture(BaseMap, oldMat.mainTexture);
+                    newMat.SetColor(BaseColor, oldMat.color);
+                    newMat.SetFloat(SmoothnessTextureChannel, oldMat.GetFloat(Glossiness));
+                    mesh.material = newMat;
+                }
+            }
+        }
+
+        private void UpdateToStandardMaterial()
+        {
+            if (VRAvatar.Active == null)
+                return;
+
+            var hands = VRAvatar.Active.Hands;
+
+            foreach (var hand in hands)
+            {
+                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+
+                foreach (var mesh in meshes)
+                {
+                    if (mesh.material.shader == Shader.Find("Standard"))
+                    {
+                        return;
+                    }
+
+                    var oldMat = mesh.material;
+                    var newMat = new Material(Shader.Find("Standard"));
+
+                    newMat.mainTexture = oldMat.GetTexture(BaseMap);
+                    newMat.color = oldMat.GetColor(BaseColor);
+                    newMat.SetFloat(Glossiness, oldMat.GetFloat(SmoothnessTextureChannel));
+                    mesh.material = newMat;
+                }
+            }
         }
 
         private void UpdateInputDevices()

@@ -17,7 +17,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
     [AddComponentMenu("")]
     public class GearVRAvatar : MonoBehaviour, IVRDeviceAvatar
     {
-        public static EPointerActivationType PointerActivationType = EPointerActivationType.ActiveController;
+        public static EPointerActivationType PointerActivationType = EPointerActivationType.Both;
 
         private GazeInput mGazeInput = null;
 

@@ -15,7 +15,7 @@ namespace Liminal.SDK.VR
         [Tooltip("The device to emulate during development. NOTE: You may need to change Player Settings to correctly emulate some devices.")]
         [SerializeField] private VREmulatorDevice m_EmulatorDevice = VREmulatorDevice.Daydream;
         [Tooltip("When building an app directly to a device for testing, you can specify which device will be used. Leave as 'None' to have the emulator attempt to automatically detect the device.")]
-        [SerializeField] private VREmulatorDevice m_BuildDevice = VREmulatorDevice.None;
+        [SerializeField] private VREmulatorDevice m_BuildDevice = VREmulatorDevice.GearVR;
 
         #region Properties
 

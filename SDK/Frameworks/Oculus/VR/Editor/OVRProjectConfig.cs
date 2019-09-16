@@ -46,9 +46,10 @@ public class OVRProjectConfig : ScriptableObject
 		string assetPath = AssetDatabase.GetAssetPath(script);
 		string editorDir = Directory.GetParent(assetPath).FullName;
 		string ovrDir = Directory.GetParent(editorDir).FullName;
-        string oculusDir = Application.dataPath + "/Oculus/";//Directory.GetParent(ovrDir).FullName;
-        string configAssetPath = Path.GetFullPath(Path.Combine(oculusDir, "OculusProjectConfig.asset"));
-		Uri configUri = new Uri(configAssetPath);
+        string oculusDir = Directory.GetParent(ovrDir).FullName;
+        string configAssetPath = Application.dataPath + "Assets/Oculus/OculusProjectConfig.asset";//Path.GetFullPath(Path.Combine(oculusDir, "OculusProjectConfig.asset"));
+
+        Uri configUri = new Uri(configAssetPath);
 		Uri projectUri = new Uri(Application.dataPath);
 		Uri relativeUri = projectUri.MakeRelativeUri(configUri);
 

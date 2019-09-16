@@ -46,9 +46,8 @@ public class OVRProjectConfig : ScriptableObject
 		string assetPath = AssetDatabase.GetAssetPath(script);
 		string editorDir = Directory.GetParent(assetPath).FullName;
 		string ovrDir = Directory.GetParent(editorDir).FullName;
-        string oculusDir = Directory.GetParent(ovrDir).FullName;
+        string oculusDir = Application.dataPath + $"/Liminal/Resources";//Directory.GetParent(ovrDir).FullName;
         string configAssetPath = Path.GetFullPath(Path.Combine(oculusDir, "OculusProjectConfig.asset"));
-        Debug.Log($"<color=red>{configAssetPath}</color>");
         Uri configUri = new Uri(configAssetPath);
 		Uri projectUri = new Uri(Application.dataPath);
 		Uri relativeUri = projectUri.MakeRelativeUri(configUri);
@@ -73,7 +72,8 @@ public class OVRProjectConfig : ScriptableObject
 			projectConfig = ScriptableObject.CreateInstance<OVRProjectConfig>();
 			projectConfig.targetDeviceTypes = new List<DeviceType>();
 			projectConfig.targetDeviceTypes.Add(DeviceType.GearVrOrGo);
-			AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
+            projectConfig.targetDeviceTypes.Add(DeviceType.Quest);
+            AssetDatabase.CreateAsset(projectConfig, oculusProjectConfigAssetPath);
 		}
 		return projectConfig;
 	}

@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEditor;
+using Newtonsoft.Json;
 
 [InitializeOnLoad]
 public class LiminalSDKResources : EditorWindow
@@ -25,7 +24,11 @@ public class LiminalSDKResources : EditorWindow
         var lwrpFiles = Directory.GetFiles(lwrpShadersPath).Where(name => !name.EndsWith(".meta")).ToList();
         var gvrFiles = Directory.GetFiles(gvrShadersPath).Where(name => !name.EndsWith(".meta")).ToList();
 
-        CopyShaders(SDKResourcesConsts.LWRPShaderResourcesPath, lwrpFiles);
+        if (ContainsLightweightRenderPipeline())
+        {
+            CopyShaders(SDKResourcesConsts.LWRPShaderResourcesPath, lwrpFiles);
+        }
+
         CopyShaders(SDKResourcesConsts.GVRShaderResourcesPath, gvrFiles);
 
         AssetDatabase.Refresh();
@@ -40,5 +43,30 @@ public class LiminalSDKResources : EditorWindow
 
             File.Copy(file, location + $"/{Path.GetFileName(file)}");
         }
+    }
+
+    static bool ContainsLightweightRenderPipeline()
+    {
+        var lightweightEnabled = false;
+
+        if (!File.Exists(UnityPackageManagerUtils.ManifestPath))
+            return false;
+
+        var manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(UnityPackageManagerUtils.ManifestPath));
+        lightweightEnabled = manifest.Dependencies.ComUnityRenderPipelinesLightweight != null;
+
+        return lightweightEnabled;
+    }
+
+    public partial class Manifest
+    {
+        [JsonProperty("dependencies")]
+        public Dependencies Dependencies { get; set; }
+    }
+
+    public partial class Dependencies
+    {
+        [JsonProperty("com.unity.render-pipelines.lightweight")]
+        public string ComUnityRenderPipelinesLightweight { get; set; }
     }
 }

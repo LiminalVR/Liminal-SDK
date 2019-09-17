@@ -71,6 +71,12 @@ namespace Liminal.Platform.Experimental.App
             var loadOp = ExperienceAppPlayer.Load(experience);
             LoadingBar.Load(loadOp);
             yield return loadOp.LoadScene();
+
+            ScreenFader.Instance.FadeToBlack();
+            yield return ScreenFader.Instance.WaitUntilFadeComplete();
+            LoadingBar.SetActiveState(false);
+            yield return new WaitForSeconds(5f);
+
             ExperienceAppPlayer.Begin();
 
             ExperienceApp.OnComplete += OnExperienceComplete;

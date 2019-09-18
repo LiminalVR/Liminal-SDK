@@ -233,23 +233,23 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
             foreach (var hand in hands)
             {
-                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+                if (hand.GetControllerVisual() == null)
+                    continue;
+                
+                var mesh = hand.GetControllerVisual().GetComponentInChildren<MeshRenderer>();
 
-                foreach (var mesh in meshes)
+                if (mesh.material.shader.name.Equals("Lightweight Render Pipeline/Lit"))
                 {
-                    if (mesh.material.shader == Shader.Find("Lightweight Render Pipeline/Lit"))
-                    {
-                        return;
-                    }
-
-                    var oldMat = mesh.material;
-                    var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
-
-                    newMat.SetTexture(BaseMap, oldMat.mainTexture);
-                    newMat.SetColor(BaseColor, oldMat.color);
-                    newMat.SetFloat(SmoothnessTextureChannel, oldMat.GetFloat(Glossiness));
-                    mesh.material = newMat;
+                    continue;
                 }
+
+                var oldMat = mesh.material;
+                var newMat = new Material(Shader.Find("Lightweight Render Pipeline/Lit"));
+
+                newMat.SetTexture(BaseMap, oldMat.mainTexture);
+                newMat.SetColor(BaseColor, oldMat.color);
+                newMat.SetFloat(SmoothnessTextureChannel, oldMat.GetFloat(Glossiness));
+                mesh.material = newMat;
             }
         }
 
@@ -262,23 +262,24 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
             foreach (var hand in hands)
             {
-                var meshes = hand.Transform.gameObject.GetComponentsInChildren<MeshRenderer>();
+                if (hand.GetControllerVisual() == null)
+                    continue;
 
-                foreach (var mesh in meshes)
+                var mesh = hand.GetControllerVisual().GetComponentInChildren<MeshRenderer>();
+
+                if (mesh.material.shader.name.Equals(("Standard")))
                 {
-                    if (mesh.material.shader == Shader.Find("Standard"))
-                    {
-                        return;
-                    }
-
-                    var oldMat = mesh.material;
-                    var newMat = new Material(Shader.Find("Standard"));
-
-                    newMat.mainTexture = oldMat.GetTexture(BaseMap);
-                    newMat.color = oldMat.GetColor(BaseColor);
-                    newMat.SetFloat(Glossiness, oldMat.GetFloat(SmoothnessTextureChannel));
-                    mesh.material = newMat;
+                    continue;
                 }
+
+                var oldMat = mesh.material;
+                var newMat = new Material(Shader.Find("Standard"))
+                {
+                    mainTexture = oldMat.GetTexture(BaseMap), color = oldMat.GetColor(BaseColor)
+                };
+
+                newMat.SetFloat(Glossiness, oldMat.GetFloat(SmoothnessTextureChannel));
+                mesh.material = newMat;
             }
         }
 

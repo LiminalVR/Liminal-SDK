@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
+using Liminal.Core.Fader;
 using Liminal.Platform.Experimental.App.Experiences;
 using Liminal.Platform.Experimental.Exceptions;
 using Liminal.Platform.Experimental.Extensions;
@@ -213,10 +214,25 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 
             // Fetch scene name from the bundle and begin loading it
             var scenePath = assetBundle.GetAllScenePaths()[0];
-            SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
+
+            var loadOp = SceneManager.LoadSceneAsync(scenePath, LoadSceneMode.Additive);
             SceneManager.sceneLoaded += OnSceneLoadCompleted;
 
+            loadOp.allowSceneActivation = false;
+
+            while (loadOp.progress < 0.9f)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+
             SetState(State.Loaded);
+
+            ScreenFader.Instance.FadeToBlack(2f);
+
+            yield return new WaitForSeconds(3f);
+
+            loadOp.allowSceneActivation = true;
+
             IsLoaded = true;
         }
 

@@ -44,8 +44,11 @@ public class CanvasLoadingBar
 
             UpdateLoadingBarProgress(1f);
         }
-        
-        gameObject.SetActive(false);
+    }
+
+    public override void SetActiveState(bool state)
+    {
+        gameObject.SetActive(state);
     }
 
     protected override void UpdateLoadingBarProgress(float normalisedProgress)

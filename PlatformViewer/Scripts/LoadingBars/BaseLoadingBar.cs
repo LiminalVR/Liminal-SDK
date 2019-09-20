@@ -19,5 +19,7 @@ public abstract class BaseLoadingBar
 
     protected abstract IEnumerator RunLoadingBarCoro(BundleAsyncLoadOperationBase loadingOperation);
 
+    public abstract void SetActiveState(bool state);
+
     protected abstract void UpdateLoadingBarProgress(float normalisedProgress);
 }

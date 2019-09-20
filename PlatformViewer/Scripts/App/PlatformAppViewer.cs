@@ -71,6 +71,9 @@ namespace Liminal.Platform.Experimental.App
             var loadOp = ExperienceAppPlayer.Load(experience);
             LoadingBar.Load(loadOp);
             yield return loadOp.LoadScene();
+
+            LoadingBar.SetActiveState(false);
+
             ExperienceAppPlayer.Begin();
 
             ExperienceApp.OnComplete += OnExperienceComplete;

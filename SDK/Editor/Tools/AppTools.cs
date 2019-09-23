@@ -79,10 +79,6 @@ namespace Liminal.SDK.Tools
             // Make sure this is the only open scene
             scene = EditorSceneManager.OpenScene(scene.path, OpenSceneMode.Single);
 
-            // Set the asset bundle name
-            var sceneAsset = AssetImporter.GetAtPath(scene.path);
-            sceneAsset.SetAssetBundleNameAndVariant("appscene", "");
-
             var app = UnityEngine.Object.FindObjectOfType<ExperienceApp>();
             if (app == null)
             {

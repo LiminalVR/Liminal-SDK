@@ -129,6 +129,10 @@ namespace Liminal.SDK.Build
                 {
                     scenePath = AssetDatabase.GetAssetPath(_targetScene);
                 }
+                else
+                {
+                    _targetScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(EditorSceneManager.GetActiveScene().path);
+                }
             }
             EditorGUILayout.EndHorizontal();
         }

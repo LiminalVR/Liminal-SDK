@@ -11,9 +11,10 @@ public class LiminalSDKResources : EditorWindow
     static LiminalSDKResources()
     {
         SetupLightweightShaders();
+        InitialiseSettingsConfig();
     }
 
-    static void SetupLightweightShaders()
+    private static void SetupLightweightShaders()
     {
         if (!Directory.Exists(SDKResourcesConsts.LiminalSDKResourcesPath))
             Directory.CreateDirectory(SDKResourcesConsts.LiminalSDKResourcesPath);
@@ -36,7 +37,7 @@ public class LiminalSDKResources : EditorWindow
         AssetDatabase.Refresh();
     }
 
-    static void CopyShaders(string location, List<string> files)
+    private static void CopyShaders(string location, List<string> files)
     {
         foreach (var file in files)
         {
@@ -45,5 +46,16 @@ public class LiminalSDKResources : EditorWindow
 
             File.Copy(file, location + $"/{Path.GetFileName(file)}");
         }
+    }
+
+    private static void InitialiseSettingsConfig()
+    {
+        if (File.Exists($"{SDKResourcesConsts.LiminalSettingsConfigPath}"))
+            return;
+
+        var defaultSettings = CreateInstance<ExperienceProfile>();
+        defaultSettings.Init();
+
+        AssetDatabase.CreateAsset(defaultSettings,$"{SDKResourcesConsts.LiminalSettingsConfigPath}");
     }
 }

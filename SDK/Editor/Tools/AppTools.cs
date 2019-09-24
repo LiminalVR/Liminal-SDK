@@ -92,6 +92,9 @@ namespace Liminal.SDK.Tools
                 app.transform.SetParentAndIdentity(null);
             }
 
+            //attach the experience settings profile to the config if it exists 
+            app.LimappConfig.ProfileToApply = Resources.Load<ExperienceProfile>("LimappConfig");
+
             // Ensure the VREmulator is available on the app
             app.gameObject.GetOrAddComponent<VREmulator>();
 

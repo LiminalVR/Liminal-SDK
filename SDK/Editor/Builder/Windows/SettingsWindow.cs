@@ -1,15 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using Liminal.SDK.Editor.Build;
+﻿using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Liminal.SDK.Build
 {
     public class SettingsWindow : BaseWindowDrawer
     {
+        private UnityEditor.Editor _currentConfigEditor;
+        private ExperienceProfile _limappConfig;
+        private Vector2 _scrollPos;
+
         public override void Draw(BuildWindowConfig config)
         {
             EditorGUILayout.BeginVertical("Box");
@@ -17,7 +18,51 @@ namespace Liminal.SDK.Build
                 EditorGUIHelper.DrawTitle("Experience Settings");
                 EditorGUILayout.LabelField("This page is used to set the various settings of the experience");
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
+
+                GetOrCreateConfig();
+
+                DrawFields(_limappConfig, "Limapp Config");
             }
+        }
+
+        private void GetOrCreateConfig()
+        {
+            if (!File.Exists($"{SDKResourcesConsts.LiminalSettingsConfigPath}"))
+            {
+                LiminalSDKResources.InitialiseSettingsConfig();
+                _limappConfig = AssetDatabase.LoadAssetAtPath<ExperienceProfile>($"{SDKResourcesConsts.LiminalSettingsConfigPath}");
+            }
+            else if (_limappConfig == null)
+            {
+                _limappConfig = AssetDatabase.LoadAssetAtPath<ExperienceProfile>($"{SDKResourcesConsts.LiminalSettingsConfigPath}");
+            }
+        }
+
+        public void DrawFields(ExperienceProfile profile, string name)
+        {
+            EditorGUILayout.BeginHorizontal();
+            {
+                GUILayout.Label(name, GUILayout.Width(Screen.width * 0.2F));
+            }
+            EditorGUILayout.EndHorizontal();
+
+            _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+
+            var tmpEditor = UnityEditor.Editor.CreateEditor(profile);
+
+            if (_currentConfigEditor != null)
+            {
+                Object.DestroyImmediate(_currentConfigEditor);
+            }
+
+            _currentConfigEditor = tmpEditor;
+
+            if (_currentConfigEditor != null && _limappConfig != null)
+            {
+                _currentConfigEditor.OnInspectorGUI();
+            }
+
+            EditorGUILayout.EndScrollView();
         }
     }
 }

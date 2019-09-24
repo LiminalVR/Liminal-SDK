@@ -48,7 +48,7 @@ public class LiminalSDKResources : EditorWindow
         }
     }
 
-    private static void InitialiseSettingsConfig()
+    public static void InitialiseSettingsConfig()
     {
         if (File.Exists($"{SDKResourcesConsts.LiminalSettingsConfigPath}"))
             return;

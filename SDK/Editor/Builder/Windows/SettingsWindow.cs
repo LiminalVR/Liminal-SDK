@@ -19,23 +19,39 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.LabelField("This page is used to set the various settings of the experience");
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
-                GetOrCreateConfig();
+                GetConfig();
+
+                if (_limappConfig == null)
+                {
+                    GUILayout.FlexibleSpace();
+
+                    if (GUILayout.Button("Create New Config File"))
+                    {
+                        CreateConfig();
+                    }
+
+                    return;
+                }
 
                 DrawFields(_limappConfig, "Limapp Config");
             }
         }
 
-        private void GetOrCreateConfig()
+        private void GetConfig()
         {
-            if (!File.Exists($"{SDKResourcesConsts.LiminalSettingsConfigPath}"))
-            {
-                LiminalSDKResources.InitialiseSettingsConfig();
-                _limappConfig = AssetDatabase.LoadAssetAtPath<ExperienceProfile>($"{SDKResourcesConsts.LiminalSettingsConfigPath}");
-            }
-            else if (_limappConfig == null)
+            if (_limappConfig == null)
             {
                 _limappConfig = AssetDatabase.LoadAssetAtPath<ExperienceProfile>($"{SDKResourcesConsts.LiminalSettingsConfigPath}");
             }
+        }
+
+        private void CreateConfig()
+        {
+            if (File.Exists($"{SDKResourcesConsts.LiminalSettingsConfigPath}"))
+                return;
+
+            LiminalSDKResources.InitialiseSettingsConfig();
+            _limappConfig = AssetDatabase.LoadAssetAtPath<ExperienceProfile>($"{SDKResourcesConsts.LiminalSettingsConfigPath}");
         }
 
         public void DrawFields(ExperienceProfile profile, string name)

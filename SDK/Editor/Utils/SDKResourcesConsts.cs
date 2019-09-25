@@ -24,4 +24,9 @@
     /// Path to package gvr shader resources folder
     /// </summary>
     public const string PackageGVRShaders = "SDK/Shaders/GVRShaders";
+
+    /// <summary>
+    /// Path to the Liminal Settings Config scriptable object
+    /// </summary>
+    public const string LiminalSettingsConfigPath = LiminalSDKResourcesPath + "/LimappConfig.asset";
 }

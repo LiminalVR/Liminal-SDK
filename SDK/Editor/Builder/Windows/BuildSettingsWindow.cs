@@ -81,6 +81,7 @@ namespace Liminal.SDK.Build
             BuildSettingLookup.AddSafe(BuildSettingMenus.Publishing, new PublishConfigurationWindow());
             BuildSettingLookup.AddSafe(BuildSettingMenus.Setup, new SetupWindow());
             BuildSettingLookup.AddSafe(BuildSettingMenus.Preview, new AppPreviewWindow());
+            BuildSettingLookup.AddSafe(BuildSettingMenus.Settings, new SettingsWindow());
         }
 
         private void SetupFolderPaths()

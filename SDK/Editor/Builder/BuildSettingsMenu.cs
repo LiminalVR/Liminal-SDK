@@ -4,6 +4,7 @@
     Publishing,
     Build,
     Preview,
+    Settings,
 }
 
 

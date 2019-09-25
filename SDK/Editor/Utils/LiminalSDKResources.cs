@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEngine;
 using System.IO;
 using System.Linq;
-using UnityEditor;
-using Newtonsoft.Json;
 
 [InitializeOnLoad]
 public class LiminalSDKResources : EditorWindow
@@ -12,11 +13,16 @@ public class LiminalSDKResources : EditorWindow
         SetupLightweightShaders();
     }
 
-    static void SetupLightweightShaders()
+    private static void SetupLightweightShaders()
     {
-        Directory.CreateDirectory(SDKResourcesConsts.LiminalSDKResourcesPath);
-        Directory.CreateDirectory(SDKResourcesConsts.LWRPShaderResourcesPath);
-        Directory.CreateDirectory(SDKResourcesConsts.GVRShaderResourcesPath);
+        if (!Directory.Exists(SDKResourcesConsts.LiminalSDKResourcesPath))
+            Directory.CreateDirectory(SDKResourcesConsts.LiminalSDKResourcesPath);
+
+        if (!Directory.Exists(SDKResourcesConsts.LWRPShaderResourcesPath))
+            Directory.CreateDirectory(SDKResourcesConsts.LWRPShaderResourcesPath);
+
+        if (!Directory.Exists(SDKResourcesConsts.GVRShaderResourcesPath))
+            Directory.CreateDirectory(SDKResourcesConsts.GVRShaderResourcesPath);
 
         var lwrpShadersPath = $"{UnityPackageManagerUtils.FullPackageLocation}{SDKResourcesConsts.PackageLWRPShaders}";
         var gvrShadersPath = $"{UnityPackageManagerUtils.FullPackageLocation}{SDKResourcesConsts.PackageGVRShaders}";
@@ -24,17 +30,13 @@ public class LiminalSDKResources : EditorWindow
         var lwrpFiles = Directory.GetFiles(lwrpShadersPath).Where(name => !name.EndsWith(".meta")).ToList();
         var gvrFiles = Directory.GetFiles(gvrShadersPath).Where(name => !name.EndsWith(".meta")).ToList();
 
-        if (ContainsLightweightRenderPipeline())
-        {
-            CopyShaders(SDKResourcesConsts.LWRPShaderResourcesPath, lwrpFiles);
-        }
-
+        CopyShaders(SDKResourcesConsts.LWRPShaderResourcesPath, lwrpFiles);
         CopyShaders(SDKResourcesConsts.GVRShaderResourcesPath, gvrFiles);
 
         AssetDatabase.Refresh();
     }
 
-    static void CopyShaders(string location, List<string> files)
+    private static void CopyShaders(string location, List<string> files)
     {
         foreach (var file in files)
         {
@@ -45,28 +47,14 @@ public class LiminalSDKResources : EditorWindow
         }
     }
 
-    static bool ContainsLightweightRenderPipeline()
+    public static void InitialiseSettingsConfig()
     {
-        var lightweightEnabled = false;
+        if (File.Exists($"{SDKResourcesConsts.LiminalSettingsConfigPath}"))
+            return;
 
-        if (!File.Exists(UnityPackageManagerUtils.ManifestPath))
-            return false;
+        var defaultSettings = CreateInstance<ExperienceProfile>();
+        defaultSettings.Init();
 
-        var manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(UnityPackageManagerUtils.ManifestPath));
-        lightweightEnabled = manifest.Dependencies.ComUnityRenderPipelinesLightweight != null;
-
-        return lightweightEnabled;
-    }
-
-    public partial class Manifest
-    {
-        [JsonProperty("dependencies")]
-        public Dependencies Dependencies { get; set; }
-    }
-
-    public partial class Dependencies
-    {
-        [JsonProperty("com.unity.render-pipelines.lightweight")]
-        public string ComUnityRenderPipelinesLightweight { get; set; }
+        AssetDatabase.CreateAsset(defaultSettings,$"{SDKResourcesConsts.LiminalSettingsConfigPath}");
     }
 }

@@ -125,7 +125,7 @@ namespace Liminal.SDK.Build
 
                 if (GUILayout.Button("...", GUILayout.Width(Screen.width * 0.1F)))
                 {
-                    limappPath = EditorUtility.OpenFilePanelWithFilters("Limapp Directory", limappPath, new string[] { "FileType", "limapp" });
+                    limappPath = EditorUtility.OpenFilePanelWithFilters("Limapp Directory", limappPath, new string[] { "FileType", "limapp,ulimapp"});
                     limappPath = DirectoryUtils.ReplaceBackWithForwardSlashes(limappPath);
                 }
             }

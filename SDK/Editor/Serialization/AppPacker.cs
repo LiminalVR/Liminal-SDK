@@ -141,7 +141,6 @@ namespace Liminal.SDK.Editor.Serialization
                 switch (mPack.CompressionType)
                 {
                     case ECompressionType.LMZA:
-                        
                         SevenZipHelper.Compress(inStream, outStream);
                         break;
                     case ECompressionType.Uncompressed:

@@ -20,7 +20,7 @@ namespace Liminal.SDK.Build
             EditorGUILayout.BeginVertical("Box");
             {
                 EditorGUIHelper.DrawTitle("Build Limapp");
-                EditorGUILayout.LabelField("This process will build a .limapp file that will run on the Liminal Platform");
+                EditorGUILayout.LabelField("This process will build a limapp file that will run on the Liminal Platform");
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
                 DrawSceneSelector(ref _scenePath, "Target Scene", config);
@@ -31,6 +31,15 @@ namespace Liminal.SDK.Build
                 _selectedPlatform = config.SelectedPlatform;
                 _selectedPlatform = (BuildPlatform)EditorGUILayout.EnumPopup("Select Platform", _selectedPlatform);
                 config.SelectedPlatform = _selectedPlatform;
+
+                _compressionType = config.CompressionType;
+                _compressionType = (ECompressionType)EditorGUILayout.EnumPopup("Compression Format", _compressionType);
+                config.CompressionType = _compressionType;
+
+                if (_compressionType == ECompressionType.Uncompressed)
+                {
+                    EditorGUILayout.LabelField("Uncompressed limapps are not valid for release.", EditorStyles.boldLabel);
+                }
 
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUILayout.LabelField("Additional References");
@@ -99,11 +108,13 @@ namespace Liminal.SDK.Build
                             break;
 
                         case BuildPlatform.GearVR:
-                            AppBuilder.BuildAndroid();
+                            AppBuilder.BuildLimapp(BuildTarget.Android, AppBuildInfo.BuildTargetDevices.GearVR,
+                                _compressionType);
                             break;
 
                         case BuildPlatform.Standalone:
-                            AppBuilder.BuildStandalone();
+                            AppBuilder.BuildLimapp(BuildTarget.StandaloneWindows, AppBuildInfo.BuildTargetDevices.Emulator,
+                                _compressionType);
                             break;
                     }
                 }
@@ -138,6 +149,7 @@ namespace Liminal.SDK.Build
         }
 
         private BuildPlatform _selectedPlatform;
+        private ECompressionType _compressionType;
         private SceneAsset _targetScene;
         private string _scenePath = string.Empty;
     }

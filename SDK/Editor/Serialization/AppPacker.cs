@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using UnityEngine;
 
 namespace Liminal.SDK.Editor.Serialization
 {
@@ -137,7 +138,18 @@ namespace Liminal.SDK.Editor.Serialization
             using (var inStream = File.OpenRead(tmpFile))
             using (var outStream = File.Create(mOutputPath))
             {
-                SevenZipHelper.Compress(inStream, outStream);
+                switch (mPack.CompressionType)
+                {
+                    case ECompressionType.LMZA:
+                        SevenZipHelper.Compress(inStream, outStream);
+                        break;
+                    case ECompressionType.Uncompressed:
+                        inStream.CopyTo(outStream);
+                        break;
+                    default:
+                        SevenZipHelper.Compress(inStream, outStream);
+                        break;
+                }
             }
 
             // Delete the temoprary file if it's still there...

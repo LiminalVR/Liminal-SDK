@@ -6,7 +6,7 @@ public class BuildWindowConfig
 {
     public string PreviousScene = "";
     public string TargetScene = "";
-    public List<string> AdditionalReferences;
+    public List<string> AdditionalReferences = new List<string>();
 
     /// <summary>
     /// The default additional references we should provide.

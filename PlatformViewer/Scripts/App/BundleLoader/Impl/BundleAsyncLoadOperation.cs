@@ -69,7 +69,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
         public BundleAsyncLoadOperation(Experience experience) : base(experience)
         {
             mExperience = experience ?? throw new ArgumentNullException("experience");
-            CoroutineService.Instance.StartCoroutine(DoLoad(experience.Bytes,experience.CompressionType));
+            CoroutineService.Instance.StartCoroutine(DoLoad(experience.Bytes, experience.CompressionType));
         }
 
         private IEnumerator DoLoad(byte[] data, ECompressionType compression = ECompressionType.LMZA)

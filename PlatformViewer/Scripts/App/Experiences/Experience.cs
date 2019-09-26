@@ -4,5 +4,6 @@
     {
         public int Id;
         public byte[] Bytes;
+        public ECompressionType CompressionType;
     }
 }

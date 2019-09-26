@@ -69,16 +69,16 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
         public BundleAsyncLoadOperation(Experience experience) : base(experience)
         {
             mExperience = experience ?? throw new ArgumentNullException("experience");
-            CoroutineService.Instance.StartCoroutine(DoLoad(experience.Bytes));
+            CoroutineService.Instance.StartCoroutine(DoLoad(experience.Bytes, experience.CompressionType));
         }
 
-        private IEnumerator DoLoad(byte[] data)
+        private IEnumerator DoLoad(byte[] data, ECompressionType compression = ECompressionType.LMZA)
         {
             SerializationUtils.ClearGlobalSerializableTypes();
-            yield return UnpackFile(data);
+            yield return UnpackFile(data, compression);
         }
 
-        private IEnumerator UnpackFile(byte[] data)
+        private IEnumerator UnpackFile(byte[] data, ECompressionType compression = ECompressionType.LMZA)
         {
             Debug.Log("[BundleLoader] Commencing unpack...");
 
@@ -90,7 +90,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 
                 try
                 {
-                    unpacker.UnpackAsync(data);
+                    unpacker.UnpackAsync(data, compression);
                 }
                 catch (Exception e)
                 {

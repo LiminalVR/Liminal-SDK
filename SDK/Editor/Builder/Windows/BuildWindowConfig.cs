@@ -32,4 +32,6 @@ public class BuildWindowConfig
         };
 
     public BuildPlatform SelectedPlatform = BuildPlatform.Current;
+
+    public ECompressionType CompressionType { get; set; }
 }

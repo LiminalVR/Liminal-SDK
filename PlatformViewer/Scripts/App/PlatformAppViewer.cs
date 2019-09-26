@@ -66,6 +66,7 @@ namespace Liminal.Platform.Experimental.App
             {
                 Id = ExperienceAppUtils.AppIdFromName(fileName),
                 Bytes = _limappData,
+                CompressionType = GetCompressionType(fileName),
             };
 
             var loadOp = ExperienceAppPlayer.Load(experience);
@@ -78,6 +79,19 @@ namespace Liminal.Platform.Experimental.App
 
             ExperienceApp.OnComplete += OnExperienceComplete;
             ExperienceApp.Initializing += SetScreenfaderActive;
+        }
+
+        private ECompressionType GetCompressionType(string fileName)
+        {
+            var compression = ECompressionType.LMZA;
+
+            if (string.IsNullOrEmpty(fileName) || string.IsNullOrWhiteSpace(fileName))
+                return compression;
+            
+            if (Path.GetExtension(fileName).Equals(".ulimapp")) 
+                compression = ECompressionType.Uncompressed;
+
+            return compression;
         }
 
         private void SetScreenfaderActive()

@@ -47,26 +47,15 @@ namespace Liminal.SDK.Editor.Build
         /// <summary>
         /// Builds a Liminal Experience Application from the current scene and standalone build target.
         /// </summary>
-        public static void BuildStandalone()
+        public static void BuildLimapp(BuildTarget target, AppBuildInfo.BuildTargetDevices devices,
+            ECompressionType compression = ECompressionType.LMZA)
         {
             Build(new AppBuildInfo()
             {
                 Scene = SceneManager.GetActiveScene(),
-                BuildTarget = BuildTarget.StandaloneWindows,
-                BuildTargetDevice = AppBuildInfo.BuildTargetDevices.Emulator,
-            });
-        }
-
-        /// <summary>
-        /// Builds a Liminal Experience Application from the current scene and the Android build target.
-        /// </summary>
-        public static void BuildAndroid()
-        {
-            Build(new AppBuildInfo()
-            {
-                Scene = SceneManager.GetActiveScene(),
-                BuildTarget = BuildTarget.Android,
-                BuildTargetDevice = AppBuildInfo.BuildTargetDevices.GearVR,
+                BuildTarget = target,
+                BuildTargetDevice = devices,
+                CompressionType = compression,
             });
         }
 
@@ -186,7 +175,9 @@ namespace Liminal.SDK.Editor.Build
                 Debug.Log("[Liminal.Build] Packing app...");
 
                 var platformName = GetAppPlatformOutputName(buildInfo);
-                var appFilename = string.Format("app_{0}_{1}_v{2}.limapp", appManifest.Id, platformName, appManifest.Version);
+                var extension = GetFileExtension(buildInfo.CompressionType);
+                var appFilename = string.Format("app_{0}_{1}_v{2}.{3}", appManifest.Id, platformName,
+                    appManifest.Version, extension);
                 var appPackPath = Path.Combine(outputPath, appFilename);
                 var appPack = new AppPack()
                 {
@@ -194,15 +185,16 @@ namespace Liminal.SDK.Editor.Build
                     ApplicationId = appManifest.Id,
                     Assemblies = BuildPackAssemblyRawBytesList(asmPath, buildTargetGroup, buildInfo.BuildTarget),
                     SceneBundle = File.ReadAllBytes(Path.Combine(outputPath, "appscene")),
+                    CompressionType = buildInfo.CompressionType,
                 };
 
                 // Pack the AppPack into a compressed file
                 UpdateProgressBar("Building Limapp", "Compressing App", 0.8F);
-
+                
                 new AppPacker()
                     .PackAsync(appPack, appPackPath)
                     .Wait();
-
+                    
                 UpdateProgressBar("Building Limapp", "Cleaning up", 0.9F);
                 Debug.Log("[Liminal.Build] Cleaning up...");
 
@@ -211,7 +203,7 @@ namespace Liminal.SDK.Editor.Build
                 foreach (var file in Directory.GetFiles(outputPath))
                 {
                     var ext = Path.GetExtension(file).ToLower();
-                    if (ext != ".limapp")
+                    if (ext != ".limapp" && ext != ".ulimapp")
                     {
                         TryDeleteFile(file);
                     }
@@ -243,6 +235,22 @@ namespace Liminal.SDK.Editor.Build
             }
         }
 
+        private static string GetFileExtension(ECompressionType compressionType = ECompressionType.LMZA)
+        {
+            var extension = string.Empty;
+
+            switch (compressionType)
+            {
+                case ECompressionType.LMZA:
+                    extension = "limapp";
+                    break;
+                case ECompressionType.Uncompressed:
+                    extension = "ulimapp";
+                    break;
+            }
+
+            return extension;
+        }
         #endregion
 
         private static string GetAppPlatformOutputName(AppBuildInfo buildInfo)

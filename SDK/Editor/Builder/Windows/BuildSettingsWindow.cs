@@ -28,7 +28,6 @@ namespace Liminal.SDK.Build
             Window = GetWindow(typeof(BuildSettingsWindow), true, "Build Settings");
 
             Window.minSize = new Vector2(_width, _height);
-            Window.maxSize = new Vector2(_width, _height);
 
             Window.Show();
         }

@@ -34,6 +34,14 @@ namespace Liminal.SDK.Build
                 }
 
                 DrawFields(_limappConfig, "Limapp Config");
+
+                GUILayout.FlexibleSpace();
+
+                if (GUILayout.Button("Update Config From Project Settings"))
+                {
+                    _limappConfig.SaveProjectSettings();
+                    Debug.Log("Config Updated!");
+                }
             }
         }
 

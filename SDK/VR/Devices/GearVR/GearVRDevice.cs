@@ -88,7 +88,6 @@ namespace Liminal.SDK.VR.Devices.GearVR
             }
 
             CheckUsedRenderPipeline();
-            Debug.Log(UnityEngine.XR.XRDevice.model);
         }
         
         bool IVRDevice.HasCapabilities(VRDeviceCapability capabilities)

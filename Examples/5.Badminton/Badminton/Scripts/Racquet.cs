@@ -9,7 +9,7 @@ public class Racquet : MonoBehaviour
 
     public void FixedUpdate()
     {
-        RigidBody.MovePosition(Target.position);
         RigidBody.MoveRotation(Target.rotation * Quaternion.Euler(RotationOffset));
+        RigidBody.MovePosition(Target.position + Target.forward * -0.3F);
     }
 }

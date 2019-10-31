@@ -5,7 +5,7 @@
 This is a repository containing the Liminal SDK as a Unity Package. This package is used to bundle `scripts`, a `Unity Scene` and `Assets` into a `.limapp` file. The `.limapp` file is required for the Liminal Platform to run as one of our `Experiences`. 
 
 ### Unity Version
-Unity 2018.3.8f1
+Unity 2019.1.10f1
 
 ## Setting Up
 

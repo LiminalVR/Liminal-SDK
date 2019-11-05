@@ -24,6 +24,8 @@ namespace Liminal.SDK.VR.Avatars.Extensions
         /// Always allow gaze input.
         /// </summary>
         Always,
+
+        NewPolicy,
     }
 
     /// <summary>

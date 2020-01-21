@@ -10,7 +10,7 @@ public class LiminalSDKResources : EditorWindow
 {
     static LiminalSDKResources()
     {
-        SetupLightweightShaders();
+        // SetupLightweightShaders();
     }
 
     private static void SetupLightweightShaders()

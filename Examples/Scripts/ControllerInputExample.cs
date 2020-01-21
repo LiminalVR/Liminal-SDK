@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class ControllerInputExample : MonoBehaviour
 {
-    public Text InputText; 
+    public Text InputText;
 
     private void Update()
     {

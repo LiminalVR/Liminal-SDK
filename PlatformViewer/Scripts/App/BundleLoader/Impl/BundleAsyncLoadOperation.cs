@@ -226,7 +226,9 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
             }
 
             SetState(State.Loaded);
+            yield return new WaitForSeconds(1f);
 
+            SetState(State.Completed);
             ScreenFader.Instance.FadeToBlack(2f);
 
             yield return new WaitForSeconds(3f);

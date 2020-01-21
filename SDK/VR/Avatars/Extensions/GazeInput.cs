@@ -121,6 +121,18 @@ namespace Liminal.SDK.VR.Avatars.Extensions
         #endregion
 
         /// <summary>
+        /// Set and apply a new delay and duration for the gaze input. 
+        /// </summary>
+        /// <param name="delay">The total time in seconds it takes to begin the gaze</param>
+        /// <param name="duration">The total time in seconds it takes to trigger a click</param>
+        public void UpdateHoverSettings(float delay, float duration)
+        {
+            m_HoverDelay = Mathf.Max(delay, 0);
+            m_HoverDuration = Mathf.Max(duration, 0);
+            ApplyTimedPointerProperties();
+        }
+
+        /// <summary>
         /// Initializes the avatar extension.
         /// </summary>
         /// <param name="avatar">The <see cref="IVRAvatar"/> the extension is bound to.</param>

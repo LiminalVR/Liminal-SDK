@@ -107,6 +107,19 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             SetupInitialControllerState();
 
             UpdateHandedness();
+            SetupTracking();
+        }
+
+        private void SetupTracking()
+        {
+            if (OVRManager.instance == null)
+                return;
+
+            if (!OVRUtils.IsOculusQuest) 
+                return;
+
+            OVRManager.instance.trackingOriginType = OVRManager.TrackingOrigin.FloorLevel;
+            mAvatar.Head.Transform.localPosition = Vector3.zero;
         }
 
         private void OnEnable()

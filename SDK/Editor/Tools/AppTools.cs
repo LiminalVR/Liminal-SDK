@@ -12,6 +12,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Reflection;
+using Assembly = UnityEditor.Compilation.Assembly;
 
 namespace Liminal.SDK.Tools
 {
@@ -60,7 +62,7 @@ namespace Liminal.SDK.Tools
         {
             var scene = SceneManager.GetActiveScene();
             var accept = EditorUtility.DisplayDialog("Setup Experience App Scene",
-                string.Format("Setup the current scene ({0}) as your Experience App scene? This will modify the structure of the scene.", scene.name),
+                $"Setup the current scene ({scene.name}) as your Experience App scene? This will modify the structure of the scene.",
                 "OK", "Cancel");
 
             if (!accept)
@@ -76,21 +78,35 @@ namespace Liminal.SDK.Tools
                 AssetImporter.GetAtPath(path).SetAssetBundleNameAndVariant(null, null);
             }
 
+            foreach (var obj in scene.GetRootGameObjects())
+            {
+                Undo.RegisterFullObjectHierarchyUndo(obj, $"Undo setup {obj}");
+            }
             // Make sure this is the only open scene
             scene = EditorSceneManager.OpenScene(scene.path, OpenSceneMode.Single);
+            
+            var baseType = typeof(ExperienceApp);
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var assembly = assemblies.First(x => x.FullName.Contains("Assembly-CSharp,"));
 
-            var app = UnityEngine.Object.FindObjectOfType<ExperienceApp>();
-            if (app == null)
+            var types = assembly.GetTypes();
+            var appType = types.First(t => t != baseType && baseType.IsAssignableFrom(t));
+
+            var appObj = UnityEngine.Object.FindObjectOfType(appType) as GameObject;
+
+            if (appObj == null)
             {
-                app = new GameObject("[ExperienceApp]")
-                    .AddComponent<ExperienceApp>();
+                appObj = new GameObject("[ExperienceApp]");
+                appObj.AddComponent(appType);
             }
             else
             {
                 // Move to the root
-                app.gameObject.name = "[ExperienceApp]";
-                app.transform.SetParentAndIdentity(null);
+                appObj.gameObject.name = "[ExperienceApp]";
+                appObj.transform.SetParentAndIdentity(null);
             }
+
+            var app = appObj.GetComponent<ExperienceApp>();
 
             //attach the experience settings profile to the config if it exists 
             app.LimappConfig.ProfileToApply = Resources.Load<ExperienceProfile>("LimappConfig");
@@ -132,7 +148,20 @@ namespace Liminal.SDK.Tools
                 }
             }
 
+            EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log("Setup complete! Please ensure that you use the cameras nested under VRAvatar/Head as your VR cameras.");
+        }
+
+        public static void GenerateScripts()
+        {
+            var targetPath = $"{Application.dataPath}/Liminal/MyExperienceApp.cs";
+            var templatePath = $"{UnityPackageManagerUtils.FullPackageLocation}SDK/Templates/MyExperienceApp.cs.txt";
+
+            if (!File.Exists(targetPath))
+            {
+                File.Copy(templatePath, targetPath);
+                AssetDatabase.Refresh();
+            }
         }
     }
 }

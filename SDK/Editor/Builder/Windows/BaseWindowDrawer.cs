@@ -4,4 +4,9 @@
 public abstract class BaseWindowDrawer
 {
     public abstract void Draw(BuildWindowConfig config);
+
+    public virtual void OnEnabled()
+    {
+
+    }
 }

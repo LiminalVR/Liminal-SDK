@@ -95,7 +95,10 @@ namespace Liminal.SDK.Build
                 EditorGUI.indentLevel--;
 
                 GUILayout.FlexibleSpace();
-                GUI.enabled = !_scenePath.Equals(string.Empty);
+                var enabled = !_scenePath.Equals(string.Empty);
+                if(!enabled)
+                    GUILayout.Label("Scene cannot be empty", "CN StatusWarn");
+                GUI.enabled = enabled;
 
                 if (GUILayout.Button("Build"))
                 {

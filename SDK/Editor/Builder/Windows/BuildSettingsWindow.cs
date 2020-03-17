@@ -11,7 +11,7 @@ namespace Liminal.SDK.Build
     /// </summary>
     public class BuildSettingsWindow : EditorWindow
     {
-        private const int _width = 500;
+        private const int _width = 550;
         private const int _height = 300;
 
         public static EditorWindow Window;
@@ -54,14 +54,20 @@ namespace Liminal.SDK.Build
             SetupPreviewScene();
 
             SetupMenuWindows();
+            
+            var activeWindow = BuildSettingLookup[_selectedMenu];
+            activeWindow.OnEnabled();
         }
 
         private void OnGUI()
         {
             var tabs = Enum.GetNames(typeof(BuildSettingMenus));
+            EditorGUI.BeginChangeCheck();
             _selectedMenu = (BuildSettingMenus) GUILayout.Toolbar(SelectedMenuIndex, tabs);
-
             var activeWindow = BuildSettingLookup[_selectedMenu];
+            if(EditorGUI.EndChangeCheck())
+                activeWindow.OnEnabled();
+
             activeWindow.Draw(_windowConfig);
 
             if (!Directory.Exists(BuildWindowConsts.ConfigFolderPath))

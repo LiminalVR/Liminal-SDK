@@ -171,7 +171,8 @@ namespace Liminal.SDK.Editor.Build
                 if (!methodDef.HasBody)
                     continue;
 
-                // Finf all calls in the method body
+                // Finf all calls in the method bod
+
                 var methodCalls = methodDef.Body.Instructions
                     .Where(x => x.OpCode == OpCodes.Call)
                     .ToArray();

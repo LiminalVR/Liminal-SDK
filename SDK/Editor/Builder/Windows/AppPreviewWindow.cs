@@ -16,6 +16,7 @@ namespace Liminal.SDK.Build
 
         public override void Draw(BuildWindowConfig config)
         {
+            GUILayout.BeginVertical("Box");
             EditorGUIHelper.DrawTitle("App Preview");
             GUILayout.Label("The Preview Scene will load and run your limapp created from the Build Tool");
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
@@ -61,6 +62,7 @@ namespace Liminal.SDK.Build
                     EditorSceneManager.OpenScene(BuildWindowConsts.PreviewAppScenePath, OpenSceneMode.Single);
                 }
             }
+            GUILayout.EndVertical();
         }
 
         /// <summary>
@@ -90,7 +92,7 @@ namespace Liminal.SDK.Build
             {
                 var androidFile = File.ReadAllBytes(_appPreviewConfig.AndroidPath);
                 var androidFileName = Path.GetFileName(_appPreviewConfig.AndroidPath);
-                
+
                 var androidStreamingPath = $"{streamingAssetFolder}/{androidFileName}";
                 var copyDoesNotExist = !File.Exists(androidStreamingPath);
 
@@ -125,7 +127,7 @@ namespace Liminal.SDK.Build
 
                 if (GUILayout.Button("...", GUILayout.Width(Screen.width * 0.1F)))
                 {
-                    limappPath = EditorUtility.OpenFilePanelWithFilters("Limapp Directory", limappPath, new string[] { "FileType", "limapp,ulimapp"});
+                    limappPath = EditorUtility.OpenFilePanelWithFilters("Limapp Directory", limappPath, new string[] { "FileType", "limapp,ulimapp" });
                     limappPath = DirectoryUtils.ReplaceBackWithForwardSlashes(limappPath);
                 }
             }

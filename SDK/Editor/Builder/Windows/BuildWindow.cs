@@ -130,14 +130,14 @@ namespace Liminal.SDK.Build
         {
             EditorGUILayout.BeginHorizontal();
             {
-                GUILayout.Label(name, GUILayout.Width(Screen.width * 0.2F));
+                GUILayout.Label(name, GUILayout.Width(Size.x * 0.2F));
 
                 if (AssetDatabase.LoadAssetAtPath(config.TargetScene, typeof(SceneAsset)) != null)
                 {
                     _targetScene = (SceneAsset) AssetDatabase.LoadAssetAtPath(config.TargetScene, typeof(SceneAsset));
                 }
 
-                _targetScene = (SceneAsset)EditorGUILayout.ObjectField(_targetScene, typeof(SceneAsset), true, GUILayout.Width(Screen.width * 0.75F));
+                _targetScene = (SceneAsset)EditorGUILayout.ObjectField(_targetScene, typeof(SceneAsset), true, GUILayout.Width(Size.x * 0.75F));
 
                 if (_targetScene != null)
                 {

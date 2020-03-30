@@ -57,6 +57,11 @@ namespace Liminal.SDK.Build
             
             var activeWindow = BuildSettingLookup[_selectedMenu];
             activeWindow.OnEnabled();
+
+            foreach (var entry in BuildSettingLookup)
+            {
+                entry.Value.Size = position.size;
+            }
         }
 
         private void OnGUI()

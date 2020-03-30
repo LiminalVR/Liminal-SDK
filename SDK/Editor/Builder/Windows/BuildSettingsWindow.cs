@@ -57,11 +57,6 @@ namespace Liminal.SDK.Build
             
             var activeWindow = BuildSettingLookup[_selectedMenu];
             activeWindow.OnEnabled();
-
-            foreach (var entry in BuildSettingLookup)
-            {
-                entry.Value.Size = position.size;
-            }
         }
 
         private void OnGUI()
@@ -83,6 +78,12 @@ namespace Liminal.SDK.Build
             // boolean true is used to format the resulting string for maximum readability. False would format it for minimum size.
             var configJson = JsonUtility.ToJson(_windowConfig, true);
             File.WriteAllText(BuildWindowConsts.BuildWindowConfigPath, configJson);
+
+
+            foreach (var entry in BuildSettingLookup)
+            {
+                entry.Value.Size = position.size;
+            }
         }
 
         private void SetupMenuWindows()

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
   EmulatorPath: C:/Work/Unity/LiminalSdk-2019-3/Liminal-SDK-Unity-Package/Assets/_Builds/Emulator
-    - Ripple Effect-ff257ec5-de6a-4da0-baa8-614c23fe9664.limapp
-  AndroidPath: C:/Work/Unity/LiminalSdk-2019-3/Liminal-SDK-Unity-Package/Assets
-  AndroidAppFullName: app_999_gearvr_v1.limapp
+    - Happy Dance-6568769c-f5ab-43bb-8f2e-8fc0ebd11d6e.limapp
+  AndroidPath: W:/Limapps/FromMerge/Ion-GearVr.limapp
+  AndroidAppFullName: Ion-GearVr.limapp

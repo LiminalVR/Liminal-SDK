@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EmulatorPath: C:/Work/Unity/LiminalSdk-2019-3/Liminal-SDK-Unity-Package/Assets/_Builds/Emulator
     - Happy Dance-6568769c-f5ab-43bb-8f2e-8fc0ebd11d6e.limapp
-  AndroidPath: W:/Limapps/FromMerge/Ion-GearVr.limapp
-  AndroidAppFullName: Ion-GearVr.limapp
+  AndroidPath: W:/Limapps/GearVr - ReliefPoint-0e76e72b-7436-41b2-9169-e735d9d1d2f0.limapp
+  AndroidAppFullName: GearVr - ReliefPoint-0e76e72b-7436-41b2-9169-e735d9d1d2f0.limapp

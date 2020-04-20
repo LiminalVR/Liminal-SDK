@@ -84,7 +84,7 @@ namespace Liminal.SDK.XR
 
         public bool GetButtonDown(string button)
         {
-            InputDevice.TryGetFeatureValue(CommonUsages.triggerButton, out var isPressed);
+            return _inputsMap[]
             return isPressed;
         }
 
@@ -93,17 +93,52 @@ namespace Liminal.SDK.XR
             return UnityEngine.Input.GetMouseButtonUp(0);
         }
 
-        private bool _triggerPressed;
-        private bool _triggerUp;
+        public Dictionary<InputFeatureUsage<bool>, EPressState> _inputsMap = new Dictionary<InputFeatureUsage<bool>, EPressState>();
+        public List<InputFeatureUsage<bool>> _inputs = new List<InputFeatureUsage<bool>>();
 
         private void Update()
         {
-            _triggerUp = false;
+            foreach (var input in _inputs)
+            {
+                if (!_inputsMap.ContainsKey(input))
+                    _inputsMap.Add(input, EPressState.None);
 
-            InputDevice.TryGetFeatureValue(CommonUsages.triggerButton, out var triggerPressed);
+                InputDevice.TryGetFeatureValue(input, out var pressed);
 
-            if (_triggerPressed && triggerPressed)
-                _triggerUp = true;
+                var currentState = _inputsMap[input];
+                if (pressed)
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.None:
+                            _inputsMap[input] = EPressState.Down;
+                            break;
+                        case EPressState.Down:
+                            _inputsMap[input] = EPressState.Pressing;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.Up:
+                            _inputsMap[input] = EPressState.None;
+                            break;
+                        default:
+                            _inputsMap[input] = EPressState.Up;
+                            break;
+                    }
+                }
+            }
+        }
+
+        public enum EPressState
+        {
+            None,
+            Down,
+            Pressing,
+            Up
         }
     }
 

@@ -5,7 +5,6 @@ using Liminal.SDK.VR.Avatars.Controllers;
 using Liminal.SDK.VR.Input;
 using Liminal.SDK.VR.Pointers;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -36,17 +35,27 @@ namespace Liminal.SDK.XR
         public VRInputDeviceHand Hand { get; }
         public bool IsTouching { get; }
 
-        private static readonly VRInputDeviceCapability _capabilities =
-            VRInputDeviceCapability.DirectionalInput |
-            VRInputDeviceCapability.Touch |
-            VRInputDeviceCapability.TriggerButton;
+        private static readonly VRInputDeviceCapability _capabilities = VRInputDeviceCapability.DirectionalInput |
+                                                                        VRInputDeviceCapability.Touch |
+                                                                        VRInputDeviceCapability.TriggerButton;
 
         public UnityXRInputDevice(VRInputDeviceHand hand)
         {
             Hand = hand;
             Pointer = new InputDevicePointer(this);
             Pointer.Activate();
+
+            foreach (var button in _XrButtonMap)
+                AddInput(button.Key);
         }
+
+        public Dictionary<string, string> _XrButtonMap = new Dictionary<string, string>
+        {
+            { VRButton.Trigger, "TriggerButton"},
+        };
+
+        public Dictionary<string, EPressState> _inputsMap = new Dictionary<string, EPressState>();
+        public List<string> _inputs = new List<string>();
 
         public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Hand == VRInputDeviceHand.Right ? XRNode.RightHand : XRNode.LeftHand);
 
@@ -82,26 +91,18 @@ namespace Liminal.SDK.XR
 
         public bool GetButton(string button)
         {
-            AddInput(Trigger);
-            return _inputsMap[Trigger] == EPressState.Pressing;
+            return _inputsMap[_XrButtonMap[button]] == EPressState.Pressing;
         }
 
         public bool GetButtonDown(string button)
         {
-            AddInput(Trigger);
-            return _inputsMap[Trigger] == EPressState.Down;
+            return _inputsMap[_XrButtonMap[button]] == EPressState.Down;
         }
-
-        public string Trigger => "TriggerButton";
 
         public bool GetButtonUp(string button)
         {
-            AddInput(Trigger);
-            return _inputsMap[Trigger] == EPressState.Up;
+            return _inputsMap[_XrButtonMap[button]] == EPressState.Up;
         }
-
-        public Dictionary<string, EPressState> _inputsMap = new Dictionary<string, EPressState>();
-        public List<string> _inputs = new List<string>();
 
         public void AddInput(string input)
         {
@@ -203,6 +204,7 @@ namespace Liminal.SDK.XR
             SecondaryInputDevice = secondary;
 
             XRInputs.Add(primary);
+            XRInputs.Add(secondary);
 
             InputDevices = new List<IVRInputDevice>
             {
@@ -247,7 +249,7 @@ namespace Liminal.SDK.XR
             var secondaryPointer = secondaryHand.GetComponentInChildren<LaserPointerVisual>();
             secondaryPointer?.Bind(SecondaryInputDevice.Pointer);
 
-            //avatar/head need to be at 0
+            avatar.Head.Transform.localPosition = Vector3.zero;
             //UpdateConnectedControllers();
             //SetDefaultPointerActivation();
         }

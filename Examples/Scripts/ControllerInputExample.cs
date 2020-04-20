@@ -19,6 +19,7 @@ public class ControllerInputExample : MonoBehaviour
             AppendDeviceInput(inputStringBuilder, device.SecondaryInputDevice, "Secondary");
 
             InputText.text = inputStringBuilder.ToString();
+
         }
     }
 
@@ -29,6 +30,12 @@ public class ControllerInputExample : MonoBehaviour
 
         builder.AppendLine($"{deviceName} Back: {inputDevice.GetButton(VRButton.Back)}");
         builder.AppendLine($"{deviceName} Button One: {inputDevice.GetButton(VRButton.Primary)}");
+
+        if (inputDevice.GetButtonUp(VRButton.Trigger))
+        {
+            Debug.Log("Button up");
+        }
+
         //builder.AppendLine($"{deviceName} Touch Pad Touching: {inputDevice.IsTouching}");
         //builder.AppendLine($"{deviceName} Axis2D-One: {inputDevice.GetAxis2D(VRAxis.One)}");
         //builder.AppendLine($"{deviceName} Axis2D-OneRaw: {inputDevice.GetAxis2D(VRAxis.OneRaw)}");

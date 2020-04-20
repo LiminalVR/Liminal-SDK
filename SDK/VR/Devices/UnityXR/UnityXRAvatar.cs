@@ -58,8 +58,8 @@ namespace Liminal.SDK.XR
         public Dictionary<string, string> _XrButtonMap = new Dictionary<string, string>
         {
             { VRButton.Trigger, "TriggerButton"},
-            { VRButton.Back, "Back"},
             { VRButton.Primary, "TriggerButton"},
+            { VRButton.Back, "SecondaryButton"},
             { VRButton.Touch, "Touch"},
             //VRAxis.One
             //VRAxis.OneRaw

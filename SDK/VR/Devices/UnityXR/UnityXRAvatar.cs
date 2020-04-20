@@ -20,6 +20,11 @@ namespace Liminal.SDK.XR
         {
             throw new System.NotImplementedException();
         }
+
+        private void Update()
+        {
+            VRDevice.Device.Update();
+        }
     }
 
     public class UnityXRInputDevice : IVRInputDevice
@@ -77,21 +82,35 @@ namespace Liminal.SDK.XR
 
         public bool GetButton(string button)
         {
-            return _inputsMap[CommonUsages.triggerButton] == EPressState.Pressing;
+            AddInput(Trigger);
+            return _inputsMap[Trigger] == EPressState.Pressing;
         }
 
         public bool GetButtonDown(string button)
         {
-            return _inputsMap[CommonUsages.triggerButton] == EPressState.Down;
+            AddInput(Trigger);
+            return _inputsMap[Trigger] == EPressState.Down;
         }
+
+        public string Trigger => "TriggerButton";
 
         public bool GetButtonUp(string button)
         {
-            return _inputsMap[CommonUsages.triggerButton] == EPressState.Up;
+            AddInput(Trigger);
+            return _inputsMap[Trigger] == EPressState.Up;
         }
 
-        public Dictionary<InputFeatureUsage<bool>, EPressState> _inputsMap = new Dictionary<InputFeatureUsage<bool>, EPressState>();
-        public List<InputFeatureUsage<bool>> _inputs = new List<InputFeatureUsage<bool>>();
+        public Dictionary<string, EPressState> _inputsMap = new Dictionary<string, EPressState>();
+        public List<string> _inputs = new List<string>();
+
+        public void AddInput(string input)
+        {
+            if (!_inputsMap.ContainsKey(input))
+            {
+                _inputs.Add(input);
+                _inputsMap.Add(input, EPressState.None);
+            }
+        }
 
         public void Update()
         {
@@ -100,7 +119,7 @@ namespace Liminal.SDK.XR
                 if (!_inputsMap.ContainsKey(input))
                     _inputsMap.Add(input, EPressState.None);
 
-                InputDevice.TryGetFeatureValue(input, out var pressed);
+                InputDevice.TryGetFeatureValue(new InputFeatureUsage<bool>(input), out var pressed);
 
                 var currentState = _inputsMap[input];
                 if (pressed)
@@ -119,6 +138,7 @@ namespace Liminal.SDK.XR
                 {
                     switch (currentState)
                     {
+                        case EPressState.None:
                         case EPressState.Up:
                             _inputsMap[input] = EPressState.None;
                             break;
@@ -176,8 +196,13 @@ namespace Liminal.SDK.XR
 
         public UnityXRDevice()
         {
-            PrimaryInputDevice = new UnityXRInputDevice(VRInputDeviceHand.Right);
-            SecondaryInputDevice = new UnityXRInputDevice(VRInputDeviceHand.Left);
+            var primary = new UnityXRInputDevice(VRInputDeviceHand.Right);
+            var secondary = new UnityXRInputDevice(VRInputDeviceHand.Left);
+
+            PrimaryInputDevice = primary;
+            SecondaryInputDevice = secondary;
+
+            XRInputs.Add(primary);
 
             InputDevices = new List<IVRInputDevice>
             {

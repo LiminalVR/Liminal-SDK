@@ -49,9 +49,21 @@ namespace Liminal.SDK.XR
                 AddInput(button.Key);
         }
 
+        public UnityXRInputDevice()
+        {
+            foreach (var button in _XrButtonMap)
+                AddInput(button.Key);
+        }
+
         public Dictionary<string, string> _XrButtonMap = new Dictionary<string, string>
         {
             { VRButton.Trigger, "TriggerButton"},
+            { VRButton.Back, "Back"},
+            { VRButton.Primary, "TriggerButton"},
+            { VRButton.Touch, "Touch"},
+            //VRAxis.One
+            //VRAxis.OneRaw
+            //IsTouching
         };
 
         public Dictionary<string, EPressState> _inputsMap = new Dictionary<string, EPressState>();
@@ -91,17 +103,24 @@ namespace Liminal.SDK.XR
 
         public bool GetButton(string button)
         {
-            return _inputsMap[_XrButtonMap[button]] == EPressState.Pressing;
+            return GetButtonState(button) == EPressState.Pressing;
         }
 
         public bool GetButtonDown(string button)
         {
-            return _inputsMap[_XrButtonMap[button]] == EPressState.Down;
+            return GetButtonState(button) == EPressState.Down;
         }
 
         public bool GetButtonUp(string button)
         {
-            return _inputsMap[_XrButtonMap[button]] == EPressState.Up;
+            return GetButtonState(button) == EPressState.Up;
+        }
+
+        public EPressState GetButtonState(string button)
+        {
+            Debug.Log(button);
+            AddInput(_XrButtonMap[button]);
+            return _inputsMap[_XrButtonMap[button]];
         }
 
         public void AddInput(string input)
@@ -241,13 +260,18 @@ namespace Liminal.SDK.XR
 
             avatar.PrimaryHand.Transform.SetParent(primaryHand.transform);
             var primaryPointer = primaryHand.GetComponentInChildren<LaserPointerVisual>();
-            PrimaryInputDevice.Pointer.Transform = primaryPointer.transform;
+
+            if(primaryPointer != null)
+                PrimaryInputDevice.Pointer.Transform = primaryPointer.transform;
 
             primaryPointer?.Bind(PrimaryInputDevice.Pointer);
             avatar.SecondaryHand.Transform.SetParent(secondaryHand.transform);
 
             var secondaryPointer = secondaryHand.GetComponentInChildren<LaserPointerVisual>();
             secondaryPointer?.Bind(SecondaryInputDevice.Pointer);
+
+            if(secondaryPointer != null)
+                SecondaryInputDevice.Pointer.Transform = secondaryPointer.transform;
 
             avatar.Head.Transform.localPosition = Vector3.zero;
             //UpdateConnectedControllers();

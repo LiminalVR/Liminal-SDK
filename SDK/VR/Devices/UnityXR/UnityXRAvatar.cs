@@ -77,20 +77,19 @@ namespace Liminal.SDK.XR
 
         public bool GetButton(string button)
         {
-            return UnityEngine.Input.GetMouseButton(0);
+            return _inputsMap[CommonUsages.triggerButton] == EPressState.Pressing;
         }
 
         private InputFeatureUsage<bool> _using;
 
         public bool GetButtonDown(string button)
         {
-            return _inputsMap[]
-            return isPressed;
+            return _inputsMap[CommonUsages.triggerButton] == EPressState.Down;
         }
 
         public bool GetButtonUp(string button)
         {
-            return UnityEngine.Input.GetMouseButtonUp(0);
+            return _inputsMap[CommonUsages.triggerButton] == EPressState.Up;
         }
 
         public Dictionary<InputFeatureUsage<bool>, EPressState> _inputsMap = new Dictionary<InputFeatureUsage<bool>, EPressState>();

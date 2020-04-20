@@ -43,7 +43,7 @@ namespace Liminal.SDK.XR
             Pointer.Activate();
         }
 
-        public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+        public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Hand == VRInputDeviceHand.Right ? XRNode.RightHand : XRNode.LeftHand);
 
         public bool HasCapabilities(VRInputDeviceCapability capabilities)
         {
@@ -80,8 +80,6 @@ namespace Liminal.SDK.XR
             return _inputsMap[CommonUsages.triggerButton] == EPressState.Pressing;
         }
 
-        private InputFeatureUsage<bool> _using;
-
         public bool GetButtonDown(string button)
         {
             return _inputsMap[CommonUsages.triggerButton] == EPressState.Down;
@@ -95,7 +93,7 @@ namespace Liminal.SDK.XR
         public Dictionary<InputFeatureUsage<bool>, EPressState> _inputsMap = new Dictionary<InputFeatureUsage<bool>, EPressState>();
         public List<InputFeatureUsage<bool>> _inputs = new List<InputFeatureUsage<bool>>();
 
-        private void Update()
+        public void Update()
         {
             foreach (var input in _inputs)
             {
@@ -167,6 +165,8 @@ namespace Liminal.SDK.XR
         public IVRInputDevice PrimaryInputDevice { get; }
         public IVRInputDevice SecondaryInputDevice { get; }
 
+        public List<UnityXRInputDevice> XRInputs = new List<UnityXRInputDevice>();
+
         public int CpuLevel { get; set; }
         public int GpuLevel { get; set; }
 
@@ -229,6 +229,10 @@ namespace Liminal.SDK.XR
 
         public void Update()
         {
+            foreach (var input in XRInputs)
+            {
+                input.Update();
+            }
         }
     }
 }

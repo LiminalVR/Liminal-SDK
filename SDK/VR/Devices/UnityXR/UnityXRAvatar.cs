@@ -118,7 +118,6 @@ namespace Liminal.SDK.XR
 
         public EPressState GetButtonState(string button)
         {
-            Debug.Log(button);
             AddInput(_XrButtonMap[button]);
             return _inputsMap[_XrButtonMap[button]];
         }

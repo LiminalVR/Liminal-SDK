@@ -5,6 +5,10 @@ using Liminal.SDK.VR.Avatars.Controllers;
 using Liminal.SDK.VR.Input;
 using Liminal.SDK.VR.Pointers;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.SpatialTracking;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
 
 namespace Liminal.SDK.XR
 {
@@ -20,11 +24,30 @@ namespace Liminal.SDK.XR
 
     public class UnityXRInputDevice : IVRInputDevice
     {
-        public string Name { get; }
+        public string Name => "UnityController";
         public IVRPointer Pointer { get; }
+
+        public int ButtonCount => 3;
+        public VRInputDeviceHand Hand { get; }
+        public bool IsTouching { get; }
+
+        private static readonly VRInputDeviceCapability _capabilities =
+            VRInputDeviceCapability.DirectionalInput |
+            VRInputDeviceCapability.Touch |
+            VRInputDeviceCapability.TriggerButton;
+
+        public UnityXRInputDevice(VRInputDeviceHand hand)
+        {
+            Hand = hand;
+            Pointer = new InputDevicePointer(this);
+            Pointer.Activate();
+        }
+
+        public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+
         public bool HasCapabilities(VRInputDeviceCapability capabilities)
         {
-            throw new System.NotImplementedException();
+            return ((_capabilities & capabilities) == capabilities);
         }
 
         public bool HasAxis1D(string axis)
@@ -54,22 +77,34 @@ namespace Liminal.SDK.XR
 
         public bool GetButton(string button)
         {
-            throw new System.NotImplementedException();
+            return UnityEngine.Input.GetMouseButton(0);
         }
+
+        private InputFeatureUsage<bool> _using;
 
         public bool GetButtonDown(string button)
         {
-            throw new System.NotImplementedException();
+            InputDevice.TryGetFeatureValue(CommonUsages.triggerButton, out var isPressed);
+            return isPressed;
         }
 
         public bool GetButtonUp(string button)
         {
-            throw new System.NotImplementedException();
+            return UnityEngine.Input.GetMouseButtonUp(0);
         }
 
-        public int ButtonCount { get; }
-        public VRInputDeviceHand Hand { get; }
-        public bool IsTouching { get; }
+        private bool _triggerPressed;
+        private bool _triggerUp;
+
+        private void Update()
+        {
+            _triggerUp = false;
+
+            InputDevice.TryGetFeatureValue(CommonUsages.triggerButton, out var triggerPressed);
+
+            if (_triggerPressed && triggerPressed)
+                _triggerUp = true;
+        }
     }
 
     public class UnityXRHeadset : IVRHeadset
@@ -88,10 +123,33 @@ namespace Liminal.SDK.XR
     public class UnityXRDevice : IVRDevice
     {
         private static readonly VRDeviceCapability _capabilities = VRDeviceCapability.Controller | VRDeviceCapability.UserPrescenceDetection;
+        
+        public string Name => "UnityXR";
+        public int InputDeviceCount => 2;
+
+        public IVRHeadset Headset => new UnityXRHeadset();
+        public IEnumerable<IVRInputDevice> InputDevices { get; }
+
+        public IVRInputDevice PrimaryInputDevice { get; }
+        public IVRInputDevice SecondaryInputDevice { get; }
+
+        public int CpuLevel { get; set; }
+        public int GpuLevel { get; set; }
+
+        public event VRInputDeviceEventHandler InputDeviceConnected;
+        public event VRInputDeviceEventHandler InputDeviceDisconnected;
+        public event VRDeviceEventHandler PrimaryInputDeviceChanged;
 
         public UnityXRDevice()
         {
-            InputDevices = new List<IVRInputDevice>();
+            PrimaryInputDevice = new UnityXRInputDevice(VRInputDeviceHand.Right);
+            SecondaryInputDevice = new UnityXRInputDevice(VRInputDeviceHand.Left);
+
+            InputDevices = new List<IVRInputDevice>
+            {
+                PrimaryInputDevice,
+                SecondaryInputDevice,
+            };
         }
 
         public bool HasCapabilities(VRDeviceCapability capabilities)
@@ -101,30 +159,42 @@ namespace Liminal.SDK.XR
 
         public void SetupAvatar(IVRAvatar avatar)
         {
-            var deviceAv = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+            avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+            var manager = new GameObject().AddComponent<XRInteractionManager>();
             
+            var avatarGo = avatar.Transform.gameObject;
+            
+            var xrRig = avatarGo.AddComponent<XRRig>();
+            var centerEye = avatar.Head.CenterEyeCamera.gameObject;
+            var eyeDriver = centerEye.AddComponent<TrackedPoseDriver>();
+            eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
+            eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
+            xrRig.cameraGameObject = centerEye.gameObject;
+            xrRig.TrackingOriginMode = TrackingOriginModeFlags.Floor;
 
+            var primaryHandPrefab = Resources.Load("RightHand Controller");
+            var primaryHand = Object.Instantiate(primaryHandPrefab, avatar.Transform) as GameObject;
+
+            var secondaryHandPrefab = Resources.Load("LeftHand Controller");
+            var secondaryHand = Object.Instantiate(secondaryHandPrefab, avatar.Transform) as GameObject;
+
+            avatar.PrimaryHand.Transform.SetParent(primaryHand.transform);
+            var primaryPointer = primaryHand.GetComponentInChildren<LaserPointerVisual>();
+            PrimaryInputDevice.Pointer.Transform = primaryPointer.transform;
+
+            primaryPointer?.Bind(PrimaryInputDevice.Pointer);
+            avatar.SecondaryHand.Transform.SetParent(secondaryHand.transform);
+
+            var secondaryPointer = secondaryHand.GetComponentInChildren<LaserPointerVisual>();
+            secondaryPointer?.Bind(SecondaryInputDevice.Pointer);
+
+            //avatar/head need to be at 0
             //UpdateConnectedControllers();
             //SetDefaultPointerActivation();
         }
 
         public void Update()
         {
-            //UpdateConnectedControllers
         }
-
-        public string Name => "UnityXR";
-        public int InputDeviceCount => 2;
-
-        public IVRHeadset Headset => new UnityXRHeadset();
-        public IEnumerable<IVRInputDevice> InputDevices { get; }
-        public IVRInputDevice PrimaryInputDevice { get; }
-        public IVRInputDevice SecondaryInputDevice { get; }
-        public int CpuLevel { get; set; }
-        public int GpuLevel { get; set; }
-        public event VRInputDeviceEventHandler InputDeviceConnected;
-        public event VRInputDeviceEventHandler InputDeviceDisconnected;
-        public event VRDeviceEventHandler PrimaryInputDeviceChanged;
     }
-
 }

@@ -1,6 +1,7 @@
 ﻿using Liminal.SDK.Core;
 using Liminal.SDK.VR.Devices.Emulator;
 using System;
+using Liminal.SDK.XR;
 using UnityEngine;
 
 namespace Liminal.SDK.VR
@@ -47,10 +48,6 @@ namespace Liminal.SDK.VR
             if (!ExperienceApp.IsEmulator)
                 throw new InvalidOperationException("ExperienceApp must be in Emulation mode to create an emulator device.");
 
-#if UNITY_EDITOR
-            // Always use the emulator device in the editor
-            return new EmulatorDevice(m_EmulatorDevice);
-#else
             // A BuildDevice value of NONE means we should auto-detect the device
             if (m_BuildDevice == VREmulatorDevice.None)
                 return AutoCreateDevice();
@@ -64,12 +61,13 @@ namespace Liminal.SDK.VR
                 case VREmulatorDevice.GearVR:
                     return new Devices.GearVR.GearVRDevice();
 
+                case VREmulatorDevice.UnityXR:
+                    return new UnityXRDevice();
+
                 default:
                     Debug.Log("[VREmulator] Unsupported build device specified.");
                     return new EmulatorDevice(m_EmulatorDevice);
-
             }
-#endif
         }
 
         private IVRDevice AutoCreateDevice()

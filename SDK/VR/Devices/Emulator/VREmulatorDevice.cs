@@ -19,5 +19,6 @@
         /// Samsung GearVR emulation.
         /// </summary>
         GearVR,
+        UnityXR
     }
 }

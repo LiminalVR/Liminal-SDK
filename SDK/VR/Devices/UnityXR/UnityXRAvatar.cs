@@ -168,7 +168,9 @@ namespace Liminal.SDK.XR
             }
         }
 
-        public class Axis1DInputFeature : InputFeature<float>
+        public interface AxisInputFeature { }
+
+        public class Axis1DInputFeature : InputFeature<float>, AxisInputFeature
         {
             private const float THRESHOLD = 0.1f;
 
@@ -233,7 +235,7 @@ namespace Liminal.SDK.XR
             }
         }
 
-        public class Axis2DInputFeature : InputFeature<Vector2>
+        public class Axis2DInputFeature : InputFeature<Vector2>, AxisInputFeature
         {
             private const float THRESHOLD = 0.1f;
 
@@ -345,7 +347,20 @@ namespace Liminal.SDK.XR
 
             foreach (var pairs in _inputFeatures.ToArray())
             {
-                pairs.Value.AssignDevice(InputDevice);
+                InputFeature inputFeature = pairs.Value;
+
+                // also register axes with their raw counterpart
+                if (inputFeature is AxisInputFeature && !pairs.Key.EndsWith("Raw"))
+                {
+                    string rawKey = $"{pairs.Key}Raw";
+
+                    if (!_inputFeatures.ContainsKey(rawKey))
+                    {
+                        _inputFeatures.Add(rawKey, inputFeature);
+                    }
+                }
+
+                inputFeature.AssignDevice(InputDevice);
             }
         }
 

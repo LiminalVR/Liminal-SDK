@@ -44,7 +44,7 @@ public class ControllerInputExample : MonoBehaviour
         builder.AppendLine($"<b>{deviceName} Axis Two Raw:</b> {inputDevice.GetAxis1D(VRAxis.TwoRaw):0.00}");
 
         builder.AppendLine($"<b>{deviceName} Axis Three:</b> {inputDevice.GetAxis1D(VRAxis.Three)}");
-        builder.AppendLine($"<b>{deviceName} Axis Three Raw:</b> {inputDevice.GetAxis1D(VRAxis.ThreeRaw)}:0.00");
+        builder.AppendLine($"<b>{deviceName} Axis Three Raw:</b> {inputDevice.GetAxis1D(VRAxis.ThreeRaw):0.00}");
 
 
         if (inputDevice.GetButtonUp(VRButton.Trigger))

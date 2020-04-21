@@ -1,9 +1,13 @@
 ﻿using System;
+using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Devices.Emulator;
 using Liminal.SDK.VR.Devices.GearVR;
+using Liminal.SDK.XR;
 using UnityEngine;
 using UnityEngine.XR;
+using Object = UnityEngine.Object;
+using App;
 
 namespace Liminal.Platform.Experimental.VR
 {
@@ -35,22 +39,8 @@ namespace Liminal.Platform.Experimental.VR
 
         public IVRDevice CreateDevice()
         {
-            // Make sure XR is enabled...
             XRSettings.enabled = true;
-
-            Debug.LogFormat("[VRDevice] XRDevice.isPresent={0}", XRDevice.isPresent);
-            if (XRDevice.isPresent)
-            {
-                Debug.LogFormat("[VRDevice] XRDevice.model={0}", XRDevice.model);
-            }
-
-            if (!Application.isEditor)
-            {
-                return new GearVRDevice();
-            }
-
-            // Fallback to the emulator device
-            return new EmulatorDevice(m_EmulatorDevice);
+            return DeviceUtils.CreateDevice();
         }
 
         private static IVRDevice FindConnectedDeviceByModel(string modelName)
@@ -59,6 +49,30 @@ namespace Liminal.Platform.Experimental.VR
                 return null;
 
             throw new NotImplementedException("Device support is not implemented yet");
+        }
+    }
+}
+
+namespace App
+{
+    public static class DeviceUtils
+    {
+        public static IVRDevice CreateDevice(ExperienceApp experienceApp = null)
+        {
+            experienceApp = experienceApp ?? Object.FindObjectOfType<ExperienceApp>();
+            var sdkType = experienceApp.SDKType;
+
+            switch (sdkType)
+            {
+                case ESDKType.Legacy:
+                    return new GearVRDevice();
+
+                case ESDKType.UnityXR:
+                    return new UnityXRDevice();
+
+                default:
+                    return new EmulatorDevice(VREmulatorDevice.Daydream);
+            }
         }
     }
 }

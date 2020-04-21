@@ -229,7 +229,13 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
             yield return new WaitForSeconds(1f);
 
             SetState(State.Completed);
-            ScreenFader.Instance.FadeToBlack(2f);
+
+            if (ScreenFader.Instance == null)
+            {
+                Debug.LogError("Screen fader singleton may not be setup. Make sure the Singleton checkbox is checked on the CompoundScreenFader.");
+            }
+
+            ScreenFader.Instance?.FadeToBlack(2f);
 
             yield return new WaitForSeconds(3f);
 

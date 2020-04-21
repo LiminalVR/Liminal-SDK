@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Liminal.Platform.Experimental.App;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Liminal.SDK.Build
 {
@@ -105,10 +107,13 @@ namespace Liminal.SDK.Build
                 {
                     var streamingFile = File.ReadAllBytes(androidStreamingPath);
 
-                    if (!streamingFile.SequenceEqual(androidFile))
+                    if (GUI.changed)
                     {
-                        File.Copy(_appPreviewConfig.AndroidPath, androidStreamingPath, overwrite: true);
-                        AssetDatabase.Refresh();
+                        if (!streamingFile.SequenceEqual(androidFile))
+                        {
+                            File.Copy(_appPreviewConfig.AndroidPath, androidStreamingPath, overwrite: true);
+                            AssetDatabase.Refresh();
+                        }
                     }
                 }
 

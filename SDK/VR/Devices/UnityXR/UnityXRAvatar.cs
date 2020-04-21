@@ -8,6 +8,8 @@ using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
+using System;
+using Object = UnityEngine.Object;
 
 namespace Liminal.SDK.XR
 {
@@ -26,18 +28,285 @@ namespace Liminal.SDK.XR
         }
     }
 
+    /// <summary>
+    /// Mappings and further manual information available here: https://docs.unity3d.com/Manual/xr_input.html
+    /// All of the below are on a per-controller basis and may or may not exist depending on the platform that it currently running
+    /// 
+    /// Buttons:
+    /// - primaryButton
+    /// - secondaryButton
+    /// - secondaryTouch
+    /// - gripButton
+    /// - triggerButton
+    /// - menuButton
+    /// - primary2DAxisClick
+    /// - primary2DAxisTouch
+    /// - userPresence (WMR, Oculus)
+    /// 
+    /// Axis:
+    /// - trigger
+    /// - grip
+    /// - batteryLevel (only WMR)
+    /// 
+    /// 2D Axis:
+    /// - primary2DAxis
+    /// - secondary2DAxis
+    /// </summary>
     public class UnityXRInputDevice : IVRInputDevice
     {
+        #region Inner enums
+        public enum EPressState
+        {
+            None,
+            Down,
+            Pressing,
+            Up
+        } 
+        #endregion
+
+        #region InputFeature inner classes
+        public abstract class InputFeature
+        {
+            protected InputDevice Device { get; }
+            public EPressState PressState { get; protected set; }
+            public abstract string Name { get; }
+
+            public InputFeature(InputDevice aDevice)
+            {
+                Device = aDevice;
+                PressState = EPressState.None;
+            }
+
+            public abstract void UpdateState();
+        }
+
+        public abstract class InputFeature<T> : InputFeature where T : IEquatable<T>
+        {
+            // RawValue is assigned, also assign the 'normalised' Value
+            public virtual T RawValue 
+            {
+                get; protected set;
+            }
+            public T Value { get; protected set; }
+
+            protected InputFeatureUsage<T> BaseFeature { get; }
+
+            public override string Name => BaseFeature.name;
+
+            public InputFeature(InputDevice aDevice, InputFeatureUsage<T> aBaseFeature) : base(aDevice)
+            {
+                BaseFeature = aBaseFeature;
+            }
+        }
+
+        public class ButtonInputFeature : InputFeature<bool>
+        {
+            public override bool RawValue
+            { 
+                get => base.RawValue;
+                protected set
+                {
+                    base.RawValue = value;
+                    Value = RawValue;
+                }
+            }
+
+            public ButtonInputFeature(InputDevice aDevice, InputFeatureUsage<bool> aBaseFeature) : base(aDevice, aBaseFeature)
+            {
+            }
+
+            public override void UpdateState()
+            {
+                if (!Device.TryGetFeatureValue(BaseFeature, out bool isPressed))
+                {
+                    // couldn't get input for the feature, so mark press state as none
+                    PressState = EPressState.None;
+                    RawValue = false;
+                }
+
+                // received a value, so update accordingly
+                EPressState currentState = PressState;
+                RawValue = isPressed;
+
+                if (isPressed)
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.None:
+                            PressState = EPressState.Down;
+                            break;
+                        case EPressState.Down:
+                            PressState = EPressState.Pressing;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.Pressing:
+                            PressState = EPressState.Up;
+                            break;
+                        case EPressState.Up:
+                            PressState = EPressState.None;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        public class Axis1DInputFeature : InputFeature<float>
+        {
+            private const float THRESHOLD = 0.1f;
+
+            public override float RawValue
+            { 
+                get => base.RawValue;
+                protected set
+                {
+                    base.RawValue = value;
+                    Value = value >= THRESHOLD ? 1f : 0f;
+                }
+            }
+
+            public Axis1DInputFeature(InputDevice aDevice, InputFeatureUsage<float> aBaseFeature) : base(aDevice, aBaseFeature)
+            {
+            }
+
+            public override void UpdateState()
+            {
+                if (!Device.TryGetFeatureValue(BaseFeature, out float rawActuated))
+                {
+                    // couldn't get input for the feature, so mark press state as none
+                    PressState = EPressState.None;
+                    RawValue = 0.0f;
+                }
+
+                // received a value, so update accordingly
+                EPressState currentState = PressState;
+                RawValue = rawActuated;
+
+                // if above or equal to the threshold the axis is considered 'pressed'
+                if (rawActuated >= THRESHOLD)
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.None:
+                            PressState = EPressState.Down;
+                            break;
+                        case EPressState.Down:
+                            PressState = EPressState.Pressing;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.Pressing:
+                            PressState = EPressState.Up;
+                            break;
+                        case EPressState.Up:
+                            PressState = EPressState.None;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+
+        public class Axis2DInputFeature : InputFeature<Vector2>
+        {
+            private const float THRESHOLD = 0.1f;
+
+            public override Vector2 RawValue
+            {
+                get => base.RawValue;
+                protected set
+                {
+                    base.RawValue = value;
+
+                    Value = new Vector2(
+                        Mathf.Abs(base.RawValue.x) >= THRESHOLD ? 1f * Mathf.Sign(base.RawValue.x) : 0f,
+                        Mathf.Abs(base.RawValue.y) >= THRESHOLD ? 1f * Mathf.Sign(base.RawValue.y) : 0f
+                    );
+                }
+            }
+
+            public Axis2DInputFeature(InputDevice aDevice, InputFeatureUsage<Vector2> aBaseFeature) : base(aDevice, aBaseFeature)
+            {
+            }
+
+            public override void UpdateState()
+            {
+                if (!Device.TryGetFeatureValue(BaseFeature, out Vector2 rawActuated))
+                {
+                    // couldn't get input for the feature, so mark press state as none
+                    PressState = EPressState.None;
+                    RawValue = Vector2.zero;
+                }
+
+                // received a value, so update accordingly
+                EPressState currentState = PressState;
+                RawValue = rawActuated;
+
+                // if either axis exceeds the threshold, considered pressed
+                if (Mathf.Abs(rawActuated.x) >= THRESHOLD ||
+                    Mathf.Abs(rawActuated.y) >= THRESHOLD)
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.None:
+                            PressState = EPressState.Down;
+                            break;
+                        case EPressState.Down:
+                            PressState = EPressState.Pressing;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (currentState)
+                    {
+                        case EPressState.Pressing:
+                            PressState = EPressState.Up;
+                            break;
+                        case EPressState.Up:
+                            PressState = EPressState.None;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        #endregion
+
+
         public string Name => "UnityController";
         public IVRPointer Pointer { get; }
 
+        // TODO: Confirm this?
         public int ButtonCount => 3;
         public VRInputDeviceHand Hand { get; }
-        public bool IsTouching { get; }
+
+        // this is mapped to 'primaryTouch' inputFeature
+        public bool IsTouching { get => GetButton(VRButton.Touch); }
 
         private static readonly VRInputDeviceCapability _capabilities = VRInputDeviceCapability.DirectionalInput |
                                                                         VRInputDeviceCapability.Touch |
                                                                         VRInputDeviceCapability.TriggerButton;
+
+        private Dictionary<string, InputFeature> _inputFeatures = new Dictionary<string, InputFeature>();
 
         public UnityXRInputDevice(VRInputDeviceHand hand)
         {
@@ -45,29 +314,96 @@ namespace Liminal.SDK.XR
             Pointer = new InputDevicePointer(this);
             Pointer.Activate();
 
-            foreach (var button in _XrButtonMap)
-                AddInput(button.Key);
+            var usages = new List<InputFeatureUsage>();
+            var featureUsages = new Dictionary<string, InputFeatureUsage>();
+            if (InputDevice.TryGetFeatureUsages(usages))
+            {
+                foreach (var usage in usages)
+                {
+                    Debug.Log($"{usage.name} is {usage.type.Name}");
+                    featureUsages.Add(usage.name.ToLower(), usage);
+                }
+            }
+
+            foreach (var buttonMapping in _XrButtonMap.Keys)
+            {
+                string featureName = _XrButtonMap[buttonMapping];
+
+                if (featureUsages.TryGetValue(featureName.ToLower(), out var featureUsage))
+                {
+                    _inputFeatures.Add(
+                        buttonMapping,
+                        new ButtonInputFeature(InputDevice, featureUsage.As<bool>())
+                        );
+                }
+            }
+
+            foreach (var axis1DMapping in _XrAxis1DMap.Keys)
+            {
+                string featureName = _XrAxis1DMap[axis1DMapping];
+
+                if (featureUsages.TryGetValue(featureName.ToLower(), out var featureUsage))
+                {
+                    _inputFeatures.Add(
+                        axis1DMapping,
+                        new Axis1DInputFeature(InputDevice, featureUsage.As<float>())
+                        );
+                }
+            }
+
+            foreach (var axis2DMapping in _XrAxis2DMap.Keys)
+            {
+                string featureName = _XrAxis2DMap[axis2DMapping];
+
+                if (featureUsages.TryGetValue(featureName.ToLower(), out var featureUsage))
+                {
+                    _inputFeatures.Add(
+                        axis2DMapping,
+                        new Axis2DInputFeature(InputDevice, featureUsage.As<Vector2>())
+                        );
+                }
+            }
         }
 
         public UnityXRInputDevice()
         {
-            foreach (var button in _XrButtonMap)
-                AddInput(button.Key);
+            // default things? How?
         }
 
+        #region Dicts
         public Dictionary<string, string> _XrButtonMap = new Dictionary<string, string>
         {
-            { VRButton.Trigger, "TriggerButton"},
-            { VRButton.Primary, "TriggerButton"},
             { VRButton.Back, "SecondaryButton"},
-            { VRButton.Touch, "Touch"},
-            //VRAxis.One
-            //VRAxis.OneRaw
-            //IsTouching
+            //{ VRButton.Three, ""},
+            //{ VRButton.Four, ""},
+            { VRButton.Touch, "primaryTouch"},
+            { VRButton.Trigger, "TriggerButton"},
+
+            // also == VRButton.One
+            { VRButton.Primary, "TriggerButton"},
+            
+            // also == VRButton.Two
+            //{ VRButton.Seconday, ""},
         };
 
-        public Dictionary<string, EPressState> _inputsMap = new Dictionary<string, EPressState>();
-        public List<string> _inputs = new List<string>();
+        private Dictionary<string, string> _XrAxis1DMap = new Dictionary<string, string>
+        {
+            // 1D
+            { VRAxis.Two, "trigger" },
+            { VRAxis.TwoRaw, "trigger" },
+
+            // 1D
+            { VRAxis.Three, "grip" },
+            { VRAxis.ThreeRaw, "grip" },
+        };
+
+        private Dictionary<string, string> _XrAxis2DMap = new Dictionary<string, string>
+        {
+            // 2D
+            { VRAxis.One, "primary2DAxis" },
+            { VRAxis.OneRaw, "primary2DAxis" },
+        }; 
+        #endregion
 
         public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Hand == VRInputDeviceHand.Right ? XRNode.RightHand : XRNode.LeftHand);
 
@@ -78,27 +414,33 @@ namespace Liminal.SDK.XR
 
         public bool HasAxis1D(string axis)
         {
-            throw new System.NotImplementedException();
+            return _inputFeatures.TryGetValue(axis, out var feature) && feature is Axis1DInputFeature;
         }
 
         public bool HasAxis2D(string axis)
         {
-            throw new System.NotImplementedException();
+            return _inputFeatures.TryGetValue(axis, out var feature) && feature is Axis2DInputFeature;
         }
 
         public bool HasButton(string button)
         {
-            throw new System.NotImplementedException();
+            return _inputFeatures.TryGetValue(button, out var feature) && feature is ButtonInputFeature;
         }
 
         public float GetAxis1D(string axis)
         {
-            throw new System.NotImplementedException();
+            if (!HasAxis1D(axis)) return 0f;
+
+            var axis1DFeature = _inputFeatures[axis] as Axis1DInputFeature;
+            return axis.Contains("Raw") ? axis1DFeature.RawValue : axis1DFeature.Value;
         }
 
         public Vector2 GetAxis2D(string axis)
         {
-            throw new System.NotImplementedException();
+            if (!HasAxis2D(axis)) return Vector2.zero;
+
+            var axis2DFeature = _inputFeatures[axis] as Axis2DInputFeature;
+            return axis.Contains("Raw") ? axis2DFeature.RawValue : axis2DFeature.Value;
         }
 
         public bool GetButton(string button)
@@ -118,63 +460,27 @@ namespace Liminal.SDK.XR
 
         public EPressState GetButtonState(string button)
         {
-            AddInput(_XrButtonMap[button]);
-            return _inputsMap[_XrButtonMap[button]];
-        }
+            if (!HasButton(button)) return EPressState.None;
 
-        public void AddInput(string input)
-        {
-            if (!_inputsMap.ContainsKey(input))
-            {
-                _inputs.Add(input);
-                _inputsMap.Add(input, EPressState.None);
-            }
+            var buttonFeature = _inputFeatures[button] as ButtonInputFeature;
+            return buttonFeature.PressState;
         }
 
         public void Update()
         {
-            foreach (var input in _inputs)
+            // foreach input registered
+            foreach (var feature in _inputFeatures.Values)
             {
-                if (!_inputsMap.ContainsKey(input))
-                    _inputsMap.Add(input, EPressState.None);
-
-                InputDevice.TryGetFeatureValue(new InputFeatureUsage<bool>(input), out var pressed);
-
-                var currentState = _inputsMap[input];
-                if (pressed)
+                // update it
+                try
                 {
-                    switch (currentState)
-                    {
-                        case EPressState.None:
-                            _inputsMap[input] = EPressState.Down;
-                            break;
-                        case EPressState.Down:
-                            _inputsMap[input] = EPressState.Pressing;
-                            break;
-                    }
+                    feature.UpdateState();
                 }
-                else
+                catch (Exception e)
                 {
-                    switch (currentState)
-                    {
-                        case EPressState.None:
-                        case EPressState.Up:
-                            _inputsMap[input] = EPressState.None;
-                            break;
-                        default:
-                            _inputsMap[input] = EPressState.Up;
-                            break;
-                    }
+                    Debug.LogError($"Problems occuring within {feature.Name}");
                 }
             }
-        }
-
-        public enum EPressState
-        {
-            None,
-            Down,
-            Pressing,
-            Up
         }
     }
 

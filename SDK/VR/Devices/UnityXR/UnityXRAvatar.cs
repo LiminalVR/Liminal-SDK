@@ -10,6 +10,7 @@ using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using System;
 using Object = UnityEngine.Object;
+using System.Linq;
 
 namespace Liminal.SDK.XR
 {
@@ -19,7 +20,7 @@ namespace Liminal.SDK.XR
 
         public VRControllerVisual InstantiateControllerVisual(IVRAvatarLimb limb)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         private void Update()
@@ -67,14 +68,20 @@ namespace Liminal.SDK.XR
         #region InputFeature inner classes
         public abstract class InputFeature
         {
-            protected InputDevice Device { get; }
+            protected InputDevice? Device { get; private set; }
             public EPressState PressState { get; protected set; }
             public abstract string Name { get; }
 
-            public InputFeature(InputDevice aDevice)
+            public InputFeature()
             {
-                Device = aDevice;
                 PressState = EPressState.None;
+            }
+
+            public void AssignDevice(InputDevice aDevice)
+            {
+                if (Device.HasValue) return;
+
+                Device = aDevice;
             }
 
             public abstract void UpdateState();
@@ -89,11 +96,11 @@ namespace Liminal.SDK.XR
             }
             public T Value { get; protected set; }
 
-            protected InputFeatureUsage<T> BaseFeature { get; }
+            public InputFeatureUsage<T> BaseFeature { get; }
 
             public override string Name => BaseFeature.name;
 
-            public InputFeature(InputDevice aDevice, InputFeatureUsage<T> aBaseFeature) : base(aDevice)
+            public InputFeature(InputFeatureUsage<T> aBaseFeature) : base()
             {
                 BaseFeature = aBaseFeature;
             }
@@ -111,13 +118,15 @@ namespace Liminal.SDK.XR
                 }
             }
 
-            public ButtonInputFeature(InputDevice aDevice, InputFeatureUsage<bool> aBaseFeature) : base(aDevice, aBaseFeature)
+            public ButtonInputFeature(InputFeatureUsage<bool> aBaseFeature) : base(aBaseFeature)
             {
             }
 
             public override void UpdateState()
             {
-                if (!Device.TryGetFeatureValue(BaseFeature, out bool isPressed))
+                if (!Device.HasValue) return;
+
+                if (!Device.Value.TryGetFeatureValue(BaseFeature, out bool isPressed))
                 {
                     // couldn't get input for the feature, so mark press state as none
                     PressState = EPressState.None;
@@ -173,13 +182,15 @@ namespace Liminal.SDK.XR
                 }
             }
 
-            public Axis1DInputFeature(InputDevice aDevice, InputFeatureUsage<float> aBaseFeature) : base(aDevice, aBaseFeature)
+            public Axis1DInputFeature(InputFeatureUsage<float> aBaseFeature) : base(aBaseFeature)
             {
             }
 
             public override void UpdateState()
             {
-                if (!Device.TryGetFeatureValue(BaseFeature, out float rawActuated))
+                if (!Device.HasValue) return;
+
+                if (!Device.Value.TryGetFeatureValue(BaseFeature, out float rawActuated))
                 {
                     // couldn't get input for the feature, so mark press state as none
                     PressState = EPressState.None;
@@ -240,13 +251,15 @@ namespace Liminal.SDK.XR
                 }
             }
 
-            public Axis2DInputFeature(InputDevice aDevice, InputFeatureUsage<Vector2> aBaseFeature) : base(aDevice, aBaseFeature)
+            public Axis2DInputFeature(InputFeatureUsage<Vector2> aBaseFeature) : base(aBaseFeature)
             {
             }
 
             public override void UpdateState()
             {
-                if (!Device.TryGetFeatureValue(BaseFeature, out Vector2 rawActuated))
+                if (!Device.HasValue) return;
+
+                if (!Device.Value.TryGetFeatureValue(BaseFeature, out Vector2 rawActuated))
                 {
                     // couldn't get input for the feature, so mark press state as none
                     PressState = EPressState.None;
@@ -291,7 +304,6 @@ namespace Liminal.SDK.XR
         }
         #endregion
 
-
         public string Name => "UnityController";
         public IVRPointer Pointer { get; }
 
@@ -306,7 +318,24 @@ namespace Liminal.SDK.XR
                                                                         VRInputDeviceCapability.Touch |
                                                                         VRInputDeviceCapability.TriggerButton;
 
-        private Dictionary<string, InputFeature> _inputFeatures = new Dictionary<string, InputFeature>();
+        private Dictionary<string, InputFeature> _inputFeatures = new Dictionary<string, InputFeature>
+        {
+            // buttons
+            { VRButton.Back, new ButtonInputFeature(CommonUsages.secondaryButton) },
+            { VRButton.Touch, new ButtonInputFeature(CommonUsages.primaryTouch) },
+            { VRButton.Trigger, new ButtonInputFeature(CommonUsages.triggerButton) },
+            { VRButton.Primary, new ButtonInputFeature(CommonUsages.primaryButton) },
+            { VRButton.Seconday, new ButtonInputFeature(CommonUsages.gripButton) },
+            { VRButton.Three, new ButtonInputFeature(CommonUsages.primary2DAxisTouch) },
+            { VRButton.Four, new ButtonInputFeature(CommonUsages.primary2DAxisClick) },
+
+            // axis 2D
+            { VRAxis.One, new Axis2DInputFeature(CommonUsages.primary2DAxis) },
+
+            // axis 1D
+            { VRAxis.Two, new Axis1DInputFeature(CommonUsages.trigger) },
+            { VRAxis.Three, new Axis1DInputFeature(CommonUsages.grip) },
+        };
 
         public UnityXRInputDevice(VRInputDeviceHand hand)
         {
@@ -314,96 +343,15 @@ namespace Liminal.SDK.XR
             Pointer = new InputDevicePointer(this);
             Pointer.Activate();
 
-            var usages = new List<InputFeatureUsage>();
-            var featureUsages = new Dictionary<string, InputFeatureUsage>();
-            if (InputDevice.TryGetFeatureUsages(usages))
+            foreach (var pairs in _inputFeatures.ToArray())
             {
-                foreach (var usage in usages)
-                {
-                    Debug.Log($"{usage.name} is {usage.type.Name}");
-                    featureUsages.Add(usage.name.ToLower(), usage);
-                }
-            }
-
-            foreach (var buttonMapping in _XrButtonMap.Keys)
-            {
-                string featureName = _XrButtonMap[buttonMapping];
-
-                if (featureUsages.TryGetValue(featureName.ToLower(), out var featureUsage))
-                {
-                    _inputFeatures.Add(
-                        buttonMapping,
-                        new ButtonInputFeature(InputDevice, featureUsage.As<bool>())
-                        );
-                }
-            }
-
-            foreach (var axis1DMapping in _XrAxis1DMap.Keys)
-            {
-                string featureName = _XrAxis1DMap[axis1DMapping];
-
-                if (featureUsages.TryGetValue(featureName.ToLower(), out var featureUsage))
-                {
-                    _inputFeatures.Add(
-                        axis1DMapping,
-                        new Axis1DInputFeature(InputDevice, featureUsage.As<float>())
-                        );
-                }
-            }
-
-            foreach (var axis2DMapping in _XrAxis2DMap.Keys)
-            {
-                string featureName = _XrAxis2DMap[axis2DMapping];
-
-                if (featureUsages.TryGetValue(featureName.ToLower(), out var featureUsage))
-                {
-                    _inputFeatures.Add(
-                        axis2DMapping,
-                        new Axis2DInputFeature(InputDevice, featureUsage.As<Vector2>())
-                        );
-                }
+                pairs.Value.AssignDevice(InputDevice);
             }
         }
 
         public UnityXRInputDevice()
         {
-            // default things? How?
         }
-
-        #region Dicts
-        public Dictionary<string, string> _XrButtonMap = new Dictionary<string, string>
-        {
-            { VRButton.Back, "SecondaryButton"},
-            //{ VRButton.Three, ""},
-            //{ VRButton.Four, ""},
-            { VRButton.Touch, "primaryTouch"},
-            { VRButton.Trigger, "TriggerButton"},
-
-            // also == VRButton.One
-            { VRButton.Primary, "TriggerButton"},
-            
-            // also == VRButton.Two
-            //{ VRButton.Seconday, ""},
-        };
-
-        private Dictionary<string, string> _XrAxis1DMap = new Dictionary<string, string>
-        {
-            // 1D
-            { VRAxis.Two, "trigger" },
-            { VRAxis.TwoRaw, "trigger" },
-
-            // 1D
-            { VRAxis.Three, "grip" },
-            { VRAxis.ThreeRaw, "grip" },
-        };
-
-        private Dictionary<string, string> _XrAxis2DMap = new Dictionary<string, string>
-        {
-            // 2D
-            { VRAxis.One, "primary2DAxis" },
-            { VRAxis.OneRaw, "primary2DAxis" },
-        }; 
-        #endregion
 
         public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Hand == VRInputDeviceHand.Right ? XRNode.RightHand : XRNode.LeftHand);
 
@@ -476,7 +424,7 @@ namespace Liminal.SDK.XR
                 {
                     feature.UpdateState();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Debug.LogError($"Problems occuring within {feature.Name}");
                 }
@@ -566,7 +514,7 @@ namespace Liminal.SDK.XR
             avatar.PrimaryHand.Transform.SetParent(primaryHand.transform);
             var primaryPointer = primaryHand.GetComponentInChildren<LaserPointerVisual>();
 
-            if(primaryPointer != null)
+            if (primaryPointer != null)
                 PrimaryInputDevice.Pointer.Transform = primaryPointer.transform;
 
             primaryPointer?.Bind(PrimaryInputDevice.Pointer);
@@ -575,7 +523,7 @@ namespace Liminal.SDK.XR
             var secondaryPointer = secondaryHand.GetComponentInChildren<LaserPointerVisual>();
             secondaryPointer?.Bind(SecondaryInputDevice.Pointer);
 
-            if(secondaryPointer != null)
+            if (secondaryPointer != null)
                 SecondaryInputDevice.Pointer.Transform = secondaryPointer.transform;
 
             avatar.Head.Transform.localPosition = Vector3.zero;

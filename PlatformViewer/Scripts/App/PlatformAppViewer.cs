@@ -33,13 +33,12 @@ namespace Liminal.Platform.Experimental.App
             Assert.IsNotNull(LoadingBar, "LoadingBar must have a value or else the progress towards loading an experience will not be displayed.");
         }
 
-        private void Awake()
+        private void Start()
         {
             var deviceInitializer = GetComponentInChildren<IVRDeviceInitializer>();
             var device = deviceInitializer.CreateDevice();
             VRDevice.Initialize(device);
             VRDevice.Device.SetupAvatar(Avatar);
-
             BetterStreamingAssets.Initialize();
         }
 

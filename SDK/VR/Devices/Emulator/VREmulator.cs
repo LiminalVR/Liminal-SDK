@@ -21,9 +21,6 @@ namespace Liminal.SDK.VR
         /// <returns>The <see cref="IVRDevice"/> that was created.</returns>
         public IVRDevice CreateDevice()
         {
-            if (!ExperienceApp.IsEmulator)
-                throw new InvalidOperationException("ExperienceApp must be in Emulation mode to create an emulator device.");
-
 #if UNITY_EDITOR
             return DeviceUtils.CreateDevice(EditorType);
 #else

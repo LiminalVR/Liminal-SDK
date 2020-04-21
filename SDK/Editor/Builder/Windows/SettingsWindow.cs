@@ -15,7 +15,7 @@ namespace Liminal.SDK.Build
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            EditorGUI.PropertyField(position, property, new GUIContent("Project Settings"), true);
+            EditorGUI.PropertyField(position, property, new GUIContent("App Settings"), true);
         }
     }
 
@@ -45,7 +45,7 @@ namespace Liminal.SDK.Build
             _current = position;
             var row1 = position;
 
-            EditorGUI.PropertyField(row1, property, includeChildren: false);
+            EditorGUI.PropertyField(row1, property, new GUIContent("Project Settings"), includeChildren: false);
 
             if (property.isExpanded)
             {
@@ -146,14 +146,17 @@ namespace Liminal.SDK.Build
     {
         public override void Draw(BuildWindowConfig config)
         {
-            var experienceApp = GameObject.FindObjectOfType<ExperienceApp>();
-            if (experienceApp == null)
-                return;
-
             EditorGUIHelper.DrawTitle("Experience Settings");
             EditorGUILayout.LabelField("This page is used to set the various settings of the experience");
             EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
             GUILayout.Space(10);
+            
+            var experienceApp = GameObject.FindObjectOfType<ExperienceApp>();
+            if (experienceApp == null)
+            {
+                EditorGUILayout.LabelField("Please open the scene you wish to edit the settings of.");
+                return;
+            }
 
             var app = UnityEditor.Editor.CreateEditor(experienceApp);
             app.DrawDefaultInspector();

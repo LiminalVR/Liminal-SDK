@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.IO;
+using System.Reflection;
+using App;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Liminal.Platform.Experimental.App.Experiences;
@@ -16,8 +18,7 @@ namespace Liminal.Platform.Experimental.App
     /// <summary>
     /// A component to view a limapp within the SDK based on the AppPreviewConfig.
     /// </summary>
-    public class PlatformAppViewer 
-        : MonoBehaviour
+    public class PlatformAppViewer : MonoBehaviour
     {
         public VRAvatar Avatar;
         public ExperienceAppPlayer ExperienceAppPlayer;
@@ -25,7 +26,6 @@ namespace Liminal.Platform.Experimental.App
         public BaseLoadingBar LoadingBar;
         public GameObject SceneContainer;
 
-        private VRDeviceLoader _deviceLoader;
         private byte[] _limappData;
 
         private void OnValidate()
@@ -35,14 +35,12 @@ namespace Liminal.Platform.Experimental.App
 
         private void Awake()
         {
-            SetupVRDevice();
-            BetterStreamingAssets.Initialize();
-        }
-
-        private void SetupVRDevice()
-        {
-            _deviceLoader = new VRDeviceLoader();
+            var deviceInitializer = GetComponentInChildren<IVRDeviceInitializer>();
+            var device = deviceInitializer.CreateDevice();
+            VRDevice.Initialize(device);
             VRDevice.Device.SetupAvatar(Avatar);
+
+            BetterStreamingAssets.Initialize();
         }
 
         public void Play()
@@ -71,7 +69,9 @@ namespace Liminal.Platform.Experimental.App
 
             var loadOp = ExperienceAppPlayer.Load(experience);
             LoadingBar.Load(loadOp);
+            EnsureEmulatorFlagIsFalse();
             yield return loadOp.LoadScene();
+            EnsureEmulatorFlagIsFalse();
 
             LoadingBar.SetActiveState(false);
 
@@ -125,6 +125,12 @@ namespace Liminal.Platform.Experimental.App
                 fileName = Path.GetFileName(limappPath);
                 data = File.ReadAllBytes(limappPath);
             }
+        }
+
+        private void EnsureEmulatorFlagIsFalse()
+        {
+            var isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
+            isEmulator.SetValue(null, false);
         }
     }
 }

@@ -387,8 +387,8 @@ MonoBehaviour:
     m_Duration: 2
   LimappConfig:
     SDK:
-      Android: 0
-      Standalone: 2
+      Android: 1
+      Standalone: 1
     Project:
       Override: 0
       Profile: {fileID: 0}

@@ -29,22 +29,22 @@ public class ControllerInputExample : MonoBehaviour
         if (inputDevice == null)
             return;
 
-        builder.AppendLine($"<b>{deviceName} Back:</b> {inputDevice.GetButton(VRButton.Back)}");
-        builder.AppendLine($"<b>{deviceName} Touch Pad Touching:</b> {inputDevice.IsTouching}");
-        builder.AppendLine($"<b>{deviceName} Trigger:</b> {inputDevice.GetButton(VRButton.Trigger)}");
-        builder.AppendLine($"<b>{deviceName} Primary:</b> {inputDevice.GetButton(VRButton.Primary)}");
-        builder.AppendLine($"<b>{deviceName} Seconday:</b> {inputDevice.GetButton(VRButton.Seconday)}");
-        builder.AppendLine($"<b>{deviceName} Three:</b> {inputDevice.GetButton(VRButton.Three)}");
-        builder.AppendLine($"<b>{deviceName} Four:</b> {inputDevice.GetButton(VRButton.Four)}");
+        builder.AppendLine($"{deviceName} Back: {inputDevice.GetButton(VRButton.Back)}");
+        builder.AppendLine($"{deviceName} Touch Pad Touching: {inputDevice.IsTouching}");
+        builder.AppendLine($"{deviceName} Trigger: {inputDevice.GetButton(VRButton.Trigger)}");
+        builder.AppendLine($"{deviceName} Primary: {inputDevice.GetButton(VRButton.Primary)}");
+        builder.AppendLine($"{deviceName} Seconday: {inputDevice.GetButton(VRButton.Seconday)}");
+        builder.AppendLine($"{deviceName} Three: {inputDevice.GetButton(VRButton.Three)}");
+        builder.AppendLine($"{deviceName} Four: {inputDevice.GetButton(VRButton.Four)}");
 
-        builder.AppendLine($"<b>{deviceName} Axis One:</b> {inputDevice.GetAxis2D(VRAxis.One)}");
-        builder.AppendLine($"<b>{deviceName} Axis One Raw:</b> {inputDevice.GetAxis2D(VRAxis.OneRaw)}");
+        builder.AppendLine($"{deviceName} Axis One: {inputDevice.GetAxis2D(VRAxis.One)}");
+        builder.AppendLine($"{deviceName} Axis One Raw: {inputDevice.GetAxis2D(VRAxis.OneRaw)}");
 
-        builder.AppendLine($"<b>{deviceName} Axis Two:</b> {inputDevice.GetAxis1D(VRAxis.Two)}");
-        builder.AppendLine($"<b>{deviceName} Axis Two Raw:</b> {inputDevice.GetAxis1D(VRAxis.TwoRaw):0.00}");
+        builder.AppendLine($"{deviceName} Axis Two: {inputDevice.GetAxis1D(VRAxis.Two)}");
+        builder.AppendLine($"{deviceName} Axis Two Raw: {inputDevice.GetAxis1D(VRAxis.TwoRaw):0.00}");
 
-        builder.AppendLine($"<b>{deviceName} Axis Three:</b> {inputDevice.GetAxis1D(VRAxis.Three)}");
-        builder.AppendLine($"<b>{deviceName} Axis Three Raw:</b> {inputDevice.GetAxis1D(VRAxis.ThreeRaw):0.00}");
+        builder.AppendLine($"{deviceName} Axis Three: {inputDevice.GetAxis1D(VRAxis.Three)}");
+        builder.AppendLine($"{deviceName} Axis Three Raw: {inputDevice.GetAxis1D(VRAxis.ThreeRaw):0.00}");
 
 
         if (inputDevice.GetButtonUp(VRButton.Trigger))

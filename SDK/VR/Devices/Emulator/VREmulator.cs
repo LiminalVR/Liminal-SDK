@@ -48,12 +48,17 @@ namespace Liminal.SDK.VR
             if (!ExperienceApp.IsEmulator)
                 throw new InvalidOperationException("ExperienceApp must be in Emulation mode to create an emulator device.");
 
+            var test = m_BuildDevice;
+#if UNITY_EDITOR
+            test = m_EmulatorDevice;
+#endif
+
             // A BuildDevice value of NONE means we should auto-detect the device
-            if (m_BuildDevice == VREmulatorDevice.None)
+            if (test == VREmulatorDevice.None)
                 return AutoCreateDevice();
 
             // A specific BuildDevice was specified
-            switch (m_BuildDevice)
+            switch (test)
             {
                 case VREmulatorDevice.Daydream:
                     return new Devices.DaydreamView.DaydreamViewDevice();

@@ -22,6 +22,7 @@ namespace Liminal.SDK.Build
                 EditorGUIHelper.DrawTitle("Build Limapp");
                 EditorGUILayout.LabelField("This process will build a limapp file that will run on the Liminal Platform");
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
+                GUILayout.Space(10);
 
                 DrawSceneSelector(ref _scenePath, "Target Scene", config);
 
@@ -102,6 +103,7 @@ namespace Liminal.SDK.Build
 
                 if (GUILayout.Button("Build"))
                 {
+                    SettingsUtils.CopyProjectSettingsToProfile();
                     EditorSceneManager.OpenScene(_scenePath, OpenSceneMode.Single);
 
                     switch (_selectedPlatform)

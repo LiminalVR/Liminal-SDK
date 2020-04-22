@@ -23,13 +23,20 @@ namespace Liminal.SDK.XR
         public abstract string Name { get; }
         public IVRPointer Pointer { get; }
         public abstract int ButtonCount { get; }
-        public VRInputDeviceHand Hand { get; }
+        public abstract VRInputDeviceHand Hand { get; }
         public abstract bool IsTouching { get; }
 
-        public UnityXRInputDevice() { }
-        public UnityXRInputDevice(VRInputDeviceHand hand) 
+        public OVRInput.Controller ControllerMask { get; private set; }
+
+        public UnityXRInputDevice() 
+        { 
+            ControllerMask = OVRInput.Controller.None;
+        }
+
+        public UnityXRInputDevice(OVRInput.Controller controllerMask) 
         {
-            Hand = hand;
+            ControllerMask = controllerMask;
+
             Pointer = CreatePointer();
         }
 

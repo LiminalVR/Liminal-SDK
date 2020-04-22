@@ -71,29 +71,18 @@ namespace Liminal.SDK.XR
 		public event VRDeviceEventHandler PrimaryInputDeviceChanged;
 		#endregion
 
-		#region Const
+		#region Constructors
 		public UnityXRDevice()
 		{
 			Headset = new UnityXRHeadset();
 
-			// update anything?
-			
+			// this is needed for the system to know that there are connected controllers
+            OVRInput.Update();
+
+			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right);
+			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
+
 			UpdateConnectedControllers();
-
-			//var primary = new UnityXRInputDevice(VRInputDeviceHand.Right);
-			//var secondary = new UnityXRInputDevice(VRInputDeviceHand.Left);
-
-			//PrimaryInputDevice = primary;
-			//SecondaryInputDevice = secondary;
-
-			//XRInputs.Add(primary);
-			//XRInputs.Add(secondary);
-
-			//mInputDevicesList = new List<IVRInputDevice>
-			//{
-			//	PrimaryInputDevice,
-			//	SecondaryInputDevice,
-			//};
 		}
 		#endregion
 
@@ -141,11 +130,35 @@ namespace Liminal.SDK.XR
 			
 			UpdateConnectedControllers();
 
-			
-
+			var primaryHandPrefab = Resources.Load("RightHand Controller");
+			var primaryHand = Object.Instantiate(primaryHandPrefab, avatar.Transform) as GameObject;
+			var secondaryHandPrefab = Resources.Load("LeftHand Controller");
+			var secondaryHand = Object.Instantiate(secondaryHandPrefab, avatar.Transform) as GameObject;
+			SetupControllerPointer(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
+			SetupControllerPointer(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
 			avatar.Head.Transform.localPosition = Vector3.zero;
 			
 			SetDefaultPointerActivation();
+		}
+
+		public void SetupControllerPointer(IVRInputDevice inputDevice, IVRAvatarHand hand, Transform xrHand)
+		{
+			hand.Transform.SetParent(xrHand);
+			var pointer = xrHand.GetComponentInChildren<LaserPointerVisual>(includeInactive: true);
+			var controllerVisual = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive: true);
+			if (pointer != null)
+			{
+				if (controllerVisual != null)
+				{
+					pointer.Bind(inputDevice.Pointer);
+					inputDevice.Pointer.Transform = pointer.transform;
+					pointer.transform.SetParent(controllerVisual.transform);
+				}
+				else
+				{
+					Object.Destroy(pointer.gameObject);
+				}
+			}
 		}
 
 		private void SetDefaultPointerActivation()
@@ -159,6 +172,7 @@ namespace Liminal.SDK.XR
 			var allControllers = new List<IVRInputDevice>();
 			var disconnectedList = new List<IVRInputDevice>();
 			var connectedList = new List<IVRInputDevice>();
+			XRInputs.Clear();
 
 			var ctrlMask = GetControllerMask();
 
@@ -168,12 +182,12 @@ namespace Liminal.SDK.XR
 			if (isRightHandPresent)
 			{
 				mRightController = mRightController ?? new UnityXRController(VRInputDeviceHand.Right);
-
 				if (!mInputDevicesList.Contains(mRightController))
 				{
 					connectedList.Add(mRightController);
 				}
 
+				XRInputs.Add(mRightController);
 				allControllers.Add(mRightController);
 			}
 			else
@@ -195,6 +209,7 @@ namespace Liminal.SDK.XR
 					connectedList.Add(mLeftController);
 				}
 
+				XRInputs.Add(mLeftController);
 				allControllers.Add(mLeftController);
 			}
 			else

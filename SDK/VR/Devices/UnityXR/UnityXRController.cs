@@ -303,6 +303,8 @@ namespace Liminal.SDK.XR
 		private static readonly VRInputDeviceCapability _capabilities = VRInputDeviceCapability.DirectionalInput |
 																		VRInputDeviceCapability.Touch |
 																		VRInputDeviceCapability.TriggerButton;
+		private VRInputDeviceHand mHand;
+		public override VRInputDeviceHand Hand => mHand;
 
 		/// <summary>
 		/// TODO: This mapping is functional for Oculus Quest.
@@ -329,8 +331,10 @@ namespace Liminal.SDK.XR
 			{ VRAxis.Three, new Axis1DInputFeature(CommonUsages.grip) },
 		};
 
-		public UnityXRController(VRInputDeviceHand hand) : base(hand)
+		public UnityXRController(VRInputDeviceHand hand) : base(OVRUtils.GetControllerType(hand))
 		{
+			mHand = hand;
+
 			Pointer?.Activate();
 
 			foreach (var pairs in _inputFeatures.ToArray())
@@ -350,6 +354,8 @@ namespace Liminal.SDK.XR
 
 				inputFeature.AssignDevice(InputDevice);
 			}
+
+			Debug.Log($"[{GetType().Name}] UnityXRController({hand}) created.");
 		}
 
 		public UnityXRController()

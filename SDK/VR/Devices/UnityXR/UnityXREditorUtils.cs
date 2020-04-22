@@ -1,18 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class UnityXREditorUtils : MonoBehaviour
+namespace Liminal.SDK.XR
 {
-    // Start is called before the first frame update
-    void Start()
+#if UNITY_EDITOR
+    public static class UnityXREditorUtils
     {
-        
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+#endif
 }

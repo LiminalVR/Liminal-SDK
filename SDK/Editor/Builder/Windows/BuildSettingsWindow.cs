@@ -26,10 +26,15 @@ namespace Liminal.SDK.Build
         public static void OpenBuildWindow()
         {
             Window = GetWindow(typeof(BuildSettingsWindow), false, "Build Settings");
-
             Window.minSize = new Vector2(_width, _height);
-
             Window.Show();
+        }
+
+        [MenuItem("Liminal/Update Package")]
+        public static void RefreshPackage()
+        {
+            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithoutLock);
+            AssetDatabase.Refresh();
         }
 
         private void OnEnable()
@@ -38,9 +43,12 @@ namespace Liminal.SDK.Build
 
             if (fileExists)
             {
-                var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
-                _windowConfig = JsonUtility.FromJson<BuildWindowConfig>(json);
-                AssetDatabase.Refresh();
+                if (File.Exists(BuildWindowConsts.BuildWindowConfigPath))
+                {
+                    var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
+                    _windowConfig = JsonUtility.FromJson<BuildWindowConfig>(json);
+                    AssetDatabase.Refresh();
+                }
             }
 
             SetupFolderPaths();
@@ -109,7 +117,6 @@ namespace Liminal.SDK.Build
             if (!sceneExists)
             {
                 var scenePath = $"{UnityPackageManagerUtils.FullPackageLocation}/{BuildWindowConsts.PackagePreviewAppScenePath}";
-                Debug.Log(scenePath);
                 File.Copy(scenePath, BuildWindowConsts.PreviewAppScenePath);
                 AssetDatabase.Refresh();
             }

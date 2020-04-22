@@ -177,7 +177,13 @@ namespace Liminal.SDK.XR
 			eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
 			eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
 			xrRig.cameraGameObject = centerEye.gameObject;
-			xrRig.TrackingOriginMode = TrackingOriginModeFlags.Floor;
+			xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+
+			var rig = new GameObject("Rig");
+			rig.transform.SetParent(mAvatar.Transform);
+			rig.transform.position = mAvatar.Head.Transform.position;
+			mAvatar.Head.Transform.SetParent(rig.transform);
+			mAvatar.Head.Transform.localPosition = Vector3.zero;
 
 			OnActiveCameraChanged(mAvatar.Head);
 		}

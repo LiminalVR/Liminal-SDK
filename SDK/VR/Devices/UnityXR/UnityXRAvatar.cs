@@ -326,7 +326,7 @@ namespace Liminal.SDK.XR
             { VRButton.Back, new ButtonInputFeature(CommonUsages.secondaryButton) },
             { VRButton.Touch, new ButtonInputFeature(CommonUsages.primaryTouch) },
             { VRButton.Trigger, new ButtonInputFeature(CommonUsages.triggerButton) },
-            { VRButton.Primary, new ButtonInputFeature(CommonUsages.primaryButton) },
+            { VRButton.Primary, new ButtonInputFeature(CommonUsages.triggerButton) },
             { VRButton.Seconday, new ButtonInputFeature(CommonUsages.gripButton) },
             { VRButton.Three, new ButtonInputFeature(CommonUsages.primary2DAxisTouch) },
             { VRButton.Four, new ButtonInputFeature(CommonUsages.primary2DAxisClick) },
@@ -526,24 +526,33 @@ namespace Liminal.SDK.XR
             var secondaryHandPrefab = Resources.Load("LeftHand Controller");
             var secondaryHand = Object.Instantiate(secondaryHandPrefab, avatar.Transform) as GameObject;
 
-            avatar.PrimaryHand.Transform.SetParent(primaryHand.transform);
-            var primaryPointer = primaryHand.GetComponentInChildren<LaserPointerVisual>();
-
-            if (primaryPointer != null)
-                PrimaryInputDevice.Pointer.Transform = primaryPointer.transform;
-
-            primaryPointer?.Bind(PrimaryInputDevice.Pointer);
-            avatar.SecondaryHand.Transform.SetParent(secondaryHand.transform);
-
-            var secondaryPointer = secondaryHand.GetComponentInChildren<LaserPointerVisual>();
-            secondaryPointer?.Bind(SecondaryInputDevice.Pointer);
-
-            if (secondaryPointer != null)
-                SecondaryInputDevice.Pointer.Transform = secondaryPointer.transform;
+            SetupControllerPointer(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
+            SetupControllerPointer(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
 
             avatar.Head.Transform.localPosition = Vector3.zero;
             //UpdateConnectedControllers();
             //SetDefaultPointerActivation();
+        }
+
+        public void SetupControllerPointer(IVRInputDevice inputDevice, IVRAvatarHand hand, Transform xrHand)
+        {
+            hand.Transform.SetParent(xrHand);
+            var pointer = xrHand.GetComponentInChildren<LaserPointerVisual>(includeInactive: true);
+            var controllerVisual = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive: true);
+
+            if (pointer != null)
+            {
+                if (controllerVisual != null)
+                {
+                    pointer.Bind(inputDevice.Pointer);
+                    inputDevice.Pointer.Transform = pointer.transform;
+                    pointer.transform.SetParent(controllerVisual.transform);
+                }
+                else
+                {
+                    Object.Destroy(pointer.gameObject);       
+                }
+            }
         }
 
         public void Update()

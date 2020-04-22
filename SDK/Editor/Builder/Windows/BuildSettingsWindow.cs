@@ -26,10 +26,15 @@ namespace Liminal.SDK.Build
         public static void OpenBuildWindow()
         {
             Window = GetWindow(typeof(BuildSettingsWindow), false, "Build Settings");
-
             Window.minSize = new Vector2(_width, _height);
-
             Window.Show();
+        }
+
+        [MenuItem("Liminal/Update Package")]
+        public static void RefreshPackage()
+        {
+            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithoutLock);
+            AssetDatabase.Refresh();
         }
 
         private void OnEnable()

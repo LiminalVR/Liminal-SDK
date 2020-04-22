@@ -12,18 +12,21 @@ using System;
 using Object = UnityEngine.Object;
 using System.Linq;
 using Liminal.SDK.VR.Devices.GearVR.Avatar;
+using Liminal.SDK.Extensions;
+using Liminal.SDK.VR.Avatars.Extensions;
 
 namespace Liminal.SDK.XR
 {
     public class UnityXRAvatar : MonoBehaviour, IVRDeviceAvatar
     {
+        #region Variables
         private IVRAvatar mAvatar;
         public IVRAvatar Avatar
         {
             get
             {
                 if (mAvatar == null)
-                { 
+                {
                     mAvatar = GetComponentInParent<IVRAvatar>();
                 }
 
@@ -42,42 +45,44 @@ namespace Liminal.SDK.XR
             }
         }
 
+        private const string ControllerVisualPrefabName = "GearVRController";
+        private readonly List<OVRControllerHelper> mRemotes = new List<OVRControllerHelper>();
+
         private IVRDevice mDevice;
 
         private IVRTrackedObjectProxy mPrimaryControllerTracker;
         private IVRTrackedObjectProxy mSecondaryControllerTracker;
-        
+
+        private GazeInput mGazeInput = null;
+
         // OVR
         private OVRManager mManager;
-        private OVRCameraRig mCameraRig;
+        private OVRCameraRig mCameraRig; 
+        #endregion
 
         protected void Awake()
         {
-            Debug.Log($"[{GetType().Name}] XRSettings.loadedDeviceName: {XRSettings.loadedDeviceName}");
-
             mAvatar = GetComponentInParent<IVRAvatar>();
             mAvatar.InitializeExtensions();
 
-            SetupControllers();
+            mPrimaryControllerTracker = new UnityXRTrackedControllerProxy(mAvatar, VRAvatarLimbType.RightHand);
+            mSecondaryControllerTracker = new UnityXRTrackedControllerProxy(mAvatar, VRAvatarLimbType.LeftHand);
+
+            //SetupControllers();
 
             mDevice = VRDevice.Device;
-            //mSettings = gameObject.GetOrAddComponent<GearVRAvatarSettings>();
-            //mGazeInput = GetComponent<GazeInput>();
+            //mSettings = gameObject.GetOrAddComponent<UnityXRAvatarSettings>();
+            mGazeInput = GetComponent<GazeInput>();
 
             // Setup auxiliary systems
             SetupManager();
             SetupCameraRig();
 
-            // Activate OVRManager once everything is setup
-            mManager.gameObject.SetActive(true);
-
             // Load controller visuals for any VRAvatarController objects attached to the avatar
+            var avatarControllers = GetComponentsInChildren<VRAvatarController>(includeInactive: true);
+            foreach (var controller in avatarControllers)
             {
-                var avatarControllers = GetComponentsInChildren<VRAvatarController>(includeInactive: true);
-                foreach (var controller in avatarControllers)
-                {
-                    AttachControllerVisual(controller);
-                }
+                AttachControllerVisual(controller);
             }
 
             // Add event listeners
@@ -89,142 +94,200 @@ namespace Liminal.SDK.XR
             UpdateHandedness();
         }
 
-        private void Update()
+        private void OnEnable()
         {
-            VRDevice.Device.Update();
+            TrySetLimbsActive();
         }
 
-        private void SetupControllers()
+        private void OnDestroy()
         {
-            if (XRSettings.loadedDeviceName == "oculus display")
+            // Clean up event handlers
+            if (mAvatar != null)
             {
-                switch (OVRPlugin.GetSystemHeadsetType())
+                if (mAvatar.Head != null)
                 {
-                    case OVRPlugin.SystemHeadset.None:
-                        break;
-                    case OVRPlugin.SystemHeadset.GearVR_R320:
-                    case OVRPlugin.SystemHeadset.GearVR_R321:
-                    case OVRPlugin.SystemHeadset.GearVR_R322:
-                    case OVRPlugin.SystemHeadset.GearVR_R323:
-                    case OVRPlugin.SystemHeadset.GearVR_R324:
-                    case OVRPlugin.SystemHeadset.GearVR_R325:
-                        // OVRUtils.IsGearVRHeadset()
-                        break;
-                    case OVRPlugin.SystemHeadset.Oculus_Go:
-                        // OVRUtils.IsOculusGo
-                        SetupForOculusGo();
-                        break;
-                    case OVRPlugin.SystemHeadset.Oculus_Quest:
-                        // OVRUtils.IsOculusQuest
-                        SetupForOculusQuest();
-                        break;
-                    case OVRPlugin.SystemHeadset.Rift_DK1:
-                    case OVRPlugin.SystemHeadset.Rift_DK2:
-                    case OVRPlugin.SystemHeadset.Rift_CV1:
-                    case OVRPlugin.SystemHeadset.Rift_CB:
-                    case OVRPlugin.SystemHeadset.Rift_S:
-                    default:
-                        break;
+                    mAvatar.Head.ActiveCameraChanged -= OnActiveCameraChanged;
                 }
+            }
+
+            if (mDevice != null)
+            {
+                mDevice.InputDeviceConnected -= OnInputDeviceConnected;
+                mDevice.InputDeviceDisconnected -= OnInputDeviceDisconnected;
             }
         }
 
-        private void SetupForGearVR()
+        private void OnTransformParentChanged()
         {
-            throw new NotImplementedException();
-
-            mPrimaryControllerTracker = new GearVRTrackedControllerProxy(mAvatar, VRAvatarLimbType.RightHand);
-            mSecondaryControllerTracker = new GearVRTrackedControllerProxy(mAvatar, VRAvatarLimbType.LeftHand);
+            mAvatar = GetComponentInParent<IVRAvatar>();
         }
 
-        private void SetupForOculusGo()
+        private void Update()
         {
-            throw new NotImplementedException();
+            // update handedness?
+
+            RecenterHmdIfRequired();
+            DetectAndUpdateControllerStates();
+
+            //if (OVRUtils.IsOculusQuest)
+            //    DetectPointerState();
+
+            // needed?
+            //VRDevice.Device.Update();
         }
 
-        private void SetupForOculusQuest()
-        {
-            throw new NotImplementedException();
-        }
+        //private void SetupControllers()
+        //{
+        //    if (XRSettings.loadedDeviceName == "oculus display")
+        //    {
+        //        switch (OVRPlugin.GetSystemHeadsetType())
+        //        {
+        //            case OVRPlugin.SystemHeadset.None:
+        //                break;
+        //            case OVRPlugin.SystemHeadset.GearVR_R320:
+        //            case OVRPlugin.SystemHeadset.GearVR_R321:
+        //            case OVRPlugin.SystemHeadset.GearVR_R322:
+        //            case OVRPlugin.SystemHeadset.GearVR_R323:
+        //            case OVRPlugin.SystemHeadset.GearVR_R324:
+        //            case OVRPlugin.SystemHeadset.GearVR_R325:
+        //                // OVRUtils.IsGearVRHeadset()
+        //                break;
+        //            case OVRPlugin.SystemHeadset.Oculus_Go:
+        //                // OVRUtils.IsOculusGo
+        //                SetupForOculusGo();
+        //                break;
+        //            case OVRPlugin.SystemHeadset.Oculus_Quest:
+        //                // OVRUtils.IsOculusQuest
+        //                SetupForOculusQuest();
+        //                break;
+        //            case OVRPlugin.SystemHeadset.Rift_DK1:
+        //            case OVRPlugin.SystemHeadset.Rift_DK2:
+        //            case OVRPlugin.SystemHeadset.Rift_CV1:
+        //            case OVRPlugin.SystemHeadset.Rift_CB:
+        //            case OVRPlugin.SystemHeadset.Rift_S:
+        //            default:
+        //                break;
+        //        }
+        //    }
+        //}
 
+        //private void SetupForGearVR()
+        //{
+        //    throw new NotImplementedException();
+
+        //    mPrimaryControllerTracker = new GearVRTrackedControllerProxy(mAvatar, VRAvatarLimbType.RightHand);
+        //    mSecondaryControllerTracker = new GearVRTrackedControllerProxy(mAvatar, VRAvatarLimbType.LeftHand);
+        //}
+
+        //private void SetupForOculusGo()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        //private void SetupForOculusQuest()
+        //{
+        //    throw new NotImplementedException();
+        //}
+
+        #region Setup
         private void SetupManager()
         {
-            throw new NotImplementedException();
-            //if (OVRManager.instance == null)
-            //{
-            //    Debug.Log("[GearVR] Adding OVRManager");
-            //    var go = new GameObject("OVRManager");
-            //    mManager = go.AddComponent<OVRManager>();
-            //    DontDestroyOnLoad(go);
-            //}
-            //else
-            //{
-            //    mManager = OVRManager.instance;
-            //}
+            var manager = new GameObject().AddComponent<XRInteractionManager>();
+            manager.transform.SetParentAndIdentity(mAvatar.Auxiliaries);
         }
 
         private void SetupCameraRig()
         {
-            throw new NotImplementedException();
-            //var cameraRigPrefab = VRAvatarHelper.EnsureLoadPrefab<GearVRCameraRig>("GearVRCameraRig");
-            //cameraRigPrefab.gameObject.SetActive(false);
-            //mCameraRig = Instantiate(cameraRigPrefab);
-            //mCameraRig.transform.SetParentAndIdentity(mAvatar.Auxiliaries);
+            var avatarGo = mAvatar.Transform.gameObject;
+            var xrRig = avatarGo.AddComponent<XRRig>();
+            var centerEye = mAvatar.Head.CenterEyeCamera.gameObject;
+            var eyeDriver = centerEye.AddComponent<TrackedPoseDriver>();
+            eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
+            eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
+            xrRig.cameraGameObject = centerEye.gameObject;
+            xrRig.TrackingOriginMode = TrackingOriginModeFlags.Floor;
 
-            //OnActiveCameraChanged(mAvatar.Head);
+            // primary hand
+            var primaryHandPrefab = Resources.Load("RightHand Controller");
+            var primaryHand = Object.Instantiate(primaryHandPrefab, mAvatar.Transform) as GameObject;
+            mAvatar.PrimaryHand.Transform.SetParent(primaryHand.transform);
+
+            var primaryPointer = primaryHand.GetComponentInChildren<LaserPointerVisual>();
+            primaryPointer.Pointer?.Activate();
+            //if (mRightController != null)
+            //{
+            //    primaryPointer?.Bind(mRightController.Pointer);
+            //    if (primaryPointer != null)
+            //        mRightController.Pointer.Transform = primaryPointer.transform;
+            //}
+
+            // secondary hand
+            var secondaryHandPrefab = Resources.Load("LeftHand Controller");
+            var secondaryHand = Object.Instantiate(secondaryHandPrefab, mAvatar.Transform) as GameObject;
+            mAvatar.SecondaryHand.Transform.SetParent(secondaryHand.transform);
+
+            var secondaryPointer = secondaryHand.GetComponentInChildren<LaserPointerVisual>();
+            secondaryPointer.Pointer?.Activate();
+            //if (mLeftController != null)
+            //{
+            //    secondaryPointer?.Bind(mLeftController.Pointer);
+            //    if (secondaryPointer != null)
+            //        mLeftController.Pointer.Transform = secondaryPointer.transform;
+            //}
+
+            OnActiveCameraChanged(mAvatar.Head);
         }
 
         private void SetupInitialControllerState()
         {
-            throw new NotImplementedException();
-            //if (mDevice.InputDevices.Any(x => x is GearVRController))
-            //{
-            //    foreach (var controller in mDevice.InputDevices)
-            //    {
-            //        EnableController(controller as GearVRController);
-            //    }
-            //}
-            //else
-            //{
-            //    // Disable controllers and enable gaze controls
-            //    DisableAllControllers();
-            //}
+            if (mDevice.InputDevices.Any(x => x is UnityXRController))
+            {
+                foreach (var controller in mDevice.InputDevices)
+                {
+                    EnableControllerVisual(controller as UnityXRController);
+                }
+            }
+            else
+            {
+                // Disable controllers and enable gaze controls
+                DisableAllControllerVisuals();
+            }
         }
 
         private void AttachControllerVisual(VRAvatarController avatarController)
         {
-            throw new NotImplementedException();
-            //var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
+            var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
 
-            //var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
-            //prefab.gameObject.SetActive(false);
+            var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
+            prefab.gameObject.SetActive(false);
 
-            //// Create controller instance
-            //var instance = Instantiate(prefab);
-            //instance.name = prefab.name;
-            //instance.transform.SetParentAndIdentity(avatarController.transform);
+            // Create controller instance
+            var instance = Instantiate(prefab);
+            instance.name = prefab.name;
+            instance.transform.SetParentAndIdentity(avatarController.transform);
 
-            //// Make sure the OVRGearVrController component exists...
-            //var trackedRemote = instance.gameObject.GetComponent<OVRControllerHelper>();
+            // Make sure the OVRGearVrController component exists...
+            var trackedRemote = instance.gameObject.GetComponent<OVRControllerHelper>();
 
-            //if (trackedRemote == null)
-            //    trackedRemote = instance.gameObject.AddComponent<OVRControllerHelper>();
+            if (trackedRemote == null)
+                trackedRemote = instance.gameObject.AddComponent<OVRControllerHelper>();
 
-            //avatarController.ControllerVisual = instance;
-            //mRemotes.Add(trackedRemote);
+            avatarController.ControllerVisual = instance;
+            mRemotes.Add(trackedRemote);
 
-            //// Assign the correct controller based on the limb type the controller is attached to
-            //OVRInput.Controller controllerType = GetControllerTypeForLimb(limb);
-            //trackedRemote.m_controller = controllerType;
+            // Assign the correct controller based on the limb type the controller is attached to
+            OVRInput.Controller controllerType = GetControllerTypeForLimb(limb);
+            trackedRemote.m_controller = controllerType;
             //trackedRemote.m_modelGearVrController.SetActive(true);
 
-            //// Activate the controller
-            //// TODO Do we need to set active here? 
-            //var active = OVRUtils.IsLimbConnected(limb.LimbType);
-            //instance.gameObject.SetActive(active);
+            // Activate the controller
+            // TODO Do we need to set active here? 
+            var active = true;// OVRUtils.IsLimbConnected(limb.LimbType);
+            instance.gameObject.SetActive(true);
 
-            //Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active} Controller Type set to: {controllerType}");
-        }
+            Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active} Controller Type set to: {controllerType}");
+        } 
+        #endregion
 
         #region Controllers
         // TODO See if this method can be removed, it appears to not be used at all and it can be misleading when debugging.
@@ -235,7 +298,7 @@ namespace Liminal.SDK.XR
         /// <returns>The newly instantiated controller visual for the specified limb, or null if no controller visual was able to be created.</returns>
         public VRControllerVisual InstantiateControllerVisual(IVRAvatarLimb limb)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
 
             //if (limb == null)
             //    throw new ArgumentNullException("limb");
@@ -254,36 +317,34 @@ namespace Liminal.SDK.XR
             //instance.gameObject.SetActive(true);
             //return instance;
 
+            return null;
         }
 
-        //private void EnableController(GearVRController controller)
-        //{
-        //    throw new NotImplementedException();
-
-        //    //if (controller == null)
-        //    //    return;
-
-        //    //// Find the visual for the hand that matches the controller
-        //    //var remote = mRemotes.FirstOrDefault(x => (x.m_controller & controller.ControllerMask) != 0);
-        //    //if (remote != null)
-        //    //    remote.gameObject.SetActive(true);
-        //}
-
-        private void DisableAllControllers()
+        private void EnableControllerVisual(UnityXRController controller)
         {
-            throw new NotImplementedException();
-            //// Disable all controller visuals
-            //foreach (var remote in mRemotes)
-            //{
-            //    remote.gameObject.SetActive(false);
-            //}
+            if (controller == null)
+                return;
+
+            // Find the visual for the hand that matches the controller
+            OVRControllerHelper remote = null;
+            //remote = mRemotes.FirstOrDefault(x => (x.m_controller & controller.ControllerMask) != 0);
+            if (remote != null)
+                remote.gameObject.SetActive(true);
         }
 
+        private void DisableAllControllerVisuals()
+        {
+            // Disable all controller visuals
+            foreach (var remote in mRemotes)
+            {
+                remote.gameObject.SetActive(false);
+            }
+        }
         #endregion
 
         private void UpdateHandedness()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         /// <summary>
@@ -321,7 +382,8 @@ namespace Liminal.SDK.XR
 
         private void TrySetHandsActive(bool active)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+
             //if (mAvatar != null)
             //{
             //    if (OVRUtils.IsGearVRHeadset())
@@ -336,20 +398,20 @@ namespace Liminal.SDK.XR
 
         private void TrySetGazeInputActive(bool active)
         {
-            throw new NotImplementedException();
             // Ignore Always & Never Policy
-            //if (mGazeInput != null && mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
-            //{
-            //    if (active)
-            //        mGazeInput.Activate();
-            //    else
-            //        mGazeInput.Deactivate();
-            //}
+            if (mGazeInput != null && mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
+            {
+                if (active)
+                    mGazeInput.Activate();
+                else
+                    mGazeInput.Deactivate();
+            }
         }
 
         private void RecenterHmdIfRequired()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+
             //if (mSettings != null && mSettings.HmdRecenterPolicy != HmdRecenterPolicy.OnControllerRecenter)
             //    return;
 
@@ -376,25 +438,23 @@ namespace Liminal.SDK.XR
         //Notes: Device Connecting is difference than controller being active
         private void OnInputDeviceConnected(IVRDevice vrDevice, IVRInputDevice inputDevice)
         {
-            throw new NotImplementedException();
-            //var gearController = inputDevice as GearVRController;
-            //if (gearController != null)
-            //{
-            //    // A controller was connected
-            //    // Disable gaze controls
-            //    EnableController(gearController);
-            //}
+            var gearController = inputDevice as UnityXRController;
+            if (gearController != null)
+            {
+                // A controller was connected
+                // Disable gaze controls
+                EnableControllerVisual(gearController);
+            }
         }
 
         private void OnInputDeviceDisconnected(IVRDevice vrDevice, IVRInputDevice inputDevice)
         {
-            throw new NotImplementedException();
-            //if (!vrDevice.InputDevices.Any(x => x is GearVRController))
-            //{
-            //    // No controllers are connected
-            //    // Enable gaze controls
-            //    DisableAllControllers();
-            //}
+            if (!vrDevice.InputDevices.Any(x => x is UnityXRController))
+            {
+                // No controllers are connected
+                // Enable gaze controls
+                DisableAllControllerVisuals();
+            }
         }
 
         private void OnActiveCameraChanged(IVRAvatarHead head)

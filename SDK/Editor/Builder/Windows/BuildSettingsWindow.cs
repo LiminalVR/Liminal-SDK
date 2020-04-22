@@ -38,9 +38,12 @@ namespace Liminal.SDK.Build
 
             if (fileExists)
             {
-                var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
-                _windowConfig = JsonUtility.FromJson<BuildWindowConfig>(json);
-                AssetDatabase.Refresh();
+                if (File.Exists(BuildWindowConsts.BuildWindowConfigPath))
+                {
+                    var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
+                    _windowConfig = JsonUtility.FromJson<BuildWindowConfig>(json);
+                    AssetDatabase.Refresh();
+                }
             }
 
             SetupFolderPaths();

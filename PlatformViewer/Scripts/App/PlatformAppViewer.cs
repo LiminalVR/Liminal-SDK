@@ -120,7 +120,7 @@ namespace Liminal.Platform.Experimental.App
             }
             else
             {
-                var limappPath = Application.isEditor ? PreviewConfig.EmulatorPath : PreviewConfig.AndroidPath;
+                var limappPath = PreviewConfig.EmulatorPath;
                 fileName = Path.GetFileName(limappPath);
                 data = File.ReadAllBytes(limappPath);
             }

@@ -20,9 +20,6 @@ namespace App
         {
             switch (sdkType)
             {
-                case ESDKType.Legacy:
-                    return new GearVRDevice();
-
                 case ESDKType.UnityXR:
                     return new UnityXRDevice();
 

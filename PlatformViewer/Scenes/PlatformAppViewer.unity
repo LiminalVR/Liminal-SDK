@@ -132,6 +132,10 @@ PrefabInstance:
       propertyPath: EditorType
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 714268589, guid: 8ba9405ada4717e4fa46a75aa2532a9f, type: 3}
+      propertyPath: BuildType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3473043119057475689, guid: 8ba9405ada4717e4fa46a75aa2532a9f,
         type: 3}
       propertyPath: m_LocalPosition.x

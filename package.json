@@ -8,5 +8,12 @@
         "sdk",
         "unity"
     ],
+	"dependencies":
+	  {
+		"com.unity.xr.interactionsubsystems": "1.0.1",
+		"com.unity.xr.interaction.toolkit": "0.9.4",
+		"com.unity.xr.legacyinputhelpers": "2.1.2",
+		"com.unity.xr.management": "3.2.7"
+	  },
     "category": "Unity"
 }

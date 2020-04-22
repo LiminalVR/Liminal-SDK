@@ -508,7 +508,7 @@ namespace Liminal.SDK.XR
         public void SetupAvatar(IVRAvatar avatar)
         {
             avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
-            var manager = new GameObject().AddComponent<XRInteractionManager>();
+            var manager = new GameObject("XRInteractionManager").AddComponent<XRInteractionManager>();
             
             var avatarGo = avatar.Transform.gameObject;
             
@@ -521,17 +521,13 @@ namespace Liminal.SDK.XR
             xrRig.TrackingOriginMode = TrackingOriginModeFlags.Floor;
 
             var primaryHandPrefab = Resources.Load("RightHand Controller");
-            var primaryHand = Object.Instantiate(primaryHandPrefab, avatar.Transform) as GameObject;
+            var primaryHand = Object.Instantiate(primaryHandPrefab, avatar.Head.Transform) as GameObject;
 
             var secondaryHandPrefab = Resources.Load("LeftHand Controller");
-            var secondaryHand = Object.Instantiate(secondaryHandPrefab, avatar.Transform) as GameObject;
+            var secondaryHand = Object.Instantiate(secondaryHandPrefab, avatar.Head.Transform) as GameObject;
 
             SetupControllerPointer(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
             SetupControllerPointer(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
-
-            avatar.Head.Transform.localPosition = Vector3.zero;
-            //UpdateConnectedControllers();
-            //SetDefaultPointerActivation();
         }
 
         public void SetupControllerPointer(IVRInputDevice inputDevice, IVRAvatarHand hand, Transform xrHand)

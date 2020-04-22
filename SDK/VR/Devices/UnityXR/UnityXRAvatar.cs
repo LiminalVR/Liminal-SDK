@@ -517,14 +517,21 @@ namespace Liminal.SDK.XR
             var eyeDriver = centerEye.AddComponent<TrackedPoseDriver>();
             eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
             eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
+            //eyeDriver.UseRelativeTransform = true;
+
             xrRig.cameraGameObject = centerEye.gameObject;
-            xrRig.TrackingOriginMode = TrackingOriginModeFlags.Floor;
+            xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+            var rig = new GameObject("Rig");
+            rig.transform.SetParent(avatar.Transform);
+            rig.transform.position = avatar.Head.Transform.position;
+            avatar.Head.Transform.SetParent(rig.transform);
+            avatar.Head.Transform.localPosition = Vector3.zero;
 
             var primaryHandPrefab = Resources.Load("RightHand Controller");
-            var primaryHand = Object.Instantiate(primaryHandPrefab, avatar.Head.Transform) as GameObject;
+            var primaryHand = Object.Instantiate(primaryHandPrefab, rig.transform) as GameObject;
 
             var secondaryHandPrefab = Resources.Load("LeftHand Controller");
-            var secondaryHand = Object.Instantiate(secondaryHandPrefab, avatar.Head.Transform) as GameObject;
+            var secondaryHand = Object.Instantiate(secondaryHandPrefab, rig.transform) as GameObject;
 
             SetupControllerPointer(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
             SetupControllerPointer(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);

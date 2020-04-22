@@ -318,7 +318,7 @@ namespace Liminal.SDK.XR
 			{ VRButton.Touch, new ButtonInputFeature(CommonUsages.primaryTouch) },
 			{ VRButton.Trigger, new ButtonInputFeature(CommonUsages.triggerButton) },
             // TODO: Map VRButton.Primary to CommonUsages.triggerButton, and create a new mapping option for CommonUsages.primaryButton
-            { VRButton.Primary, new ButtonInputFeature(CommonUsages.primaryButton) },
+            { VRButton.Primary, new ButtonInputFeature(CommonUsages.triggerButton) },
 			{ VRButton.Seconday, new ButtonInputFeature(CommonUsages.gripButton) },
 			{ VRButton.Three, new ButtonInputFeature(CommonUsages.primary2DAxisTouch) },
 			{ VRButton.Four, new ButtonInputFeature(CommonUsages.primary2DAxisClick) },

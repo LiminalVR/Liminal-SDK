@@ -1,18 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Liminal.SDK.VR;
+using Liminal.SDK.VR.Avatars;
+using Liminal.SDK.VR.Avatars.Controllers;
+using Liminal.SDK.VR.Input;
+using Liminal.SDK.VR.Pointers;
 using UnityEngine;
+using UnityEngine.SpatialTracking;
+using UnityEngine.XR;
+using UnityEngine.XR.Interaction.Toolkit;
+using System;
+using Object = UnityEngine.Object;
+using System.Linq;
+using Liminal.SDK.VR.Devices.GearVR.Avatar;
 
-public class UnityXRHeadset : MonoBehaviour
+namespace Liminal.SDK.XR
 {
-    // Start is called before the first frame update
-    void Start()
+    public class UnityXRHeadset : IVRHeadset
     {
-        
-    }
+        private static readonly VRHeadsetCapability _capabilities = 
+            VRHeadsetCapability.PositionalTracking;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public string Name => "UnityXRHeadset";
+        public IVRPointer Pointer { get; }
+
+        public bool HasCapabilities(VRHeadsetCapability capabilities)
+        {
+            return (_capabilities & capabilities) == capabilities;
+        }
     }
 }

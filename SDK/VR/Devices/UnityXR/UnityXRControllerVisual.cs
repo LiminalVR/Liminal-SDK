@@ -123,12 +123,14 @@ namespace Liminal.SDK.XR
 		{
 			base.Awake();
 
+			// TODO: Fix this section. I think this is why it's not working properly.
 			// disable all children
 			foreach (Transform child in transform)
 			{
 				child.gameObject.SetActive(false);
 			}
 
+			PointerVisual.transform.gameObject.SetActive(true);
 			PointerVisual.SetActive(true);
 		}
 		#endregion

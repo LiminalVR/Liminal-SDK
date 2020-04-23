@@ -320,7 +320,7 @@ namespace Liminal.SDK.XR
 		#endregion
 		#endregion
 
-		public override string Name => "UnityXRController";
+		public override string Name => "UnityXRController -> " + base.Name;
 
 		// TODO: Confirm this?
 		public override int ButtonCount => 3;
@@ -386,16 +386,10 @@ namespace Liminal.SDK.XR
 			Debug.Log($"[{GetType().Name}] UnityXRController({hand}) created.");
 		}
 
-		public UnityXRController()
-		{
-		}
-
 		protected override IVRPointer CreatePointer()
 		{
 			return new InputDevicePointer(this);
 		}
-
-		public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Hand == VRInputDeviceHand.Right ? XRNode.RightHand : XRNode.LeftHand);
 
 		public override bool HasCapabilities(VRInputDeviceCapability capabilities)
 		{

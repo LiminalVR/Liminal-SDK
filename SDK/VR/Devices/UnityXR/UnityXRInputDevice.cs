@@ -40,7 +40,7 @@ namespace Liminal.SDK.XR
 
         #region Properties
         #region Publics
-        public abstract string Name { get; }
+        public virtual string Name { get => InputDevice.name; }
         public IVRPointer Pointer { get; }
         public abstract int ButtonCount { get; }
         public abstract VRInputDeviceHand Hand { get; }

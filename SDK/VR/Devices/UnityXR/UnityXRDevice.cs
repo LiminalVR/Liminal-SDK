@@ -40,18 +40,16 @@ namespace Liminal.SDK.XR
 		#region Privates
 		private UnityXRController _rightController;
 		private UnityXRController _leftController;
-
-		private readonly List<IVRInputDevice> _inputDevicesList = new List<IVRInputDevice>();
 		#endregion
 		#endregion
 
 		#region Properties
 		#region Publics
 		public string Name => "UnityXR";
-		public int InputDeviceCount => _inputDevicesList.Count;
+		public int InputDeviceCount => XRInputs.Count;
 
 		public IVRHeadset Headset { get; protected set; }
-		public IEnumerable<IVRInputDevice> InputDevices { get => _inputDevicesList; }
+		public IEnumerable<IVRInputDevice> InputDevices { get => XRInputs; }
 
 		public IVRInputDevice PrimaryInputDevice { get; private set; }
 		public IVRInputDevice SecondaryInputDevice { get; private set; }
@@ -92,7 +90,7 @@ namespace Liminal.SDK.XR
 			UnityEngine.XR.InputDevices.deviceConnected += InputDevices_deviceConnected;
 			UnityEngine.XR.InputDevices.deviceDisconnected += InputDevices_deviceDisconnected;
 		}
-#endregion
+		#endregion
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
 		/// </summary>
@@ -121,6 +119,7 @@ namespace Liminal.SDK.XR
 			rig.transform.position = avatar.Head.Transform.position;
 
 			unityAvatar.gameObject.SetActive(true);
+
 			SetupManager(avatar);
 			SetupCameraRig(avatar, rig.transform);
 			SetupControllers(avatar, rig.transform);
@@ -192,8 +191,8 @@ namespace Liminal.SDK.XR
 				XRInputs.Add(_leftController);
 			}
 
-			// need to go in 
-			var primaryHandPrefab = Resources.Load("RightHand Controller");
+		   // need to go in 
+		   var primaryHandPrefab = Resources.Load("RightHand Controller");
 			var primaryHand = Object.Instantiate(primaryHandPrefab, rig) as GameObject;
 			var secondaryHandPrefab = Resources.Load("LeftHand Controller");
 			var secondaryHand = Object.Instantiate(secondaryHandPrefab, rig) as GameObject;
@@ -225,19 +224,7 @@ namespace Liminal.SDK.XR
 			SecondaryInputDevice?.Pointer?.Activate();
 		}
 
-		/// <summary>
-		/// TODO: Is this needed?
-		/// </summary>
-		private void UpdateInputDevices()
-		{
-			// determined by handedness?
-			PrimaryInputDevice = _rightController;
-			SecondaryInputDevice = _leftController;
-
-			PrimaryInputDeviceChanged?.Invoke(this);
-		}
-
-#region Events
+		#region Events
 		/// <summary>
 		/// 
 		/// </summary>
@@ -352,6 +339,6 @@ namespace Liminal.SDK.XR
 		{
 			return $"N>{device.name} :: C>{device.characteristics} :: iV>{device.isValid}";
 		}
-#endregion
+		#endregion
 	}
 }

@@ -373,8 +373,6 @@ namespace Liminal.SDK.XR
 
 				inputFeature.AssignDevice(InputDevice);
 			}
-
-			Debug.Log($"[{GetType().Name}] UnityXRController({hand}) created.");
 		}
 		#endregion
 

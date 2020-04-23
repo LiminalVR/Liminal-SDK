@@ -2,14 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Liminal.SDK.VR.Avatars.Controllers;
+using Liminal.SDK.VR.Pointers;
 
 namespace Liminal.SDK.XR
 {
 	public class UnityXRControllerVisual : VRControllerVisual
 	{
 		#region Constants
+		// TODO: Figure out what these names/keys will be
+		private const string GearVrControllerName = "UNKNOWN";
+		private const string OculusGoControllerName = "UNKNOWN";
 		private const string OculusTouchQuestAndRiftSLeftControllerName = "Oculus Touch Controller - Left";
 		private const string OculusTouchQuestAndRiftSRightControllerName = "Oculus Touch Controller - Right";
+		private const string OculusTouchRiftLeftControllerName = "UNKNOWN";
+		private const string OculusTouchRiftRightControllerName = "UNKNOWN";
 		#endregion
 
 		#region Statics
@@ -66,18 +72,20 @@ namespace Liminal.SDK.XR
 			set
 			{
 				GameObject model;
-				if (!string.IsNullOrEmpty(ActiveControllerName) && _allModels.TryGetValue(ActiveControllerName, out model))
+
+				if (!string.IsNullOrEmpty(ActiveControllerName) && AllModels.TryGetValue(ActiveControllerName, out model))
 				{
 					model?.SetActive(false);
 				}
 
+				Debug.Log($"[{GetType().Name}] ActiveControllerName set to '{value}' from '{_activeControllerName}'");
 				_activeControllerName = value;
 
 				if (!string.IsNullOrEmpty(ActiveControllerName))
 				{
-					if (_allModels.TryGetValue(ActiveControllerName, out model))
+					if (AllModels.TryGetValue(ActiveControllerName, out model))
 					{
-						model?.SetActive(true);
+						model.SetActive(true);
 					}
 					else
 					{
@@ -89,7 +97,24 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Privates
+		private Dictionary<string, GameObject> AllModels
+		{
+			get
+			{
+				if (_allModels.Count == 0)
+				{
+					// TODO: Once each name is determined, uncomment the appropriate line
+					//_allModels.Add(GearVrControllerName, _modelGearVrController);
+					//_allModels.Add(OculusGoControllerName, _modelOculusGoController);
+					_allModels.Add(OculusTouchQuestAndRiftSLeftControllerName, _modelOculusTouchQuestAndRiftSLeftController);
+					_allModels.Add(OculusTouchQuestAndRiftSRightControllerName, _modelOculusTouchQuestAndRiftSRightController);
+					//_allModels.Add(OculusTouchRiftLeftControllerName, _modelOculusTouchRiftLeftController);
+					//_allModels.Add(OculusTouchRiftRightControllerName, _modelOculusTouchRiftRightController);
+				}
 
+				return _allModels;
+			}
+		}
 		#endregion
 		#endregion
 
@@ -98,24 +123,13 @@ namespace Liminal.SDK.XR
 		{
 			base.Awake();
 
-			//_allModels.Add(_modelGearVrController);
-			//_allModels.Add(_modelOculusGoController);
-			_allModels.Add(OculusTouchQuestAndRiftSLeftControllerName, _modelOculusTouchQuestAndRiftSLeftController);
-			_allModels.Add(OculusTouchQuestAndRiftSRightControllerName, _modelOculusTouchQuestAndRiftSRightController);
-			//_allModels.Add(_modelOculusTouchRiftLeftController);
-			//_allModels.Add(_modelOculusTouchRiftRightController);
-
-			DisableAll();
-		}
-		#endregion
-
-		#region UnityXRControllerVisual
-		private void DisableAll()
-		{
-			foreach (GameObject model in _allModels.Values)
+			// disable all children
+			foreach (Transform child in transform)
 			{
-				model.SetActive(false);
+				child.gameObject.SetActive(false);
 			}
+
+			PointerVisual.SetActive(true);
 		}
 		#endregion
 	}

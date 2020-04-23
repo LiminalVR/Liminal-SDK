@@ -34,7 +34,6 @@ namespace Liminal.SDK.XR
 
 		#region Privates
 		private IVRAvatar _avatar;
-		private IVRDevice _device;
 
 		private GazeInput _gazeInput = null;
 
@@ -56,6 +55,8 @@ namespace Liminal.SDK.XR
 				return _avatar;
 			}
 		}
+
+		public IVRDevice Device => VRDevice.Device;
 		#endregion
 
 		#region Privates
@@ -66,7 +67,7 @@ namespace Liminal.SDK.XR
 		#region MonoBehaviour
 		//protected void Awake()
 		//{
-		//    Initialize();
+		//	Initialize();
 		//}
 
 		private void OnEnable()
@@ -77,15 +78,15 @@ namespace Liminal.SDK.XR
 		private void OnDestroy()
 		{
 			// Clean up event handlers
-			if (_avatar != null && _avatar.Head != null)
+			if (Avatar != null && Avatar.Head != null)
 			{
-				_avatar.Head.ActiveCameraChanged -= OnActiveCameraChanged;
+				Avatar.Head.ActiveCameraChanged -= OnActiveCameraChanged;
 			}
 
-			if (_device != null)
+			if (Device != null)
 			{
-				_device.InputDeviceConnected -= OnInputDeviceConnected;
-				_device.InputDeviceDisconnected -= OnInputDeviceDisconnected;
+				Device.InputDeviceConnected -= OnInputDeviceConnected;
+				Device.InputDeviceDisconnected -= OnInputDeviceDisconnected;
 			}
 		}
 
@@ -99,13 +100,13 @@ namespace Liminal.SDK.XR
 			RecenterHmdIfRequired();
 			DetectAndUpdateControllerStates();
 
-			if (OVRUtils.IsOculusQuest)
-			{
+			//if (OVRUtils.IsOculusQuest)
+			//{
 				DetectPointerState();
-			}
+			//}
 
 			VRDevice.Device.Update();
-		} 
+		}
 		#endregion
 
 		public void Initialize()
@@ -113,7 +114,6 @@ namespace Liminal.SDK.XR
 			_avatar = GetComponentInParent<IVRAvatar>();
 			Avatar.InitializeExtensions();
 
-			_device = VRDevice.Device;
 			_gazeInput = GetComponent<GazeInput>();
 
 			// Load controller visuals for any VRAvatarController objects attached to the avatar
@@ -124,9 +124,9 @@ namespace Liminal.SDK.XR
 			}
 
 			// Add event listeners
-			_device.InputDeviceConnected += OnInputDeviceConnected;
-			_device.InputDeviceDisconnected += OnInputDeviceDisconnected;
-			_avatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
+			Device.InputDeviceConnected += OnInputDeviceConnected;
+			Device.InputDeviceDisconnected += OnInputDeviceDisconnected;
+			Avatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
 
 			SetupInitialControllerState();
 		}
@@ -154,9 +154,9 @@ namespace Liminal.SDK.XR
 
 		private void SetupInitialControllerState()
 		{
-			if (_device.InputDevices.Any(x => x is UnityXRController))
+			if (Device.InputDevices.Any(x => x is UnityXRController))
 			{
-				foreach (var controller in _device.InputDevices)
+				foreach (var controller in Device.InputDevices)
 				{
 					EnableControllerVisual(controller as UnityXRController);
 				}
@@ -169,14 +169,17 @@ namespace Liminal.SDK.XR
 		}
 
 		private void AttachControllerVisual(VRAvatarController avatarController)
-        {
+		{
 			var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
+
+			Debug.Log($"[{GetType().Name}] AttachControllerVisual(avatarController:{avatarController.name}) -> limb.LimbType == '{limb.LimbType}'");
 
 			var instance = InstantiateControllerVisual(limb);
 
 			if (!instance)
 			{
 				// maybe log an error?
+				Debug.LogError($"[{GetType().Name}] AttachControllerVisual(avatarController) -> failed to create and instance of the controller visual prefab");
 				return;
 			}
 
@@ -194,6 +197,8 @@ namespace Liminal.SDK.XR
 				{
 					xrControllerVisual.ActiveControllerName = inputDevice.name;
 				}
+
+				// if this fails, some kind of error?
 			}
 
 			_remotes.Add(xrControllerVisual);
@@ -236,6 +241,8 @@ namespace Liminal.SDK.XR
 			if (controller == null)
 				return;
 
+			Debug.Log($"[{GetType().Name}] EnableControllerVisual(controller:{controller.Name})");
+
 			// Find the visual for the hand that matches the controller
 			UnityXRControllerVisual remote = _remotes.FirstOrDefault(r => r.ActiveControllerName == controller.InputDevice.name);
 			if (remote != null)
@@ -246,6 +253,8 @@ namespace Liminal.SDK.XR
 
 		private void DisableAllControllerVisuals()
 		{
+			Debug.Log($"[{GetType().Name}] DisableAllControllerVisuals()");
+
 			// Disable all controller visuals
 			foreach (var remote in _remotes)
 			{
@@ -287,7 +296,7 @@ namespace Liminal.SDK.XR
 			if (limbType.TryLimbToNode(out XRNode node))
 			{
 				var isLimbConnected = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(node).isValid;
-				var limb = _avatar.GetLimb(limbType);
+				var limb = Avatar.GetLimb(limbType);
 
 				limb.SetActive(isLimbConnected);
 			}
@@ -295,9 +304,9 @@ namespace Liminal.SDK.XR
 
 		private void TrySetHandsActive(bool active)
 		{
-			if (_avatar != null)
+			if (Avatar != null)
 			{
-				_avatar.SetHandsActive(active);
+				Avatar.SetHandsActive(active);
 			}
 		}
 

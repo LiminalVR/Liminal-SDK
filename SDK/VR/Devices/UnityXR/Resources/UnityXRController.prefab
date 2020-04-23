@@ -2576,13 +2576,12 @@ MonoBehaviour:
   m_NodeNames: []
   m_InputVisualList: []
   m_InputVisualNames: []
-  m_modelGearVrController: {fileID: 4992076391913603171}
-  m_modelOculusGoController: {fileID: 4990575467604360647}
-  m_modelOculusTouchQuestAndRiftSLeftController: {fileID: 4990684488934841149}
-  m_modelOculusTouchQuestAndRiftSRightController: {fileID: 4990062080965866797}
-  m_modelOculusTouchRiftLeftController: {fileID: 4991110589132808511}
-  m_modelOculusTouchRiftRightController: {fileID: 4990035675525784487}
-  m_controller: 0
+  _modelGearVrController: {fileID: 4992076391913603171}
+  _modelOculusGoController: {fileID: 4990575467604360647}
+  _modelOculusTouchQuestAndRiftSLeftController: {fileID: 4990684488934841149}
+  _modelOculusTouchQuestAndRiftSRightController: {fileID: 4990062080965866797}
+  _modelOculusTouchRiftLeftController: {fileID: 4991110589132808511}
+  _modelOculusTouchRiftRightController: {fileID: 4990035675525784487}
 --- !u!1 &4991982573919298837
 GameObject:
   m_ObjectHideFlags: 0

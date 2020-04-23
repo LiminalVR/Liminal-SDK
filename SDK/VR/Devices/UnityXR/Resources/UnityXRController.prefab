@@ -2568,10 +2568,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4991367752329270257}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81e1ef901fdc0a54d81571ec978a6d41, type: 3}
+  m_Script: {fileID: 11500000, guid: b1036994cfff1c14e97eda8870e81439, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PointerVisual: {fileID: 0}
+  m_PointerVisual: {fileID: 6652772320461938545}
   m_NodeList: []
   m_NodeNames: []
   m_InputVisualList: []
@@ -2582,7 +2582,7 @@ MonoBehaviour:
   m_modelOculusTouchQuestAndRiftSRightController: {fileID: 4990062080965866797}
   m_modelOculusTouchRiftLeftController: {fileID: 4991110589132808511}
   m_modelOculusTouchRiftRightController: {fileID: 4990035675525784487}
-  m_controller: 3
+  m_controller: 0
 --- !u!1 &4991982573919298837
 GameObject:
   m_ObjectHideFlags: 0

@@ -63,48 +63,33 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		protected void Awake()
-		{
-			List<InputDevice> allDevices = new List<InputDevice>();
-			InputDevices.GetDevices(allDevices);
-			foreach (InputDevice device in allDevices)
-			{
-				Debug.Log($"[DEVICES]\n\tdevice.name == {device.name}\n\tdevice.characteristics == {device.characteristics}\n\tdevice.manufacturer == {device.manufacturer}");
-			}
+        {
+            Initialize();
+        }
 
-			mAvatar = GetComponentInParent<IVRAvatar>();
-			mAvatar.InitializeExtensions();
+        public void Initialize()
+        {
+            mAvatar = GetComponentInParent<IVRAvatar>();
+            mAvatar.InitializeExtensions();
 
-			mPrimaryControllerTracker = new UnityXRTrackedControllerProxy(mAvatar, VRAvatarLimbType.RightHand);
-			mSecondaryControllerTracker = new UnityXRTrackedControllerProxy(mAvatar, VRAvatarLimbType.LeftHand);
+            mDevice = VRDevice.Device;
+            mGazeInput = GetComponent<GazeInput>();
 
-			//SetupControllers();
+            // Load controller visuals for any VRAvatarController objects attached to the avatar
+            var avatarControllers = GetComponentsInChildren<VRAvatarController>(includeInactive: true);
+            foreach (var controller in avatarControllers)
+                AttachControllerVisual(controller);
 
-			mDevice = VRDevice.Device;
-			//mSettings = gameObject.GetOrAddComponent<UnityXRAvatarSettings>();
-			mGazeInput = GetComponent<GazeInput>();
+            // Add event listeners
+            mDevice.InputDeviceConnected += OnInputDeviceConnected;
+            mDevice.InputDeviceDisconnected += OnInputDeviceDisconnected;
+            mAvatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
 
-			// Setup auxiliary systems
-			SetupManager();
-			SetupCameraRig();
-
-			// Load controller visuals for any VRAvatarController objects attached to the avatar
-			var avatarControllers = GetComponentsInChildren<VRAvatarController>(includeInactive: true);
-			foreach (var controller in avatarControllers)
-			{
-				AttachControllerVisual(controller);
-			}
-
-			// Add event listeners
-			mDevice.InputDeviceConnected += OnInputDeviceConnected;
-			mDevice.InputDeviceDisconnected += OnInputDeviceDisconnected;
-			mAvatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
-
-			SetupInitialControllerState();
-
-			UpdateHandedness();
+            SetupInitialControllerState();
+            UpdateHandedness();
 		}
 
-		private void OnEnable()
+        private void OnEnable()
 		{
 			TrySetLimbsActive();
 		}
@@ -169,31 +154,6 @@ namespace Liminal.SDK.XR
 		}
 
 		#region Setup
-		private void SetupManager()
-		{
-			var manager = new GameObject().AddComponent<XRInteractionManager>();
-			manager.transform.SetParentAndIdentity(mAvatar.Auxiliaries);
-		}
-
-		private void SetupCameraRig()
-		{
-			var avatarGo = mAvatar.Transform.gameObject;
-			var xrRig = avatarGo.AddComponent<XRRig>();
-			var centerEye = mAvatar.Head.CenterEyeCamera.gameObject;
-			var eyeDriver = centerEye.AddComponent<TrackedPoseDriver>();
-			eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
-			eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
-			xrRig.cameraGameObject = centerEye.gameObject;
-			xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
-
-			var rig = new GameObject("Rig");
-			rig.transform.SetParent(mAvatar.Transform);
-			rig.transform.position = mAvatar.Head.Transform.position;
-			mAvatar.Head.Transform.SetParent(rig.transform);
-			mAvatar.Head.Transform.localPosition = Vector3.zero;
-
-			OnActiveCameraChanged(mAvatar.Head);
-		}
 
 		private void SetupInitialControllerState()
 		{

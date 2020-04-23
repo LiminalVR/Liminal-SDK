@@ -1,19 +1,15 @@
 ﻿using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
-using Liminal.SDK.VR.Avatars.Controllers;
 using Liminal.SDK.VR.Input;
 using Liminal.SDK.VR.Pointers;
 using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
-using System;
 using Object = UnityEngine.Object;
-using System.Linq;
-using Liminal.SDK.VR.Devices.GearVR.Avatar;
 using UnityEngine.Assertions;
-using System.Runtime.InteropServices.WindowsRuntime;
+using Liminal.SDK.Extensions;
 
 namespace Liminal.SDK.XR
 {
@@ -75,13 +71,8 @@ namespace Liminal.SDK.XR
 		public UnityXRDevice()
 		{
 			Headset = new UnityXRHeadset();
-
-			// this is needed for the system to know that there are connected controllers
-            OVRInput.Update();
-
 			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right);
 			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
-
 			UpdateConnectedControllers();
 
 			XRDevice.deviceLoaded += XRDevice_deviceLoaded;
@@ -136,14 +127,10 @@ namespace Liminal.SDK.XR
 		{
 			// check if the controller state has changed
 			if (mControllerMask != GetControllerMask())
-			{
 				UpdateConnectedControllers();
-			}
 
 			foreach (var input in XRInputs)
-			{
 				input.Update();
-			}
 		}
 
 		public bool HasCapabilities(VRDeviceCapability capabilities)
@@ -155,21 +142,57 @@ namespace Liminal.SDK.XR
 		{
 			Assert.IsNotNull(avatar);
 
-			// allow the UnityXRAvatar to handle the rest of the setup
-			avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
-			
-			UpdateConnectedControllers();
+            var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+            var rig = new GameObject("Rig");
+            rig.transform.SetParent(avatar.Transform);
+            rig.transform.position = avatar.Head.Transform.position;
 
-			var primaryHandPrefab = Resources.Load("RightHand Controller");
-			var primaryHand = Object.Instantiate(primaryHandPrefab, avatar.Transform) as GameObject;
-			var secondaryHandPrefab = Resources.Load("LeftHand Controller");
-			var secondaryHand = Object.Instantiate(secondaryHandPrefab, avatar.Transform) as GameObject;
-			SetupControllerPointer(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
-			SetupControllerPointer(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
-			avatar.Head.Transform.localPosition = Vector3.zero;
-			
-			SetDefaultPointerActivation();
+			SetupManager(avatar);
+			SetupCameraRig(avatar, rig.transform);
+            SetupControllers(avatar, rig.transform);
+        }
+
+        private void SetupControllers(IVRAvatar avatar, Transform rig)
+        {
+            // allow the UnityXRAvatar to handle the rest of the setup
+            UpdateConnectedControllers();
+
+			// need to go in 
+            var primaryHandPrefab = Resources.Load("RightHand Controller");
+            var primaryHand = Object.Instantiate(primaryHandPrefab, rig) as GameObject;
+            var secondaryHandPrefab = Resources.Load("LeftHand Controller");
+            var secondaryHand = Object.Instantiate(secondaryHandPrefab, rig) as GameObject;
+            SetupControllerPointer(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
+            SetupControllerPointer(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
+            avatar.Head.Transform.localPosition = Vector3.zero;
+
+            SetDefaultPointerActivation();
 		}
+
+        private void SetupManager(IVRAvatar avatar)
+        {
+            var interactionManager = GameObject.FindObjectOfType<XRInteractionManager>();
+            if (interactionManager == null)
+                return;
+
+            var manager = new GameObject().AddComponent<XRInteractionManager>();
+			GameObject.DontDestroyOnLoad(manager.gameObject);
+        }
+
+        private void SetupCameraRig(IVRAvatar avatar, Transform rig)
+        {
+            var avatarGo = avatar.Transform.gameObject;
+            var xrRig = avatarGo.AddComponent<XRRig>();
+            var centerEye = avatar.Head.CenterEyeCamera.gameObject;
+            var eyeDriver = centerEye.AddComponent<TrackedPoseDriver>();
+            eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
+            eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
+            xrRig.cameraGameObject = centerEye.gameObject;
+            xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+
+            avatar.Head.Transform.SetParent(rig.transform);
+            avatar.Head.Transform.localPosition = Vector3.zero;
+        }
 
 		public void SetupControllerPointer(IVRInputDevice inputDevice, IVRAvatarHand hand, Transform xrHand)
 		{

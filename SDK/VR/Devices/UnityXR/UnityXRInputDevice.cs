@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_XR
+using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Avatars.Controllers;
@@ -55,3 +56,4 @@ namespace Liminal.SDK.XR
         public abstract void Update();
     }
 }
+#endif

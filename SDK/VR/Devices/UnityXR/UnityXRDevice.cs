@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_XR
+using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
-using Liminal.SDK.VR.Pointers;
 using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using Object = UnityEngine.Object;
 using UnityEngine.Assertions;
-using Liminal.SDK.Extensions;
 
 namespace Liminal.SDK.XR
 {
@@ -33,7 +32,7 @@ namespace Liminal.SDK.XR
 			VRDeviceCapability.DualController |
 			VRDeviceCapability.UserPrescenceDetection;
 
-		#region Variables
+#region Variables
 		public string Name => "UnityXR";
 		public int InputDeviceCount => mInputDevicesList.Count;
 
@@ -59,15 +58,15 @@ namespace Liminal.SDK.XR
 
 		public int CpuLevel { get; set; }
 		public int GpuLevel { get; set; }
-		#endregion
+#endregion
 
-		#region Events
+#region Events
 		public event VRInputDeviceEventHandler InputDeviceConnected;
 		public event VRInputDeviceEventHandler InputDeviceDisconnected;
 		public event VRDeviceEventHandler PrimaryInputDeviceChanged;
-		#endregion
+#endregion
 
-		#region Constructors
+#region Constructors
 		public UnityXRDevice()
 		{
 			Headset = new UnityXRHeadset();
@@ -76,7 +75,7 @@ namespace Liminal.SDK.XR
 
 			UpdateConnectedControllers();
 		}
-		#endregion
+#endregion
 
 		private UnityXRControllerMask GetControllerMask()
 		{
@@ -197,7 +196,7 @@ namespace Liminal.SDK.XR
 
 			var ctrlMask = GetControllerMask();
 
-			#region Controllers
+#region Controllers
 			bool isRightHandPresent = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.RightHand).isValid;
 
 			if (isRightHandPresent)
@@ -240,7 +239,7 @@ namespace Liminal.SDK.XR
 				disconnectedList.Add(mLeftController);
 				//}
 			} 
-			#endregion
+#endregion
 
 			mInputDevicesList.Clear();
 			mInputDevicesList.AddRange(allControllers);
@@ -264,3 +263,4 @@ namespace Liminal.SDK.XR
 		}
 	}
 }
+#endif

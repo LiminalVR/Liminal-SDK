@@ -12,10 +12,15 @@ namespace App
     {
         public static IVRDevice CreateDevice(ExperienceApp experienceApp = null)
         {
-            experienceApp = experienceApp ?? Object.FindObjectOfType<ExperienceApp>();
+            // TODO Add an environment SDK Configuration.
+#if UNITY_XR
             return CreateDevice(ESDKType.UnityXR);
+#else
+            return CreateDevice(ESDKType.OVR);
+#endif
         }
 
+        // This is used by the Editor
         public static IVRDevice CreateDevice(ESDKType sdkType)
         {
             switch (sdkType)

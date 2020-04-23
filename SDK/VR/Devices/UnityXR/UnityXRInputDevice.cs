@@ -20,22 +20,43 @@ namespace Liminal.SDK.XR
     /// </summary>
     public abstract class UnityXRInputDevice : IVRInputDevice
     {
+        #region Constants
+
+        #endregion
+
+        #region Statics
+
+        #endregion
+
+        #region Fields
+        #region Publics
+
+        #endregion
+
+        #region Privates
+
+        #endregion
+        #endregion
+
+        #region Properties
+        #region Publics
         public abstract string Name { get; }
         public IVRPointer Pointer { get; }
         public abstract int ButtonCount { get; }
         public abstract VRInputDeviceHand Hand { get; }
         public abstract bool IsTouching { get; }
 
-        public OVRInput.Controller ControllerMask { get; private set; }
+        public InputDevice InputDevice { get; private set; }
+        #endregion
 
-        public UnityXRInputDevice() 
-        { 
-            ControllerMask = OVRInput.Controller.None;
-        }
+        #region Privates
 
-        public UnityXRInputDevice(OVRInput.Controller controllerMask) 
+        #endregion
+        #endregion
+
+        public UnityXRInputDevice(InputDevice inputDevice) 
         {
-            ControllerMask = controllerMask;
+            InputDevice = inputDevice;
 
             Pointer = CreatePointer();
         }

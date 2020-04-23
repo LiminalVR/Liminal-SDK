@@ -292,6 +292,34 @@ namespace Liminal.SDK.XR
 		}
 		#endregion
 
+		#region Constants
+
+		#endregion
+
+		#region Statics
+
+		#endregion
+
+		#region Fields
+		#region Publics
+
+		#endregion
+
+		#region Privates
+
+		#endregion
+		#endregion
+
+		#region Properties
+		#region Publics
+
+		#endregion
+
+		#region Privates
+
+		#endregion
+		#endregion
+
 		public override string Name => "UnityXRController";
 
 		// TODO: Confirm this?
@@ -331,7 +359,7 @@ namespace Liminal.SDK.XR
 			{ VRAxis.Three, new Axis1DInputFeature(CommonUsages.grip) },
 		};
 
-		public UnityXRController(VRInputDeviceHand hand) : base(OVRUtils.GetControllerType(hand))
+		public UnityXRController(VRInputDeviceHand hand, InputDevice inputDevice) : base(inputDevice)
 		{
 			mHand = hand;
 

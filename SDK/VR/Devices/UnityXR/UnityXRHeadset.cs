@@ -17,6 +17,34 @@ namespace Liminal.SDK.XR
 {
     public class UnityXRHeadset : UnityXRInputDevice, IVRHeadset
     {
+        #region Constants
+
+        #endregion
+
+        #region Statics
+
+        #endregion
+
+        #region Fields
+        #region Publics
+
+        #endregion
+
+        #region Privates
+
+        #endregion
+        #endregion
+
+        #region Properties
+        #region Publics
+
+        #endregion
+
+        #region Privates
+
+        #endregion
+        #endregion
+
         private static readonly VRInputDeviceCapability _inputCapabilities =
             VRInputDeviceCapability.None;
 
@@ -28,7 +56,7 @@ namespace Liminal.SDK.XR
         public override bool IsTouching => false;
         public override VRInputDeviceHand Hand => VRInputDeviceHand.None;
 
-        public UnityXRHeadset() : base()
+        public UnityXRHeadset(InputDevice inputDevice) : base(inputDevice)
         {
             Pointer?.Activate();
         }

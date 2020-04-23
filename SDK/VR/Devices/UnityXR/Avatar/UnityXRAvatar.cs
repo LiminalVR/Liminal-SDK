@@ -221,15 +221,15 @@ namespace Liminal.SDK.XR
 			mRemotes.Add(trackedRemote);
 
 			// Assign the correct controller based on the limb type the controller is attached to
-			OVRInput.Controller controllerType = GetControllerTypeForLimb(limb);
-			trackedRemote.m_controller = controllerType;
-			trackedRemote.m_modelGearVrController.SetActive(true);
+			//OVRInput.Controller controllerType = GetControllerTypeForLimb(limb);
+			//trackedRemote.m_controller = controllerType;
+			//trackedRemote.ModelGearVrController.SetActive(true);
 
 			// Activate the controller
 			var active = OVRUtils.IsLimbConnected(limb.LimbType);
 			instance.gameObject.SetActive(true);
 
-			Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active} Controller Type set to: {controllerType}");
+			//Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active} Controller Type set to: {controllerType}");
 		}
 		#endregion
 
@@ -256,8 +256,8 @@ namespace Liminal.SDK.XR
 			var instance = Instantiate(prefab);
 
 			var ovrController = instance.GetComponent<UnityXRControllerVisual>();
-			ovrController.m_controller = GetControllerTypeForLimb(limb);
-			ovrController.m_modelGearVrController.SetActive(true);
+			//ovrController.m_controller = GetControllerTypeForLimb(limb);
+			//ovrController.ModelGearVrController.SetActive(true);
 			ovrController.enabled = false;
 
 			instance.gameObject.SetActive(true);
@@ -271,11 +271,11 @@ namespace Liminal.SDK.XR
 				return;
 
 			// Find the visual for the hand that matches the controller
-			UnityXRControllerVisual remote = mRemotes.FirstOrDefault(x => (x.m_controller & controller.ControllerMask) != 0);
-			if (remote != null)
-			{
-				remote.gameObject.SetActive(true);
-			}
+			//UnityXRControllerVisual remote = mRemotes.FirstOrDefault(x => (x.m_controller & controller.ControllerMask) != 0);
+			//if (remote != null)
+			//{
+			//	remote.gameObject.SetActive(true);
+			//}
 		}
 
 		private void DisableAllControllerVisuals()

@@ -5,154 +5,118 @@ using Liminal.SDK.VR.Avatars.Controllers;
 
 namespace Liminal.SDK.XR
 {
-    public class UnityXRControllerVisual : VRControllerVisual
-    {
+	public class UnityXRControllerVisual : VRControllerVisual
+	{
+		#region Constants
+		private const string OculusTouchQuestAndRiftSLeftControllerName = "Oculus Touch Controller - Left";
+		private const string OculusTouchQuestAndRiftSRightControllerName = "Oculus Touch Controller - Right";
+		#endregion
+
+		#region Statics
+
+		#endregion
+
+		#region Fields
+		#region Publics
+
+		#endregion
+
+		#region Privates
 		/// <summary>
 		/// The root GameObject that represents the GearVr Controller model.
 		/// </summary>
-		public GameObject m_modelGearVrController;
+		[SerializeField] private GameObject _modelGearVrController;
 
 		/// <summary>
 		/// The root GameObject that represents the Oculus Go Controller model.
 		/// </summary>
-		public GameObject m_modelOculusGoController;
+		[SerializeField] private GameObject _modelOculusGoController;
 
 		/// <summary>
 		/// The root GameObject that represents the Oculus Touch for Quest And RiftS Controller model (Left).
 		/// </summary>
-		public GameObject m_modelOculusTouchQuestAndRiftSLeftController;
+		[SerializeField] private GameObject _modelOculusTouchQuestAndRiftSLeftController;
 
 		/// <summary>
 		/// The root GameObject that represents the Oculus Touch for Quest And RiftS Controller model (Right).
 		/// </summary>
-		public GameObject m_modelOculusTouchQuestAndRiftSRightController;
+		[SerializeField] private GameObject _modelOculusTouchQuestAndRiftSRightController;
 
 		/// <summary>
 		/// The root GameObject that represents the Oculus Touch for Rift Controller model (Left).
 		/// </summary>
-		public GameObject m_modelOculusTouchRiftLeftController;
+		[SerializeField] private GameObject _modelOculusTouchRiftLeftController;
 
 		/// <summary>
 		/// The root GameObject that represents the Oculus Touch for Rift Controller model (Right).
 		/// </summary>
-		public GameObject m_modelOculusTouchRiftRightController;
+		[SerializeField] private GameObject _modelOculusTouchRiftRightController;
 
-		/// <summary>
-		/// The controller that determines whether or not to enable rendering of the controller model.
-		/// </summary>
-		public OVRInput.Controller m_controller;
+		private string _activeControllerName;
 
-		private enum ControllerType
+		private readonly Dictionary<string, GameObject> _allModels = new Dictionary<string, GameObject>();
+		#endregion
+		#endregion
+
+		#region Properties
+		#region Publics
+		public string ActiveControllerName
 		{
-			GearVR, Go, QuestAndRiftS, Rift
-		}
-
-		private ControllerType activeControllerType = ControllerType.Rift;
-
-		private bool m_prevControllerConnected = false;
-		private bool m_prevControllerConnectedCached = false;
-
-		void Start()
-		{
-			OVRPlugin.SystemHeadset headset = OVRPlugin.GetSystemHeadsetType();
-			switch (headset)
+			get => _activeControllerName;
+			set
 			{
-				case OVRPlugin.SystemHeadset.Oculus_Go:
-					activeControllerType = ControllerType.Go;
-					break;
-				case OVRPlugin.SystemHeadset.Oculus_Quest:
-					activeControllerType = ControllerType.QuestAndRiftS;
-					break;
-				case OVRPlugin.SystemHeadset.Rift_CV1:
-					activeControllerType = ControllerType.Rift;
-					break;
-				case OVRPlugin.SystemHeadset.Rift_S:
-					activeControllerType = ControllerType.QuestAndRiftS;
-					break;
-				case OVRPlugin.SystemHeadset.GearVR_R320:
-				case OVRPlugin.SystemHeadset.GearVR_R321:
-				case OVRPlugin.SystemHeadset.GearVR_R322:
-				case OVRPlugin.SystemHeadset.GearVR_R323:
-				case OVRPlugin.SystemHeadset.GearVR_R324:
-				case OVRPlugin.SystemHeadset.GearVR_R325:
-					activeControllerType = ControllerType.GearVR;
-					break;
-				default:
-#if UNITY_EDITOR || !UNITY_ANDROID
-					activeControllerType = ControllerType.Rift;
-#else
-				activeControllerType = ControllerType.GearVR;
-#endif
-					break;
-			}
+				GameObject model;
+				if (!string.IsNullOrEmpty(ActiveControllerName) && _allModels.TryGetValue(ActiveControllerName, out model))
+				{
+					model?.SetActive(false);
+				}
 
-			Debug.LogFormat("OVRControllerHelp: Active controller type: {0} for product {1}", activeControllerType, OVRPlugin.productName);
-			if ((activeControllerType != ControllerType.GearVR) && (activeControllerType != ControllerType.Go))
-			{
-				if (m_controller == OVRInput.Controller.LTrackedRemote)
+				_activeControllerName = value;
+
+				if (!string.IsNullOrEmpty(ActiveControllerName))
 				{
-					m_controller = OVRInput.Controller.LTouch;
-				}
-				else if (m_controller == OVRInput.Controller.RTrackedRemote)
-				{
-					m_controller = OVRInput.Controller.RTouch;
-				}
-			}
-			else
-			{
-				if (m_controller == OVRInput.Controller.LTouch)
-				{
-					m_controller = OVRInput.Controller.LTrackedRemote;
-				}
-				else if (m_controller == OVRInput.Controller.RTouch)
-				{
-					m_controller = OVRInput.Controller.RTrackedRemote;
+					if (_allModels.TryGetValue(ActiveControllerName, out model))
+					{
+						model?.SetActive(true);
+					}
+					else
+					{
+						Debug.LogError($"[{GetType().Name}] No key exists for '{ActiveControllerName}'");
+					}
 				}
 			}
 		}
+		#endregion
 
-		void Update()
+		#region Privates
+
+		#endregion
+		#endregion
+
+		#region Mono
+		protected override void Awake()
 		{
-			bool controllerConnected = OVRInput.IsControllerConnected(m_controller);
+			base.Awake();
 
-			if ((controllerConnected != m_prevControllerConnected) || !m_prevControllerConnectedCached)
+			//_allModels.Add(_modelGearVrController);
+			//_allModels.Add(_modelOculusGoController);
+			_allModels.Add(OculusTouchQuestAndRiftSLeftControllerName, _modelOculusTouchQuestAndRiftSLeftController);
+			_allModels.Add(OculusTouchQuestAndRiftSRightControllerName, _modelOculusTouchQuestAndRiftSRightController);
+			//_allModels.Add(_modelOculusTouchRiftLeftController);
+			//_allModels.Add(_modelOculusTouchRiftRightController);
+
+			DisableAll();
+		}
+		#endregion
+
+		#region UnityXRControllerVisual
+		private void DisableAll()
+		{
+			foreach (GameObject model in _allModels.Values)
 			{
-				if (activeControllerType == ControllerType.GearVR || activeControllerType == ControllerType.Go)
-				{
-					m_modelOculusGoController.SetActive(controllerConnected && (activeControllerType == ControllerType.Go));
-					m_modelGearVrController.SetActive(controllerConnected && (activeControllerType != ControllerType.Go));
-					m_modelOculusTouchQuestAndRiftSLeftController.SetActive(false);
-					m_modelOculusTouchQuestAndRiftSRightController.SetActive(false);
-					m_modelOculusTouchRiftLeftController.SetActive(false);
-					m_modelOculusTouchRiftRightController.SetActive(false);
-				}
-				else if (activeControllerType == ControllerType.QuestAndRiftS)
-				{
-					m_modelOculusGoController.SetActive(false);
-					m_modelGearVrController.SetActive(false);
-					m_modelOculusTouchQuestAndRiftSLeftController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.LTouch));
-					m_modelOculusTouchQuestAndRiftSRightController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.RTouch));
-					m_modelOculusTouchRiftLeftController.SetActive(false);
-					m_modelOculusTouchRiftRightController.SetActive(false);
-				}
-				else // if (activeControllerType == ControllerType.Rift)
-				{
-					m_modelOculusGoController.SetActive(false);
-					m_modelGearVrController.SetActive(false);
-					m_modelOculusTouchQuestAndRiftSLeftController.SetActive(false);
-					m_modelOculusTouchQuestAndRiftSRightController.SetActive(false);
-					m_modelOculusTouchRiftLeftController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.LTouch));
-					m_modelOculusTouchRiftRightController.SetActive(controllerConnected && (m_controller == OVRInput.Controller.RTouch));
-				}
-
-				m_prevControllerConnected = controllerConnected;
-				m_prevControllerConnectedCached = true;
-			}
-
-			if (!controllerConnected)
-			{
-				return;
+				model.SetActive(false);
 			}
 		}
+		#endregion
 	}
 }

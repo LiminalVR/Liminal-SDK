@@ -21,7 +21,7 @@ namespace Liminal.SDK.XR
     public abstract class UnityXRInputDevice : IVRInputDevice
     {
         public abstract string Name { get; }
-        public IVRPointer Pointer { get; }
+        public IVRPointer Pointer { get; protected set; }
         public abstract int ButtonCount { get; }
         public abstract VRInputDeviceHand Hand { get; }
         public abstract bool IsTouching { get; }

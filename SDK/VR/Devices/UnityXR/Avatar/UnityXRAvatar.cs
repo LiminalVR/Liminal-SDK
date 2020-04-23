@@ -62,11 +62,6 @@ namespace Liminal.SDK.XR
 		private OVRCameraRig mCameraRig;
 		#endregion
 
-		protected void Awake()
-        {
-            Initialize();
-        }
-
         public void Initialize()
         {
             mAvatar = GetComponentInParent<IVRAvatar>();

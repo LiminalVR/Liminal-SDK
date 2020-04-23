@@ -28,9 +28,9 @@ namespace Liminal.SDK.XR
         public override bool IsTouching => false;
         public override VRInputDeviceHand Hand => VRInputDeviceHand.None;
 
-        public UnityXRHeadset() : base()
+        public UnityXRHeadset()
         {
-            Pointer?.Activate();
+            Pointer = CreatePointer();
         }
 
         protected override IVRPointer CreatePointer()

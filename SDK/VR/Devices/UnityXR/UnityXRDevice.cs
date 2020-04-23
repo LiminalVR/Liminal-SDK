@@ -97,7 +97,7 @@ namespace Liminal.SDK.XR
 		{
 			// check if the controller state has changed
 			if (mControllerMask != GetControllerMask())
-			UpdateConnectedControllers();
+			    UpdateConnectedControllers();
 
 			foreach (var input in XRInputs)
 				input.Update();
@@ -113,14 +113,20 @@ namespace Liminal.SDK.XR
 			Assert.IsNotNull(avatar);
 
             var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+            var rig = CreateXrRig(avatar);
+			SetupManager(avatar);
+			SetupCameraRig(avatar, rig);
+            SetupControllers(avatar, rig);
+
+            unityAvatar.Initialize();
+		}
+
+        private Transform CreateXrRig(IVRAvatar avatar)
+        {
             var rig = new GameObject("Rig");
             rig.transform.SetParent(avatar.Transform);
             rig.transform.position = avatar.Head.Transform.position;
-
-			unityAvatar.gameObject.SetActive(true);
-			SetupManager(avatar);
-			SetupCameraRig(avatar, rig.transform);
-            SetupControllers(avatar, rig.transform);
+            return rig.transform;
         }
 
         private void SetupControllers(IVRAvatar avatar, Transform rig)

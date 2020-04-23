@@ -73,6 +73,7 @@ namespace Liminal.SDK.XR
 			Headset = new UnityXRHeadset();
 			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right);
 			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
+
 			UpdateConnectedControllers();
 		}
 		#endregion
@@ -128,6 +129,8 @@ namespace Liminal.SDK.XR
             var rig = new GameObject("Rig");
             rig.transform.SetParent(avatar.Transform);
             rig.transform.position = avatar.Head.Transform.position;
+            rig.transform.rotation = avatar.Head.Transform.rotation;
+
             return rig.transform;
         }
 
@@ -143,8 +146,7 @@ namespace Liminal.SDK.XR
             var secondaryHand = Object.Instantiate(secondaryHandPrefab, rig) as GameObject;
             SetupControllers(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
             SetupControllers(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
-            avatar.Head.Transform.localPosition = Vector3.zero;
-
+			
             SetDefaultPointerActivation();
 		}
 
@@ -177,6 +179,7 @@ namespace Liminal.SDK.XR
 		{
 			hand.Transform.SetParent(xrHand);
 			hand.Transform.localPosition = Vector3.zero;
+			hand.Transform.localRotation = Quaternion.identity;
         }
 
 		private void SetDefaultPointerActivation()

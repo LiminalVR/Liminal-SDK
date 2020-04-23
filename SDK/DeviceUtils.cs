@@ -12,8 +12,7 @@ namespace App
         public static IVRDevice CreateDevice(ExperienceApp experienceApp = null)
         {
             experienceApp = experienceApp ?? Object.FindObjectOfType<ExperienceApp>();
-            var sdkType = experienceApp.SDKType;
-            return CreateDevice(sdkType);
+            return CreateDevice(ESDKType.UnityXR);
         }
 
         public static IVRDevice CreateDevice(ESDKType sdkType)

@@ -61,6 +61,7 @@ namespace Liminal.SDK.XR
             Pointer = CreatePointer();
         }
 
+        #region IVRHeadset
         protected abstract IVRPointer CreatePointer();
 
         public abstract float GetAxis1D(string axis);
@@ -73,6 +74,7 @@ namespace Liminal.SDK.XR
         public abstract bool HasButton(string button);
         public abstract bool HasCapabilities(VRInputDeviceCapability capability);
 
-        public abstract void Update();
+        public abstract void Update(); 
+        #endregion
     }
 }

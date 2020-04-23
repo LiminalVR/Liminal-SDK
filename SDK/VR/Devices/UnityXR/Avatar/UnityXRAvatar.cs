@@ -20,11 +20,11 @@ namespace Liminal.SDK.XR
 	public class UnityXRAvatar : MonoBehaviour, IVRDeviceAvatar
 	{
 		#region Constants
-
+		private const string ControllerVisualPrefabName = "UnityXRController";
 		#endregion
 
 		#region Statics
-
+		public static EPointerActivationType PointerActivationType = EPointerActivationType.Both;
 		#endregion
 
 		#region Fields
@@ -33,13 +33,29 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Privates
+		private IVRAvatar _avatar;
+		private IVRDevice _device;
 
+		private GazeInput _gazeInput = null;
+
+		private readonly List<UnityXRControllerVisual> _remotes = new List<UnityXRControllerVisual>();
 		#endregion
 		#endregion
 
 		#region Properties
 		#region Publics
+		public IVRAvatar Avatar
+		{
+			get
+			{
+				if (_avatar == null)
+				{
+					_avatar = GetComponentInParent<IVRAvatar>();
+				}
 
+				return _avatar;
+			}
+		}
 		#endregion
 
 		#region Privates
@@ -47,77 +63,13 @@ namespace Liminal.SDK.XR
 		#endregion
 		#endregion
 
-		#region Variables
-		public static EPointerActivationType PointerActivationType = EPointerActivationType.Both;
+		#region MonoBehaviour
+		//protected void Awake()
+		//{
+		//    Initialize();
+		//}
 
-		private IVRAvatar mAvatar;
-		public IVRAvatar Avatar
-		{
-			get
-			{
-				if (mAvatar == null)
-				{
-					mAvatar = GetComponentInParent<IVRAvatar>();
-				}
-
-				return mAvatar;
-			}
-		}
-
-		private bool IsHandControllerActive
-		{
-			get
-			{
-				if (OVRUtils.IsOculusQuest)
-					return OVRUtils.IsQuestControllerConnected;
-
-				return false;// (OVRInput.GetActiveController() & GearVRController.AllHandControllersMask) != 0;
-			}
-		}
-
-		private const string ControllerVisualPrefabName = "UnityXRController";
-		private readonly List<UnityXRControllerVisual> mRemotes = new List<UnityXRControllerVisual>();
-
-		private IVRDevice mDevice;
-
-		private IVRTrackedObjectProxy mPrimaryControllerTracker;
-		private IVRTrackedObjectProxy mSecondaryControllerTracker;
-
-		private GazeInput mGazeInput = null;
-
-		// OVR
-		private OVRManager mManager;
-		private OVRCameraRig mCameraRig;
-		#endregion
-
-		protected void Awake()
-        {
-            Initialize();
-        }
-
-        public void Initialize()
-        {
-            mAvatar = GetComponentInParent<IVRAvatar>();
-            mAvatar.InitializeExtensions();
-
-            mDevice = VRDevice.Device;
-            mGazeInput = GetComponent<GazeInput>();
-
-            // Load controller visuals for any VRAvatarController objects attached to the avatar
-            var avatarControllers = GetComponentsInChildren<VRAvatarController>(includeInactive: true);
-            foreach (var controller in avatarControllers)
-                AttachControllerVisual(controller);
-
-            // Add event listeners
-            mDevice.InputDeviceConnected += OnInputDeviceConnected;
-            mDevice.InputDeviceDisconnected += OnInputDeviceDisconnected;
-            mAvatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
-
-            SetupInitialControllerState();
-            UpdateHandedness();
-		}
-
-        private void OnEnable()
+		private void OnEnable()
 		{
 			TrySetLimbsActive();
 		}
@@ -125,32 +77,25 @@ namespace Liminal.SDK.XR
 		private void OnDestroy()
 		{
 			// Clean up event handlers
-			if (mAvatar != null)
+			if (_avatar != null && _avatar.Head != null)
 			{
-				if (mAvatar.Head != null)
-				{
-					mAvatar.Head.ActiveCameraChanged -= OnActiveCameraChanged;
-				}
+				_avatar.Head.ActiveCameraChanged -= OnActiveCameraChanged;
 			}
 
-			if (mDevice != null)
+			if (_device != null)
 			{
-				mDevice.InputDeviceConnected -= OnInputDeviceConnected;
-				mDevice.InputDeviceDisconnected -= OnInputDeviceDisconnected;
+				_device.InputDeviceConnected -= OnInputDeviceConnected;
+				_device.InputDeviceDisconnected -= OnInputDeviceDisconnected;
 			}
 		}
 
 		private void OnTransformParentChanged()
 		{
-			mAvatar = GetComponentInParent<IVRAvatar>();
+			_avatar = GetComponentInParent<IVRAvatar>();
 		}
 
 		private void Update()
 		{
-			// update handedness?
-			//if (mCachedActiveController != OVRInput.GetActiveController())
-				UpdateHandedness();
-
 			RecenterHmdIfRequired();
 			DetectAndUpdateControllerStates();
 
@@ -160,6 +105,30 @@ namespace Liminal.SDK.XR
 			}
 
 			VRDevice.Device.Update();
+		} 
+		#endregion
+
+		public void Initialize()
+		{
+			_avatar = GetComponentInParent<IVRAvatar>();
+			Avatar.InitializeExtensions();
+
+			_device = VRDevice.Device;
+			_gazeInput = GetComponent<GazeInput>();
+
+			// Load controller visuals for any VRAvatarController objects attached to the avatar
+			var avatarControllers = GetComponentsInChildren<VRAvatarController>(includeInactive: true);
+			foreach (var controller in avatarControllers)
+			{
+				AttachControllerVisual(controller);
+			}
+
+			// Add event listeners
+			_device.InputDeviceConnected += OnInputDeviceConnected;
+			_device.InputDeviceDisconnected += OnInputDeviceDisconnected;
+			_avatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
+
+			SetupInitialControllerState();
 		}
 
 		private void DetectPointerState()
@@ -185,9 +154,9 @@ namespace Liminal.SDK.XR
 
 		private void SetupInitialControllerState()
 		{
-			if (mDevice.InputDevices.Any(x => x is UnityXRController))
+			if (_device.InputDevices.Any(x => x is UnityXRController))
 			{
-				foreach (var controller in mDevice.InputDevices)
+				foreach (var controller in _device.InputDevices)
 				{
 					EnableControllerVisual(controller as UnityXRController);
 				}
@@ -203,38 +172,40 @@ namespace Liminal.SDK.XR
         {
 			var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
 
-			var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
-			prefab.gameObject.SetActive(false);
+			var instance = InstantiateControllerVisual(limb);
+
+			if (!instance)
+			{
+				// maybe log an error?
+				return;
+			}
 
 			// Create controller instance
-			var instance = Instantiate(prefab);
-			instance.name = prefab.name;
 			instance.transform.SetParentAndIdentity(avatarController.transform);
-
-			// Make sure the OVRGearVrController component exists...
-			var trackedRemote = instance.gameObject.GetComponent<UnityXRControllerVisual>();
-
-			if (trackedRemote == null)
-				trackedRemote = instance.gameObject.AddComponent<UnityXRControllerVisual>();
-
 			avatarController.ControllerVisual = instance;
-			mRemotes.Add(trackedRemote);
 
-			// Assign the correct controller based on the limb type the controller is attached to
-			//OVRInput.Controller controllerType = GetControllerTypeForLimb(limb);
-			//trackedRemote.m_controller = controllerType;
-			//trackedRemote.ModelGearVrController.SetActive(true);
+			var xrControllerVisual = instance.GetComponent<UnityXRControllerVisual>();
+			// assign the name based on the limb
+			if (limb.LimbType.TryLimbToNode(out XRNode node))
+			{
+				InputDevice inputDevice = InputDevices.GetDeviceAtXRNode(node);
+
+				if (inputDevice.isValid)
+				{
+					xrControllerVisual.ActiveControllerName = inputDevice.name;
+				}
+			}
+
+			_remotes.Add(xrControllerVisual);
 
 			// Activate the controller
-			var active = OVRUtils.IsLimbConnected(limb.LimbType);
-			instance.gameObject.SetActive(true);
+			var active = !string.IsNullOrEmpty(xrControllerVisual.ActiveControllerName);
 
-			//Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active} Controller Type set to: {controllerType}");
+			Debug.Log($"Attached Controller: {limb.LimbType} and SetActive: {active} Controller Type set to: {xrControllerVisual.ActiveControllerName}");
 		}
 		#endregion
 
 		#region Controllers
-		// TODO See if this method can be removed, it appears to not be used at all and it can be misleading when debugging.
 		/// <summary>
 		/// Instantiates a <see cref="VRControllerVisual"/> for a limb.
 		/// </summary>
@@ -255,11 +226,6 @@ namespace Liminal.SDK.XR
 			var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
 			var instance = Instantiate(prefab);
 
-			var ovrController = instance.GetComponent<UnityXRControllerVisual>();
-			//ovrController.m_controller = GetControllerTypeForLimb(limb);
-			//ovrController.ModelGearVrController.SetActive(true);
-			ovrController.enabled = false;
-
 			instance.gameObject.SetActive(true);
 
 			return instance;
@@ -271,27 +237,22 @@ namespace Liminal.SDK.XR
 				return;
 
 			// Find the visual for the hand that matches the controller
-			//UnityXRControllerVisual remote = mRemotes.FirstOrDefault(x => (x.m_controller & controller.ControllerMask) != 0);
-			//if (remote != null)
-			//{
-			//	remote.gameObject.SetActive(true);
-			//}
+			UnityXRControllerVisual remote = _remotes.FirstOrDefault(r => r.ActiveControllerName == controller.InputDevice.name);
+			if (remote != null)
+			{
+				remote.gameObject.SetActive(true);
+			}
 		}
 
 		private void DisableAllControllerVisuals()
 		{
 			// Disable all controller visuals
-			foreach (var remote in mRemotes)
+			foreach (var remote in _remotes)
 			{
 				remote.gameObject.SetActive(false);
 			}
 		}
 		#endregion
-
-		private void UpdateHandedness()
-		{
-			//throw new NotImplementedException();
-		}
 
 		/// <summary>
 		/// Detects and Updates the state of the controllers including the TouchPad on the GearVR headset
@@ -312,8 +273,8 @@ namespace Liminal.SDK.XR
 
 			//if (OVRUtils.IsOculusQuest)
 			//{
-			//    TrySetHandActive(VRAvatarLimbType.RightHand);
-			//    TrySetHandActive(VRAvatarLimbType.LeftHand);
+			TrySetHandActive(VRAvatarLimbType.RightHand);
+			TrySetHandActive(VRAvatarLimbType.LeftHand);
 			//}
 			//else
 			//{
@@ -323,38 +284,35 @@ namespace Liminal.SDK.XR
 
 		private void TrySetHandActive(VRAvatarLimbType limbType)
 		{
-			var isLimbConnected = OVRUtils.IsLimbConnected(limbType);
-			var limb = mAvatar.GetLimb(limbType);
+			if (limbType.TryLimbToNode(out XRNode node))
+			{
+				var isLimbConnected = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(node).isValid;
+				var limb = _avatar.GetLimb(limbType);
 
-			limb.SetActive(isLimbConnected);
+				limb.SetActive(isLimbConnected);
+			}
 		}
 
 		private void TrySetHandsActive(bool active)
 		{
-			if (mAvatar != null)
+			if (_avatar != null)
 			{
-				//if (OVRUtils.IsGearVRHeadset())
-				//{
-				//	if (OVRInput.GetActiveController() == OVRInput.Controller.Touchpad)
-				//		active = false;
-				//}
-
-				mAvatar.SetHandsActive(active);
+				_avatar.SetHandsActive(active);
 			}
 		}
 
 		private void TrySetGazeInputActive(bool active)
 		{
 			// Ignore Always & Never Policy
-			if (mGazeInput != null && mGazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
+			if (_gazeInput != null && _gazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
 			{
 				if (active)
 				{
-					mGazeInput.Activate();
+					_gazeInput.Activate();
 				}
 				else
 				{
-					mGazeInput.Deactivate();
+					_gazeInput.Deactivate();
 				}
 			}
 		}
@@ -373,19 +331,8 @@ namespace Liminal.SDK.XR
 			//}
 		}
 
-		private OVRInput.Controller GetControllerTypeForLimb(IVRAvatarLimb limb)
-		{
-			if (limb.LimbType == VRAvatarLimbType.LeftHand)
-				return OVRInput.Controller.LTouch;
-
-			if (limb.LimbType == VRAvatarLimbType.RightHand)
-				return OVRInput.Controller.RTouch;
-
-			return OVRInput.Controller.None;
-		}
 
 		#region Event Handlers
-
 		//Notes: Device Connecting is difference than controller being active
 		private void OnInputDeviceConnected(IVRDevice vrDevice, IVRInputDevice inputDevice)
 		{
@@ -403,17 +350,15 @@ namespace Liminal.SDK.XR
 			if (!vrDevice.InputDevices.Any(x => x is UnityXRController))
 			{
 				// No controllers are connected
-				// Enable gaze controls
 				DisableAllControllerVisuals();
+				// Enable gaze controls
+				TrySetGazeInputActive(true);
 			}
 		}
 
 		private void OnActiveCameraChanged(IVRAvatarHead head)
 		{
-			if (mCameraRig != null)
-			{
-				mCameraRig.usePerEyeCameras = head.UsePerEyeCameras;
-			}
+
 		}
 		#endregion
 	}

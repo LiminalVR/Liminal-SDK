@@ -297,7 +297,9 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Statics
-
+		private static readonly VRInputDeviceCapability _capabilities = VRInputDeviceCapability.DirectionalInput |
+																		VRInputDeviceCapability.Touch |
+																		VRInputDeviceCapability.TriggerButton;
 		#endregion
 
 		#region Fields
@@ -306,33 +308,7 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Privates
-
-		#endregion
-		#endregion
-
-		#region Properties
-		#region Publics
-
-		#endregion
-
-		#region Privates
-
-		#endregion
-		#endregion
-
-		public override string Name => "UnityXRController -> " + base.Name;
-
-		// TODO: Confirm this?
-		public override int ButtonCount => 3;
-
-		// this is mapped to 'primaryTouch' inputFeature
-		public override bool IsTouching { get => GetButton(VRButton.Touch); }
-
-		private static readonly VRInputDeviceCapability _capabilities = VRInputDeviceCapability.DirectionalInput |
-																		VRInputDeviceCapability.Touch |
-																		VRInputDeviceCapability.TriggerButton;
-		private VRInputDeviceHand mHand;
-		public override VRInputDeviceHand Hand => mHand;
+		private VRInputDeviceHand _hand;
 
 		/// <summary>
 		/// TODO: This mapping is functional for Oculus Quest.
@@ -358,10 +334,25 @@ namespace Liminal.SDK.XR
             { VRAxis.Two, new Axis1DInputFeature(CommonUsages.trigger) },
 			{ VRAxis.Three, new Axis1DInputFeature(CommonUsages.grip) },
 		};
+		#endregion
+		#endregion
 
+		#region Properties
+		#region Publics
+		public override int ButtonCount => 3;
+		public override bool IsTouching { get => GetButton(VRButton.Touch); }
+		public override VRInputDeviceHand Hand => _hand;
+		#endregion
+
+		#region Privates
+
+		#endregion
+		#endregion
+
+		#region Constructor
 		public UnityXRController(VRInputDeviceHand hand, InputDevice inputDevice) : base(inputDevice)
 		{
-			mHand = hand;
+			_hand = hand;
 
 			Pointer?.Activate();
 
@@ -385,7 +376,9 @@ namespace Liminal.SDK.XR
 
 			Debug.Log($"[{GetType().Name}] UnityXRController({hand}) created.");
 		}
+		#endregion
 
+		#region IVRInputDevice
 		protected override IVRPointer CreatePointer()
 		{
 			return new InputDevicePointer(this);
@@ -465,6 +458,7 @@ namespace Liminal.SDK.XR
 					Debug.LogError($"Problems occuring within {feature.Name}");
 				}
 			}
-		}
+		} 
+		#endregion
 	}
 }

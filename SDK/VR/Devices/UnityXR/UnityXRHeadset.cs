@@ -22,7 +22,11 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Statics
+		private static readonly VRInputDeviceCapability _inputCapabilities =
+			VRInputDeviceCapability.None;
 
+		private static readonly VRHeadsetCapability _headsetCapabilities =
+			VRHeadsetCapability.PositionalTracking;
 		#endregion
 
 		#region Fields
@@ -37,7 +41,9 @@ namespace Liminal.SDK.XR
 
 		#region Properties
 		#region Publics
-
+		public override int ButtonCount => 0;
+		public override bool IsTouching => false;
+		public override VRInputDeviceHand Hand => VRInputDeviceHand.None;
 		#endregion
 
 		#region Privates
@@ -45,22 +51,14 @@ namespace Liminal.SDK.XR
 		#endregion
 		#endregion
 
-		private static readonly VRInputDeviceCapability _inputCapabilities =
-			VRInputDeviceCapability.None;
-
-		private static readonly VRHeadsetCapability _headsetCapabilities =
-			VRHeadsetCapability.PositionalTracking;
-
-		public override string Name => "UnityXRHeadset -> " + base.Name;
-		public override int ButtonCount => 0;
-		public override bool IsTouching => false;
-		public override VRInputDeviceHand Hand => VRInputDeviceHand.None;
-
+		#region Constructor
 		public UnityXRHeadset(InputDevice inputDevice) : base(inputDevice)
 		{
 			Pointer?.Activate();
 		}
+		#endregion
 
+		#region IVRHeadset
 		protected override IVRPointer CreatePointer()
 		{
 			return new UnityXRGazePointer(this);
@@ -85,6 +83,7 @@ namespace Liminal.SDK.XR
 		public override bool HasAxis2D(string axis) { return false; }
 		public override bool HasButton(string button) { return false; }
 
-		public override void Update() { }
+		public override void Update() { } 
+		#endregion
 	}
 }

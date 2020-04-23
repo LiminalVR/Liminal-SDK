@@ -77,8 +77,12 @@ namespace Liminal.SDK.XR
 		{
 			// setup the headset
 			InputDevice headsetDevice = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.Head);
+
+#if !UNITY_EDITOR
 			if (!headsetDevice.isValid)
 				throw new System.Exception("headsetDevice is not valid");
+#endif
+
 			UnityXRHeadset xrHeadset = new UnityXRHeadset(headsetDevice);
 			XRInputs.Add(xrHeadset);
 			Headset = xrHeadset;
@@ -88,7 +92,7 @@ namespace Liminal.SDK.XR
 			UnityEngine.XR.InputDevices.deviceConnected += InputDevices_deviceConnected;
 			UnityEngine.XR.InputDevices.deviceDisconnected += InputDevices_deviceDisconnected;
 		}
-		#endregion
+#endregion
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
 		/// </summary>
@@ -120,6 +124,8 @@ namespace Liminal.SDK.XR
 			SetupManager(avatar);
 			SetupCameraRig(avatar, rig.transform);
 			SetupControllers(avatar, rig.transform);
+
+			unityAvatar.Initialize();
 		}
 
 		/// <summary>
@@ -231,7 +237,7 @@ namespace Liminal.SDK.XR
 			PrimaryInputDeviceChanged?.Invoke(this);
 		}
 
-		#region Events
+#region Events
 		/// <summary>
 		/// 
 		/// </summary>
@@ -346,6 +352,6 @@ namespace Liminal.SDK.XR
 		{
 			return $"N>{device.name} :: C>{device.characteristics} :: iV>{device.isValid}";
 		}
-		#endregion
+#endregion
 	}
 }

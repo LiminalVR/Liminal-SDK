@@ -37,6 +37,13 @@ namespace Liminal.SDK.Build
             AssetDatabase.Refresh();
         }
 
+        [MenuItem("Liminal/Use Legacy SDK")]
+        public static void UseLegacy()
+        {
+            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithoutXR);
+            AssetDatabase.Refresh();
+        }
+
         private void OnEnable()
         {
             var fileExists = Directory.Exists(BuildWindowConsts.ConfigFolderPath) || File.Exists(BuildWindowConsts.BuildWindowConfigPath);

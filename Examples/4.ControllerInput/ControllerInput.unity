@@ -343,7 +343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildType: 0
-  EditorType: 0
+  EditorType: 2
 --- !u!1 &650509772
 GameObject:
   m_ObjectHideFlags: 0

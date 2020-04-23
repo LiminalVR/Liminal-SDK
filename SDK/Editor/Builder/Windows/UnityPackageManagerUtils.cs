@@ -55,4 +55,38 @@ public static class UnityPackageManagerUtils
             return manifestWithoutLock;
         }
     }
+
+    public static string ManifestWithoutXR
+    {
+        get
+        {
+            var manifestJson = File.ReadAllText(ManifestPath);
+            var toolKit = "\"com.unity.xr.interaction.toolkit\": \"0.9.4-preview\",";
+            var interaction = "\"com.unity.xr.interactionsubsystems\": \"1.0.1\",";
+            var management = "\"com.unity.xr.management\": \"3.2.7\",";
+
+            manifestJson = manifestJson.Replace(toolKit, "");
+            manifestJson = manifestJson.Replace(interaction, "");
+            manifestJson = manifestJson.Replace(management, "");
+
+            return manifestJson;
+        }
+    }
+    public static string ManifestWithXR
+    {
+        get
+        {
+            var manifestJson = File.ReadAllText(ManifestPath);
+
+            var toolKit = "\"com.unity.xr.interaction.toolkit\": \"0.9.4-preview\",";
+            var interaction = "\"com.unity.xr.interactionsubsystems\": \"1.0.1\",";
+            var management = "\"com.unity.xr.management\": \"3.2.7\",";
+
+            manifestJson = manifestJson.Replace(toolKit, "");
+            manifestJson = manifestJson.Replace(interaction, "");
+            manifestJson = manifestJson.Replace(management, "");
+
+            return manifestJson;
+        }
+    }
 }

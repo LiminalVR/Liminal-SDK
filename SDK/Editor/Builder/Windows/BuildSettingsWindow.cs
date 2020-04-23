@@ -45,6 +45,10 @@ namespace Liminal.SDK.Build
 
             PlayerSettings.virtualRealitySupported = true;
             PlayerSettings.SetVirtualRealitySDKs(BuildTargetGroup.Android, new string[] { "Oculus" });
+
+            var currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
+            currentSymbols = currentSymbols.Replace("UNITY_XR", "");
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, $"{currentSymbols}");
         }
 
         [MenuItem("Liminal/Use Unity XR")]
@@ -54,8 +58,9 @@ namespace Liminal.SDK.Build
             
             File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithXR);
             AssetDatabase.Refresh();
+            var currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, $"{currentSymbols};UNITY_XR");
         }
-
 
         private void OnEnable()
         {

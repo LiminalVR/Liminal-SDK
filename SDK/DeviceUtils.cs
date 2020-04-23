@@ -26,8 +26,6 @@ namespace App
 #endif
                 case ESDKType.OVR:
                     XRSettings.enabled = true;
-                    Debug.Log(XRSettings.enabled);
-                    XRSettings.LoadDeviceByName("Oculus");
                     return new GearVRDevice();
 
                 default:

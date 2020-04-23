@@ -113,9 +113,11 @@ namespace Liminal.SDK.XR
 			Assert.IsNotNull(avatar);
 
             var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
-            var rig = CreateXrRig(avatar);
+            unityAvatar.gameObject.SetActive(true);
+
+			var rig = CreateXrRig(avatar);
 			SetupManager(avatar);
-			SetupCameraRig(avatar, rig);
+            SetupCameraRig(avatar, rig);
             SetupControllers(avatar, rig);
 
             unityAvatar.Initialize();

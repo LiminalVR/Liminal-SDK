@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Liminal.SDK.Build
 {
-    [CustomPropertyDrawer(typeof(LiminalConfig))]
     public class LiminalConfigPropertyDrawer : PropertyDrawer
     {
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -19,7 +18,7 @@ namespace Liminal.SDK.Build
         }
     }
 
-    [CustomPropertyDrawer(typeof(ProjectSettings))]
+    [CustomPropertyDrawer(typeof(LiminalConfig))]
     public class ProjectSettingsPropertyDrawer : PropertyDrawer
     {
         private Rect _current;
@@ -29,7 +28,7 @@ namespace Liminal.SDK.Build
         
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            var overrideProp = property.FindPropertyRelative("Override");
+            var overrideProp = property.FindPropertyRelative("OverrideProfile");
             var size = overrideProp.boolValue ? 3 : 2;
             if (property.isExpanded)
                 return _singleLine * size;
@@ -51,8 +50,8 @@ namespace Liminal.SDK.Build
             {
                 EditorGUI.indentLevel++;
 
-                var overrideProp = property.FindPropertyRelative("Override");
-                var profileProp = property.FindPropertyRelative("Profile");
+                var overrideProp = property.FindPropertyRelative("OverrideProfile");
+                var profileProp = property.FindPropertyRelative("ProfileToApply");
 
                 EditorGUI.PropertyField(NextRow(width: position.width * 0.9f), overrideProp);
 

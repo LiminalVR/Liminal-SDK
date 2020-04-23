@@ -73,6 +73,7 @@ namespace Liminal.SDK.XR
 		#region Constructors
 		public UnityXRDevice()
 		{
+//<<<<<<< HEAD
 			// setup the headset
 			InputDevice headsetDevice = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.Head);
 
@@ -89,6 +90,13 @@ namespace Liminal.SDK.XR
 			UnityEngine.XR.InputDevices.deviceConfigChanged += InputDevices_deviceConfigChanged;
 			UnityEngine.XR.InputDevices.deviceConnected += InputDevices_deviceConnected;
 			UnityEngine.XR.InputDevices.deviceDisconnected += InputDevices_deviceDisconnected;
+//=======
+//			Headset = new UnityXRHeadset();
+//			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right);
+//			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
+
+//			UpdateConnectedControllers();
+//>>>>>>> develop
 		}
 		#endregion
 		/// <summary>
@@ -113,19 +121,26 @@ namespace Liminal.SDK.XR
 		{
 			Assert.IsNotNull(avatar);
 
-			var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
-			var rig = new GameObject("Rig");
-			rig.transform.SetParent(avatar.Transform);
-			rig.transform.position = avatar.Head.Transform.position;
+            var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+            unityAvatar.gameObject.SetActive(true);
 
-			unityAvatar.gameObject.SetActive(true);
-
+			var rig = CreateXrRig(avatar);
 			SetupManager(avatar);
-			SetupCameraRig(avatar, rig.transform);
-			SetupControllers(avatar, rig.transform);
+            SetupCameraRig(avatar, rig);
+            SetupControllers(avatar, rig);
 
-			unityAvatar.Initialize();
+            unityAvatar.Initialize();
 		}
+
+        private Transform CreateXrRig(IVRAvatar avatar)
+        {
+            var rig = new GameObject("Rig");
+            rig.transform.SetParent(avatar.Transform);
+            rig.transform.position = avatar.Head.Transform.position;
+            rig.transform.rotation = avatar.Head.Transform.rotation;
+
+            return rig.transform;
+        }
 
 		/// <summary>
 		/// Setup the Manager
@@ -191,8 +206,8 @@ namespace Liminal.SDK.XR
 				XRInputs.Add(_leftController);
 			}
 
-		   // need to go in 
-		   var primaryHandPrefab = Resources.Load("RightHand Controller");
+			// need to go in 
+			var primaryHandPrefab = Resources.Load("RightHand Controller");
 			var primaryHand = Object.Instantiate(primaryHandPrefab, rig) as GameObject;
 			var secondaryHandPrefab = Resources.Load("LeftHand Controller");
 			var secondaryHand = Object.Instantiate(secondaryHandPrefab, rig) as GameObject;
@@ -213,6 +228,7 @@ namespace Liminal.SDK.XR
 		{
 			hand.Transform.SetParent(xrHand);
 			hand.Transform.localPosition = Vector3.zero;
+			hand.Transform.localRotation = Quaternion.identity;
 		}
 
 		/// <summary>

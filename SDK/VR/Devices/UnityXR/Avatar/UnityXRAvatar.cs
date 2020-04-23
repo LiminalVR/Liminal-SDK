@@ -172,7 +172,7 @@ namespace Liminal.SDK.XR
 		}
 
 		private void AttachControllerVisual(VRAvatarController avatarController)
-		{
+        {
 			var limb = avatarController.GetComponentInParent<IVRAvatarLimb>();
 
 			var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);

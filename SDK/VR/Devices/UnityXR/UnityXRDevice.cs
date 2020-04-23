@@ -93,11 +93,11 @@ namespace Liminal.SDK.XR
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
 		/// </summary>
-		public void Update()
+		public void Update ()
 		{
 			// check if the controller state has changed
 			if (mControllerMask != GetControllerMask())
-				UpdateConnectedControllers();
+			UpdateConnectedControllers();
 
 			foreach (var input in XRInputs)
 				input.Update();
@@ -117,6 +117,7 @@ namespace Liminal.SDK.XR
             rig.transform.SetParent(avatar.Transform);
             rig.transform.position = avatar.Head.Transform.position;
 
+			unityAvatar.gameObject.SetActive(true);
 			SetupManager(avatar);
 			SetupCameraRig(avatar, rig.transform);
             SetupControllers(avatar, rig.transform);
@@ -132,8 +133,8 @@ namespace Liminal.SDK.XR
             var primaryHand = Object.Instantiate(primaryHandPrefab, rig) as GameObject;
             var secondaryHandPrefab = Resources.Load("LeftHand Controller");
             var secondaryHand = Object.Instantiate(secondaryHandPrefab, rig) as GameObject;
-            SetupControllerPointer(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
-            SetupControllerPointer(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
+            SetupControllers(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
+            SetupControllers(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
             avatar.Head.Transform.localPosition = Vector3.zero;
 
             SetDefaultPointerActivation();
@@ -142,10 +143,10 @@ namespace Liminal.SDK.XR
         private void SetupManager(IVRAvatar avatar)
         {
             var interactionManager = GameObject.FindObjectOfType<XRInteractionManager>();
-            if (interactionManager == null)
+            if (interactionManager != null)
                 return;
 
-            var manager = new GameObject().AddComponent<XRInteractionManager>();
+            var manager = new GameObject("XRInteractionManager").AddComponent<XRInteractionManager>();
 			GameObject.DontDestroyOnLoad(manager.gameObject);
         }
 
@@ -164,25 +165,11 @@ namespace Liminal.SDK.XR
             avatar.Head.Transform.localPosition = Vector3.zero;
         }
 
-		public void SetupControllerPointer(IVRInputDevice inputDevice, IVRAvatarHand hand, Transform xrHand)
+		public void SetupControllers(IVRInputDevice inputDevice, IVRAvatarHand hand, Transform xrHand)
 		{
 			hand.Transform.SetParent(xrHand);
-			var pointer = xrHand.GetComponentInChildren<LaserPointerVisual>(includeInactive: true);
-			var controllerVisual = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive: true);
-			if (pointer != null)
-			{
-				if (controllerVisual != null)
-				{
-					pointer.Bind(inputDevice.Pointer);
-					inputDevice.Pointer.Transform = pointer.transform;
-					pointer.transform.SetParent(controllerVisual.transform);
-				}
-				else
-				{
-					Object.Destroy(pointer.gameObject);
-				}
-			}
-		}
+			hand.Transform.localPosition = Vector3.zero;
+        }
 
 		private void SetDefaultPointerActivation()
 		{

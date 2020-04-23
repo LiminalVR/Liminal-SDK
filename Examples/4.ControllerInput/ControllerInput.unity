@@ -311,14 +311,9 @@ MonoBehaviour:
     m_Color: {r: 0, g: 0, b: 0, a: 1}
     m_Duration: 2
   LimappConfig:
-    SDK:
-      Android: 1
-      Standalone: 1
-    Project:
-      Override: 0
-      Profile: {fileID: 0}
     SavedProfile: {fileID: 0}
     ProfileToApply: {fileID: 0}
+    OverrideProfile: 0
 --- !u!4 &531037339
 Transform:
   m_ObjectHideFlags: 0

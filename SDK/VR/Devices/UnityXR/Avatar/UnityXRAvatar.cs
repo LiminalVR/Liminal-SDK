@@ -64,6 +64,13 @@ namespace Liminal.SDK.XR
 
 		protected void Awake()
 		{
+			List<InputDevice> allDevices = new List<InputDevice>();
+			InputDevices.GetDevices(allDevices);
+			foreach (InputDevice device in allDevices)
+			{
+				Debug.Log($"[DEVICES]\n\tdevice.name == {device.name}\n\tdevice.characteristics == {device.characteristics}\n\tdevice.manufacturer == {device.manufacturer}");
+			}
+
 			mAvatar = GetComponentInParent<IVRAvatar>();
 			mAvatar.InitializeExtensions();
 

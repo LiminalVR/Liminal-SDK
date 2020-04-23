@@ -83,6 +83,36 @@ namespace Liminal.SDK.XR
 			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
 
 			UpdateConnectedControllers();
+
+			XRDevice.deviceLoaded += XRDevice_deviceLoaded;
+			UnityEngine.XR.InputDevices.deviceConfigChanged += InputDevices_deviceConfigChanged;
+			UnityEngine.XR.InputDevices.deviceConnected += InputDevices_deviceConnected;
+			UnityEngine.XR.InputDevices.deviceDisconnected += InputDevices_deviceDisconnected;
+		}
+
+		private void InputDevices_deviceDisconnected(InputDevice obj)
+		{
+			Debug.Log($"[{GetType().Name}] InputDevices_deviceDisconnected({nameof(obj)}:{InputDeviceToString(obj)})");
+		}
+
+		private void InputDevices_deviceConnected(InputDevice obj)
+		{
+			Debug.Log($"[{GetType().Name}] InputDevices_deviceConnected({nameof(obj)}:{InputDeviceToString(obj)})");
+		}
+
+		private void InputDevices_deviceConfigChanged(InputDevice obj)
+		{
+			Debug.Log($"[{GetType().Name}] InputDevices_deviceConfigChanged({nameof(obj)}:{InputDeviceToString(obj)})");
+		}
+
+		private void XRDevice_deviceLoaded(string loadedDevice)
+		{
+			Debug.Log($"[{GetType().Name}] XRDevice_deviceLoaded({nameof(loadedDevice)}:{loadedDevice})");
+		}
+
+		private string InputDeviceToString(InputDevice device)
+		{
+			return device.ToString();
 		}
 		#endregion
 

@@ -8,10 +8,5 @@
         "sdk",
         "unity"
     ],
-	"dependencies":
-	  {
-    "com.unity.xr.interaction.toolkit": "0.9.4-preview",
-    "com.unity.xr.management": "3.2.7"
-	  },
     "category": "Unity"
 }

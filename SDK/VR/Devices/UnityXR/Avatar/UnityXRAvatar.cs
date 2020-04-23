@@ -1,17 +1,13 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_XR
+using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Avatars.Controllers;
 using Liminal.SDK.VR.Input;
-using Liminal.SDK.VR.Pointers;
 using UnityEngine;
-using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
-using UnityEngine.XR.Interaction.Toolkit;
 using System;
-using Object = UnityEngine.Object;
 using System.Linq;
-using Liminal.SDK.VR.Devices.GearVR.Avatar;
 using Liminal.SDK.Extensions;
 using Liminal.SDK.VR.Avatars.Extensions;
 
@@ -372,3 +368,4 @@ namespace Liminal.SDK.XR
 		#endregion
 	}
 }
+#endif

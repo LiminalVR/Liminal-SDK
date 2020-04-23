@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
+﻿#if UNITY_XR
+using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
-using Liminal.SDK.VR.Pointers;
 using UnityEngine;
 using UnityEngine.SpatialTracking;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using Object = UnityEngine.Object;
 using UnityEngine.Assertions;
-using Liminal.SDK.Extensions;
 
 namespace Liminal.SDK.XR
 {
@@ -58,7 +57,7 @@ namespace Liminal.SDK.XR
 
 		public int CpuLevel { get; set; }
 		public int GpuLevel { get; set; }
-		#endregion
+#endregion
 
 		#region Privates
 		#endregion
@@ -68,12 +67,11 @@ namespace Liminal.SDK.XR
 		public event VRInputDeviceEventHandler InputDeviceConnected;
 		public event VRInputDeviceEventHandler InputDeviceDisconnected;
 		public event VRDeviceEventHandler PrimaryInputDeviceChanged;
-		#endregion
+#endregion
 
-		#region Constructors
+#region Constructors
 		public UnityXRDevice()
 		{
-//<<<<<<< HEAD
 			// setup the headset
 			InputDevice headsetDevice = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.Head);
 
@@ -90,13 +88,6 @@ namespace Liminal.SDK.XR
 			UnityEngine.XR.InputDevices.deviceConfigChanged += InputDevices_deviceConfigChanged;
 			UnityEngine.XR.InputDevices.deviceConnected += InputDevices_deviceConnected;
 			UnityEngine.XR.InputDevices.deviceDisconnected += InputDevices_deviceDisconnected;
-//=======
-//			Headset = new UnityXRHeadset();
-//			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right);
-//			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
-
-//			UpdateConnectedControllers();
-//>>>>>>> develop
 		}
 		#endregion
 		/// <summary>
@@ -268,7 +259,6 @@ namespace Liminal.SDK.XR
 			{
 				// headset was connected, so create a new one
 				UnityXRHeadset headset = new UnityXRHeadset(obj);
-
 				Headset = headset;
 				inputDevice = headset;
 			}
@@ -358,3 +348,4 @@ namespace Liminal.SDK.XR
 		#endregion
 	}
 }
+#endif

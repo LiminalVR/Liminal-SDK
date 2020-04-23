@@ -19,6 +19,34 @@ namespace Liminal.SDK.XR
 {
 	public class UnityXRAvatar : MonoBehaviour, IVRDeviceAvatar
 	{
+		#region Constants
+
+		#endregion
+
+		#region Statics
+
+		#endregion
+
+		#region Fields
+		#region Publics
+
+		#endregion
+
+		#region Privates
+
+		#endregion
+		#endregion
+
+		#region Properties
+		#region Publics
+
+		#endregion
+
+		#region Privates
+
+		#endregion
+		#endregion
+
 		#region Variables
 		public static EPointerActivationType PointerActivationType = EPointerActivationType.Both;
 

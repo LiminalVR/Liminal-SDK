@@ -27,6 +27,34 @@ namespace Liminal.SDK.XR
 	/// </summary>
 	public class UnityXRDevice : IVRDevice
 	{
+		#region Constants
+
+		#endregion
+
+		#region Statics
+
+		#endregion
+
+		#region Fields
+		#region Publics
+
+		#endregion
+
+		#region Privates
+
+		#endregion
+		#endregion
+
+		#region Properties
+		#region Publics
+
+		#endregion
+
+		#region Privates
+
+		#endregion
+		#endregion
+
 		private static readonly VRDeviceCapability _capabilities = 
 			VRDeviceCapability.Controller |
 			// Is this VRDeviceCapability needed? Will having it in break things? ... only time will tell

@@ -42,7 +42,20 @@ namespace Liminal.SDK.Build
         {
             File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithoutXR);
             AssetDatabase.Refresh();
+
+            PlayerSettings.virtualRealitySupported = true;
+            PlayerSettings.SetVirtualRealitySDKs(BuildTargetGroup.Android, new string[] { "Oculus" });
         }
+
+        [MenuItem("Liminal/Use Unity XR")]
+        public static void UseUnityXR()
+        {
+            PlayerSettings.virtualRealitySupported = false;
+            
+            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithXR);
+            AssetDatabase.Refresh();
+        }
+
 
         private void OnEnable()
         {

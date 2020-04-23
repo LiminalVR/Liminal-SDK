@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Liminal.SDK.Extensions;
 using UnityEngine;
 
@@ -64,10 +65,11 @@ public static class UnityPackageManagerUtils
             var toolKit = "\"com.unity.xr.interaction.toolkit\": \"0.9.4-preview\",";
             var interaction = "\"com.unity.xr.interactionsubsystems\": \"1.0.1\",";
             var management = "\"com.unity.xr.management\": \"3.2.7\",";
-
+            var oculus = "\"com.unity.xr.oculus\": \"1.3.3\",";
             manifestJson = manifestJson.Replace(toolKit, "");
             manifestJson = manifestJson.Replace(interaction, "");
             manifestJson = manifestJson.Replace(management, "");
+            manifestJson = manifestJson.Replace(oculus, "");
 
             return manifestJson;
         }
@@ -78,13 +80,29 @@ public static class UnityPackageManagerUtils
         {
             var manifestJson = File.ReadAllText(ManifestPath);
 
-            var toolKit = "\"com.unity.xr.interaction.toolkit\": \"0.9.4-preview\",";
-            var interaction = "\"com.unity.xr.interactionsubsystems\": \"1.0.1\",";
-            var management = "\"com.unity.xr.management\": \"3.2.7\",";
+            var oldOculus = "\"com.unity.xr.oculus.android\": \"1.36.0\",";
+            manifestJson.Replace(oldOculus, "");
 
-            manifestJson = manifestJson.Replace(toolKit, "");
-            manifestJson = manifestJson.Replace(interaction, "");
-            manifestJson = manifestJson.Replace(management, "");
+            //manifestJson = manifestJson.Replace( "\"com.unity.xr.oculus.android\": \"1.36.0\",", oculus);
+            var oculus = "\r\n\"com.unity.xr.oculus\": \"1.3.3\",";
+            var toolKit = "\r\n\"com.unity.xr.interaction.toolkit\": \"0.9.4-preview\",";
+            var subsystems = "\r\n\"com.unity.xr.interactionsubsystems\": \"1.0.1\",";
+            var management = "\r\n\"com.unity.xr.management\": \"3.2.7\",";
+
+            var builder = new StringBuilder();
+
+            if (!manifestJson.Contains("com.unity.xr.oculus\": \"1.3.3\","))
+                builder.Append(oculus);
+            if (!manifestJson.Contains("com.unity.xr.interaction.toolkit"))
+                builder.Append(toolKit);
+            if (!manifestJson.Contains("com.unity.xr.interactionsubsystems"))
+                builder.Append(subsystems);
+            if (!manifestJson.Contains("com.unity.xr.management"))
+                builder.Append(management);
+
+            var targetText = "\"dependencies\": {";
+            manifestJson = manifestJson.Replace(targetText,
+                $"{targetText}{builder}");
 
             return manifestJson;
         }

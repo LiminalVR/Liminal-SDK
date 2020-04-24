@@ -123,16 +123,30 @@ namespace Liminal.SDK.XR
 		{
 			base.Awake();
 
-			// TODO: Fix this section. I think this is why it's not working properly.
 			// disable all children
 			foreach (Transform child in transform)
 			{
 				child.gameObject.SetActive(false);
 			}
 
+			//_modelGearVrController?.SetActive(false);
+			//_modelOculusGoController?.SetActive(false);
+			//_modelOculusTouchQuestAndRiftSLeftController?.SetActive(false);
+			//_modelOculusTouchQuestAndRiftSRightController?.SetActive(false);
+			//_modelOculusTouchRiftLeftController?.SetActive(false);
+			//_modelOculusTouchRiftRightController?.SetActive(false);
+
 			PointerVisual.transform.gameObject.SetActive(true);
 			PointerVisual.SetActive(true);
 		}
+
+		//private void Update()
+		//{
+		//	Debug.Log($"I am here! I am alive!!!");
+
+		//	LaserPointerVisual laserPointer = (PointerVisual as LaserPointerVisual);
+		//	laserPointer.SetActive(true);
+		//}
 		#endregion
 	}
 }

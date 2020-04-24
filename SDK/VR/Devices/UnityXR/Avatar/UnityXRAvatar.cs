@@ -4,10 +4,12 @@ using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Avatars.Controllers;
 using Liminal.SDK.VR.Input;
+using Liminal.SDK.VR.Pointers;
 using UnityEngine;
 using UnityEngine.XR;
 using System;
 using System.Linq;
+using Liminal.SDK;
 using Liminal.SDK.Extensions;
 using Liminal.SDK.VR.Avatars.Extensions;
 
@@ -93,7 +95,7 @@ namespace Liminal.SDK.XR
 
 		private void Update()
 		{
-			RecenterHmdIfRequired();
+			//RecenterHmdIfRequired();
 			DetectAndUpdateControllerStates();
 
 			//if (OVRUtils.IsOculusQuest)
@@ -184,10 +186,11 @@ namespace Liminal.SDK.XR
 			avatarController.ControllerVisual = instance;
 
 			var xrControllerVisual = instance.GetComponent<UnityXRControllerVisual>();
+			InputDevice inputDevice = default;
 			// assign the name based on the limb
 			if (limb.LimbType.TryLimbToNode(out XRNode node))
 			{
-				InputDevice inputDevice = InputDevices.GetDeviceAtXRNode(node);
+				inputDevice = InputDevices.GetDeviceAtXRNode(node);
 
 				if (inputDevice.isValid)
 				{
@@ -196,6 +199,14 @@ namespace Liminal.SDK.XR
 
 				// if this fails, some kind of error?
 			}
+
+			UnityXRDevice xrDevice = Device as UnityXRDevice;
+			IVRInputDevice vrInputDevice = xrDevice.XRInputs.Where(xr => xr.InputDevice == inputDevice).FirstOrDefault();
+
+			var pointerVisual = avatarController.GetComponentInChildren<LaserPointerVisual>(includeInactive:true);
+			pointerVisual?.Bind(vrInputDevice.Pointer);
+			if (pointerVisual != null)
+				vrInputDevice.Pointer.Transform = pointerVisual.transform;
 
 			_remotes.Add(xrControllerVisual);
 

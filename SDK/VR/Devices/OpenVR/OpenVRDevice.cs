@@ -1,7 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
+using UnityEngine;
+using Valve.VR;
 
 namespace Liminal.SDK.OpenVR
 {
@@ -31,13 +35,54 @@ namespace Liminal.SDK.OpenVR
         {
             PrimaryInputDevice = new OpenVRController(VRInputDeviceHand.Right);
             SecondaryInputDevice = new OpenVRController(VRInputDeviceHand.Left);
+
+            InputDevices = new List<IVRInputDevice>
+            {
+                PrimaryInputDevice,
+                SecondaryInputDevice
+            };
         }
 
         public bool HasCapabilities(VRDeviceCapability capabilities) => ((_capabilities & capabilities) == capabilities);
 
         public void SetupAvatar(IVRAvatar avatar)
         {
+            var openVRAvatar = avatar.Transform.gameObject.AddComponent<OpenVRAvatar>();
+            var rigPrefab = Resources.Load("SteamVRRig");
+            var rig = GameObject.Instantiate(rigPrefab) as GameObject;
+            rig.transform.SetParent(avatar.Auxiliaries);
 
+            var leftHand = rig.GetComponentsInChildren<SteamVR_Behaviour_Pose>().FirstOrDefault(x => x.inputSource == SteamVR_Input_Sources.LeftHand);
+            var rightHand = rig.GetComponentsInChildren<SteamVR_Behaviour_Pose>().FirstOrDefault(x => x.inputSource == SteamVR_Input_Sources.RightHand);
+
+            avatar.PrimaryHand.TrackedObject = new OpenVRTrackedControllerProxy(rightHand);
+            avatar.SecondaryHand.TrackedObject = new OpenVRTrackedControllerProxy(leftHand);
+
+            var leftModel = leftHand.GetComponentInChildren<SteamVR_RenderModel>();
+            var rightModel = rightHand.GetComponentInChildren<SteamVR_RenderModel>();
+
+            openVRAvatar.gameObject.SetActive(true);
+            
+            openVRAvatar.StartCoroutine(MigrateModel(leftModel, avatar.SecondaryHand));
+            openVRAvatar.StartCoroutine(MigrateModel(rightModel, avatar.PrimaryHand));
+        }
+
+        private IEnumerator MigrateModel(SteamVR_RenderModel model, IVRAvatarHand hand)
+        {
+            var controllerVisual = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive: true);
+            yield return new WaitUntil(() => model.transform.childCount != 0);
+
+            if (controllerVisual == null)
+            {
+                model.SetMeshRendererState(false);
+                yield break;
+            }
+
+            model.transform.SetParent(controllerVisual.transform);
+            model.transform.localPosition = Vector3.zero;
+            model.transform.localRotation = Quaternion.identity;
+
+            model.updateDynamically = false;
         }
 
         public void Update()

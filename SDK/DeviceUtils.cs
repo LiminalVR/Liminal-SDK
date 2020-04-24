@@ -1,4 +1,5 @@
 ﻿using Liminal.SDK.Core;
+using Liminal.SDK.OpenVR;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Devices.Emulator;
 using Liminal.SDK.VR.Devices.GearVR;
@@ -16,7 +17,7 @@ namespace App
 #if UNITY_XR
             return CreateDevice(ESDKType.UnityXR);
 #else
-            return CreateDevice(ESDKType.OVR);
+            return CreateDevice(Application.platform == RuntimePlatform.Android ? ESDKType.OVR : ESDKType.OpenVR);
 #endif
         }
 
@@ -32,6 +33,9 @@ namespace App
                 case ESDKType.OVR:
                     XRSettings.enabled = true;
                     return new GearVRDevice();
+
+                case ESDKType.OpenVR:
+                    return new OpenVRDevice();
 
                 default:
                     return new EmulatorDevice(VREmulatorDevice.Daydream);

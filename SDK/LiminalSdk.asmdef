@@ -2,6 +2,7 @@
     "name": "LiminalSdk",
     "references": [
         "Oculus.VR",
+        "SteamVR",
         "Unity.XR.Interaction.Toolkit",
         "UnityEngine.SpatialTracking"
     ],

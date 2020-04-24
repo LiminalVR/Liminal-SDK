@@ -94,6 +94,11 @@ namespace Liminal.SDK.XR
 			// this needs to be called each frame so that the input values are properly updated
 			VRDevice.Device.Update();
 		}
+
+		private void LateUpdate()
+		{
+			(Device as UnityXRDevice)?.LateUpdate();
+		}
 		#endregion
 
 		public void Initialize()

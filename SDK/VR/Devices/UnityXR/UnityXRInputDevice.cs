@@ -83,6 +83,7 @@ namespace Liminal.SDK.XR
         public abstract bool HasCapabilities(VRInputDeviceCapability capability);
 
         public abstract void Update(); 
+        public abstract void LateUpdate();
         #endregion
     }
 }

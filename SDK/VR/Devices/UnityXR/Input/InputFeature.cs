@@ -16,13 +16,20 @@ namespace Liminal.SDK.XR
 
 	public abstract class InputFeature
 	{
+		#region Fields
+		#endregion
+
+		#region Properties
 		protected InputDevice? Device { get; private set; }
 		public EPressState PressState { get; protected set; }
 		public abstract string Name { get; }
+		public bool IsUpdated { get; private set; } 
+		#endregion
 
 		public InputFeature()
 		{
 			PressState = EPressState.None;
+			MarkUpdated();
 		}
 
 		public void AssignDevice(InputDevice aDevice)
@@ -32,7 +39,13 @@ namespace Liminal.SDK.XR
 			Device = aDevice;
 		}
 
-		public abstract void UpdateState();
+		public virtual void UpdateState()
+		{
+			MarkUpdated();
+		}
+
+		public void MarkUpdated() { IsUpdated = true; }
+		public void Clean() { IsUpdated = false; }
 	}
 
 	public abstract class InputFeature<T> : InputFeature where T : IEquatable<T>
@@ -72,6 +85,8 @@ namespace Liminal.SDK.XR
 
 		public override void UpdateState()
 		{
+			base.UpdateState();
+
 			if (!Device.HasValue) return;
 
 			if (!Device.Value.TryGetFeatureValue(BaseFeature, out bool isPressed))
@@ -138,6 +153,8 @@ namespace Liminal.SDK.XR
 
 		public override void UpdateState()
 		{
+			base.UpdateState();
+
 			if (!Device.HasValue) return;
 
 			if (!Device.Value.TryGetFeatureValue(BaseFeature, out float rawActuated))
@@ -207,6 +224,8 @@ namespace Liminal.SDK.XR
 
 		public override void UpdateState()
 		{
+			base.UpdateState();
+
 			if (!Device.HasValue) return;
 
 			if (!Device.Value.TryGetFeatureValue(BaseFeature, out Vector2 rawActuated))

@@ -116,6 +116,12 @@ namespace Liminal.SDK.XR
 				input.Update();
 		}
 
+		public void LateUpdate()
+		{
+			foreach (var input in XRInputs)
+				input.LateUpdate();
+		}
+
 		public bool HasCapabilities(VRDeviceCapability capabilities)
 		{
 			return (_capabilities & capabilities) == capabilities;

@@ -9,19 +9,24 @@ namespace Liminal.SDK.OpenVR
 {
     public class OpenVRController : IVRInputDevice
     {
-        public string Name => "OpenVR Controller";
-        public IVRPointer Pointer { get; }
-
         private static readonly VRInputDeviceCapability _capabilities = VRInputDeviceCapability.DirectionalInput | VRInputDeviceCapability.Touch | VRInputDeviceCapability.TriggerButton;
 
+        public string Name => "OpenVR Controller";
         public int ButtonCount => 5;
+        
         public VRInputDeviceHand Hand { get; }
+        public IVRPointer Pointer { get; }
 
         public bool IsTouching => SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "JoystickNearPress")[SteamHand].state;
 
         public SteamVR_Input_Sources SteamHand => Hand == VRInputDeviceHand.Right ? SteamVR_Input_Sources.RightHand : SteamVR_Input_Sources.LeftHand;
 
-        public Dictionary<string, SteamVR_Action_Boolean_Source> _buttonInputMap => new Dictionary<string, SteamVR_Action_Boolean_Source>()
+
+        public Dictionary<string, SteamVR_Action_Boolean_Source> _buttonInputMap;
+        public Dictionary<string, SteamVR_Action_Vector2_Source> _axis2DMap;
+        public Dictionary<string, SteamVR_Action_Single_Source> _axis1DMap;
+
+        public Dictionary<string, SteamVR_Action_Boolean_Source> GenerateButtonInputMap() => new Dictionary<string, SteamVR_Action_Boolean_Source>()
         {
             {VRButton.Trigger, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
             {VRButton.One, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
@@ -30,13 +35,13 @@ namespace Liminal.SDK.OpenVR
             {VRButton.Back, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "Back")[SteamHand]},
         };
 
-        public Dictionary<string, SteamVR_Action_Vector2_Source> _axis2DMap => new Dictionary<string, SteamVR_Action_Vector2_Source>()
+        public Dictionary<string, SteamVR_Action_Vector2_Source> GenerateAxis2DInputMap() => new Dictionary<string, SteamVR_Action_Vector2_Source>()
         {
             {VRAxis.One, SteamVR_Input.GetAction<SteamVR_Action_Vector2>("default", "Joystick")[SteamHand]},
             {VRAxis.OneRaw, SteamVR_Input.GetAction<SteamVR_Action_Vector2>("default", "Joystick")[SteamHand]},
         };
 
-        public Dictionary<string, SteamVR_Action_Single_Source> _axis1DMap => new Dictionary<string, SteamVR_Action_Single_Source>()
+        public Dictionary<string, SteamVR_Action_Single_Source> GenerateAxis1DInputMap() => new Dictionary<string, SteamVR_Action_Single_Source>()
         {
             {VRAxis.Two, SteamVR_Input.GetAction<SteamVR_Action_Single>("default", "Trigger")[SteamHand]},
             {VRAxis.TwoRaw, SteamVR_Input.GetAction<SteamVR_Action_Single>("default", "Trigger")[SteamHand]},
@@ -49,6 +54,10 @@ namespace Liminal.SDK.OpenVR
             Pointer = new InputDevicePointer(this);
             Pointer.Activate();
             Hand = hand;
+
+            _buttonInputMap = GenerateButtonInputMap();
+            _axis1DMap = GenerateAxis1DInputMap();
+            _axis2DMap = GenerateAxis2DInputMap();
         }
 
         public bool HasCapabilities(VRInputDeviceCapability capabilities) => ((_capabilities & capabilities) == capabilities);

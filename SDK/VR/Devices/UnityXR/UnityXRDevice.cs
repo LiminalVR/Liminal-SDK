@@ -85,9 +85,7 @@ namespace Liminal.SDK.XR
 				throw new System.Exception("headsetDevice is not valid");
 #endif
 
-			UnityXRHeadset xrHeadset = new UnityXRHeadset(headsetDevice);
-			XRInputs.Add(xrHeadset);
-			Headset = xrHeadset;
+			Headset = CreateGenericHeadset();
 
 			// event for device loading
 			XRDevice.deviceLoaded += XRDevice_deviceLoaded;
@@ -103,6 +101,12 @@ namespace Liminal.SDK.XR
 			_inputSubsystem.trackingOriginUpdated += InputSubsystem_trackingOriginUpdated;
 		}
 		#endregion
+
+		private static IVRHeadset CreateGenericHeadset()
+		{
+			return new SimpleHeadset("GenericHeadset", VRHeadsetCapability.None);
+		}
+
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
 		/// </summary>
@@ -267,12 +271,9 @@ namespace Liminal.SDK.XR
 			bool isHeadset = (obj.characteristics & InputDeviceCharacteristics.HeadMounted) != 0;
 			bool isHeldInHand = (obj.characteristics & InputDeviceCharacteristics.HeldInHand) != 0;
 
-			if (isHeadset)
+			if (isHeadset && Headset == null)
 			{
-				// headset was connected, so create a new one
-				UnityXRHeadset headset = new UnityXRHeadset(obj);
-				Headset = headset;
-				inputDevice = headset;
+				Headset = CreateGenericHeadset();
 			}
 			else if (isHeldInHand)
 			{
@@ -313,9 +314,6 @@ namespace Liminal.SDK.XR
 
 			if (isHeadset)
 			{
-				UnityXRHeadset xrHeadset = Headset as UnityXRHeadset;
-				inputDevice = xrHeadset;
-				XRInputs.Remove(xrHeadset);
 				Headset = null;
 			}
 			else if (isHeldInHand)

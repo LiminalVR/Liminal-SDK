@@ -17,7 +17,7 @@ namespace Liminal.SDK.OpenVR
         public int ButtonCount => 5;
         public VRInputDeviceHand Hand { get; }
 
-        public bool IsTouching { get; }
+        public bool IsTouching => SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "JoystickNearPress")[SteamHand].state;
 
         public SteamVR_Input_Sources SteamHand => Hand == VRInputDeviceHand.Right ? SteamVR_Input_Sources.RightHand : SteamVR_Input_Sources.LeftHand;
 
@@ -26,10 +26,24 @@ namespace Liminal.SDK.OpenVR
             {VRButton.Trigger, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
             {VRButton.One, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
             {VRButton.Two, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "Secondary")[SteamHand]},
-            {VRButton.Touch, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "Touch")[SteamHand]},
-            {VRButton.Back, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
+            {VRButton.Touch, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "JoystickPress")[SteamHand]},
+            {VRButton.Back, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "Back")[SteamHand]},
         };
-        
+
+        public Dictionary<string, SteamVR_Action_Vector2_Source> _axis2DMap => new Dictionary<string, SteamVR_Action_Vector2_Source>()
+        {
+            {VRAxis.One, SteamVR_Input.GetAction<SteamVR_Action_Vector2>("default", "Joystick")[SteamHand]},
+            {VRAxis.OneRaw, SteamVR_Input.GetAction<SteamVR_Action_Vector2>("default", "Joystick")[SteamHand]},
+        };
+
+        public Dictionary<string, SteamVR_Action_Single_Source> _axis1DMap => new Dictionary<string, SteamVR_Action_Single_Source>()
+        {
+            {VRAxis.Two, SteamVR_Input.GetAction<SteamVR_Action_Single>("default", "Trigger")[SteamHand]},
+            {VRAxis.TwoRaw, SteamVR_Input.GetAction<SteamVR_Action_Single>("default", "Trigger")[SteamHand]},
+            {VRAxis.Three, SteamVR_Input.GetAction<SteamVR_Action_Single>("default", "Squeeze")[SteamHand]},
+            {VRAxis.ThreeRaw, SteamVR_Input.GetAction<SteamVR_Action_Single>("default", "Squeeze")[SteamHand]},
+        };
+
         public OpenVRController(VRInputDeviceHand hand)
         {
             Pointer = new InputDevicePointer(this);
@@ -41,27 +55,33 @@ namespace Liminal.SDK.OpenVR
 
         public bool HasAxis1D(string axis)
         {
-            throw new System.NotImplementedException();
+            _axis1DMap.TryGetValue(axis, out var result);
+            return result != null;
         }
 
         public bool HasAxis2D(string axis)
         {
-            throw new System.NotImplementedException();
+            _axis2DMap.TryGetValue(axis, out var result);
+            return result != null;
         }
 
         public bool HasButton(string button)
         {
-            throw new System.NotImplementedException();
+            // TODO This is probably wrong or going to throw an error
+            _buttonInputMap.TryGetValue(button, out var result);
+            return result != null;
         }
 
         public float GetAxis1D(string axis)
         {
-            throw new System.NotImplementedException();
+            _axis1DMap.TryGetValue(axis, out var result);
+            return result?.axis ?? 0;
         }
 
         public Vector2 GetAxis2D(string axis)
         {
-            throw new System.NotImplementedException();
+            _axis2DMap.TryGetValue(axis, out var result);
+            return result?.axis ?? Vector2.zero;
         }
 
         public bool GetButton(string button)

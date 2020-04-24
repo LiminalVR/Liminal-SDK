@@ -121,6 +121,46 @@ namespace Valve.VR
             }
         }
         
+        public virtual SteamVR_Action_Single Trigger
+        {
+            get
+            {
+                return SteamVR_Actions.default_Trigger;
+            }
+        }
+        
+        public virtual SteamVR_Action_Vector2 Joystick
+        {
+            get
+            {
+                return SteamVR_Actions.default_Joystick;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean Back
+        {
+            get
+            {
+                return SteamVR_Actions.default_Back;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean JoystickNearPress
+        {
+            get
+            {
+                return SteamVR_Actions.default_JoystickNearPress;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean JoystickPress
+        {
+            get
+            {
+                return SteamVR_Actions.default_JoystickPress;
+            }
+        }
+        
         public virtual SteamVR_Action_Vibration Haptic
         {
             get

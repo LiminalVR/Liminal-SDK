@@ -56,8 +56,8 @@ namespace Liminal.SDK.OpenVR
             var leftHand = rig.GetComponentsInChildren<SteamVR_Behaviour_Pose>().FirstOrDefault(x => x.inputSource == SteamVR_Input_Sources.LeftHand);
             var rightHand = rig.GetComponentsInChildren<SteamVR_Behaviour_Pose>().FirstOrDefault(x => x.inputSource == SteamVR_Input_Sources.RightHand);
 
-            avatar.PrimaryHand.TrackedObject = new OpenVRTrackedControllerProxy(rightHand);
-            avatar.SecondaryHand.TrackedObject = new OpenVRTrackedControllerProxy(leftHand);
+            avatar.PrimaryHand.TrackedObject = new OpenVRTrackedControllerProxy(rightHand, avatar.Head.Transform, avatar.Transform);
+            avatar.SecondaryHand.TrackedObject = new OpenVRTrackedControllerProxy(leftHand, avatar.Head.Transform, avatar.Transform);
 
             var leftModel = leftHand.GetComponentInChildren<SteamVR_RenderModel>();
             var rightModel = rightHand.GetComponentInChildren<SteamVR_RenderModel>();

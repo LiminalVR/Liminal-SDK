@@ -4,6 +4,7 @@ using System.Linq;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
+using Liminal.SDK.VR.Pointers;
 using UnityEngine;
 using Valve.VR;
 
@@ -39,7 +40,7 @@ namespace Liminal.SDK.OpenVR
             InputDevices = new List<IVRInputDevice>
             {
                 PrimaryInputDevice,
-                SecondaryInputDevice
+                SecondaryInputDevice,
             };
         }
 
@@ -70,7 +71,7 @@ namespace Liminal.SDK.OpenVR
         private IEnumerator MigrateModel(SteamVR_RenderModel model, IVRAvatarHand hand)
         {
             var controllerVisual = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive: true);
-            yield return new WaitUntil(() => model.transform.childCount != 0);
+            yield return new WaitUntil(() => model.transform.childCount != 1);
 
             if (controllerVisual == null)
             {
@@ -81,9 +82,10 @@ namespace Liminal.SDK.OpenVR
             model.transform.SetParent(controllerVisual.transform);
             model.transform.localPosition = Vector3.zero;
             model.transform.localRotation = Quaternion.identity;
-
-            model.updateDynamically = false;
-        }
+            var pointerVisual = controllerVisual.GetComponentInChildren<LaserPointerVisual>(includeInactive: true);
+            pointerVisual.Bind(hand.InputDevice.Pointer);
+            hand.InputDevice.Pointer.Transform = pointerVisual.transform;
+        }   
 
         public void Update()
         {

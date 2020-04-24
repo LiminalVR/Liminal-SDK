@@ -26,13 +26,14 @@ namespace Liminal.SDK.OpenVR
             {VRButton.Trigger, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
             {VRButton.One, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
             {VRButton.Two, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "Secondary")[SteamHand]},
-            {VRButton.Touch, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "Joystick")[SteamHand]},
+            {VRButton.Touch, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "Touch")[SteamHand]},
             {VRButton.Back, SteamVR_Input.GetAction<SteamVR_Action_Boolean>("default", "InteractUI")[SteamHand]},
         };
         
         public OpenVRController(VRInputDeviceHand hand)
         {
             Pointer = new InputDevicePointer(this);
+            Pointer.Activate();
             Hand = hand;
         }
 

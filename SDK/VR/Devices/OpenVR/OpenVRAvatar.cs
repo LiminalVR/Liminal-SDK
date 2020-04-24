@@ -8,8 +8,18 @@ namespace Liminal.SDK.OpenVR
     {
         public VRControllerVisual InstantiateControllerVisual(IVRAvatarLimb limb)
         {
-            // Leave this to OpenVR
+            // We don't need to make the controllers. SteamVR handles it all. 
             return null;
+        }
+
+        private void Awake()
+        {
+            var avatar  = GetComponentInParent<IVRAvatar>();
+            avatar.InitializeExtensions();
+        }
+
+        private void Update()
+        {
         }
 
         public IVRAvatar Avatar { get; }

@@ -32,18 +32,20 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Fields
-		#region Publics
+		#region Public
 
 		#endregion
 
-		#region Privates
+		#region Private
 		private UnityXRController _rightController;
 		private UnityXRController _leftController;
+
+		private XRInputSubsystem _inputSubsystem;
 		#endregion
 		#endregion
 
 		#region Properties
-		#region Publics
+		#region Public
 		public string Name => "UnityXR";
 		public int InputDeviceCount => XRInputs.Count;
 
@@ -55,11 +57,14 @@ namespace Liminal.SDK.XR
 
 		public List<UnityXRInputDevice> XRInputs { get; } = new List<UnityXRInputDevice>();
 
+		// TODO: Implement these?
 		public int CpuLevel { get; set; }
 		public int GpuLevel { get; set; }
-#endregion
 
-		#region Privates
+		public XRInputSubsystem XRInputSubsystem => _inputSubsystem;
+		#endregion
+
+		#region Private
 		#endregion
 		#endregion
 
@@ -67,9 +72,9 @@ namespace Liminal.SDK.XR
 		public event VRInputDeviceEventHandler InputDeviceConnected;
 		public event VRInputDeviceEventHandler InputDeviceDisconnected;
 		public event VRDeviceEventHandler PrimaryInputDeviceChanged;
-#endregion
+		#endregion
 
-#region Constructors
+		#region Constructors
 		public UnityXRDevice()
 		{
 			// setup the headset
@@ -84,10 +89,18 @@ namespace Liminal.SDK.XR
 			XRInputs.Add(xrHeadset);
 			Headset = xrHeadset;
 
+			// event for device loading
 			XRDevice.deviceLoaded += XRDevice_deviceLoaded;
+
+			// events for device [dis]connection and/or changing
 			UnityEngine.XR.InputDevices.deviceConfigChanged += InputDevices_deviceConfigChanged;
 			UnityEngine.XR.InputDevices.deviceConnected += InputDevices_deviceConnected;
 			UnityEngine.XR.InputDevices.deviceDisconnected += InputDevices_deviceDisconnected;
+
+			// subsystem events
+			_inputSubsystem = headsetDevice.subsystem;
+			_inputSubsystem.boundaryChanged += InputSubsystem_boundaryChanged;
+			_inputSubsystem.trackingOriginUpdated += InputSubsystem_trackingOriginUpdated;
 		}
 		#endregion
 		/// <summary>
@@ -112,26 +125,26 @@ namespace Liminal.SDK.XR
 		{
 			Assert.IsNotNull(avatar);
 
-            var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
-            unityAvatar.gameObject.SetActive(true);
+			var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+			unityAvatar.gameObject.SetActive(true);
 
 			var rig = CreateXrRig(avatar);
 			SetupManager(avatar);
-            SetupCameraRig(avatar, rig);
-            SetupControllers(avatar, rig);
+			SetupCameraRig(avatar, rig);
+			SetupControllers(avatar, rig);
 
-            unityAvatar.Initialize();
+			unityAvatar.Initialize();
 		}
 
-        private Transform CreateXrRig(IVRAvatar avatar)
-        {
-            var rig = new GameObject("Rig");
-            rig.transform.SetParent(avatar.Transform);
-            rig.transform.position = avatar.Head.Transform.position;
-            rig.transform.rotation = avatar.Head.Transform.rotation;
+		private Transform CreateXrRig(IVRAvatar avatar)
+		{
+			var rig = new GameObject("Rig");
+			rig.transform.SetParent(avatar.Transform);
+			rig.transform.position = avatar.Head.Transform.position;
+			rig.transform.rotation = avatar.Head.Transform.rotation;
 
-            return rig.transform;
-        }
+			return rig.transform;
+		}
 
 		/// <summary>
 		/// Setup the Manager
@@ -223,7 +236,7 @@ namespace Liminal.SDK.XR
 		}
 
 		/// <summary>
-		/// 
+		/// Just activate both if they're available, for now
 		/// </summary>
 		private void SetDefaultPointerActivation()
 		{
@@ -238,8 +251,7 @@ namespace Liminal.SDK.XR
 		/// <param name="loadedDevice"></param>
 		private void XRDevice_deviceLoaded(string loadedDevice)
 		{
-			// is this needed for anything?
-			Debug.Log($"[{GetType().Name}] XRDevice_deviceLoaded({nameof(loadedDevice)}:{loadedDevice})");
+			// could this be useful at all?
 		}
 
 		/// <summary>
@@ -344,6 +356,24 @@ namespace Liminal.SDK.XR
 		private string InputDeviceToString(InputDevice device)
 		{
 			return $"N>{device.name} :: C>{device.characteristics} :: iV>{device.isValid}";
+		}
+
+		/// <summary>
+		/// An event that takes the delegate instance that the XRInputSubsystem calls when it changes its tracking boundary.
+		/// </summary>
+		/// <param name="inputSystem"></param>
+		private void InputSubsystem_boundaryChanged(XRInputSubsystem inputSystem)
+		{
+			// could this be useful at all?
+		}
+
+		/// <summary>
+		/// An event that takes the delegate instance that the XRInputSubsystem calls when it changes the origin it reports devices at.
+		/// </summary>
+		/// <param name="inputSystem"></param>
+		private void InputSubsystem_trackingOriginUpdated(XRInputSubsystem inputSystem)
+		{
+			// could this be useful at all?
 		}
 		#endregion
 	}

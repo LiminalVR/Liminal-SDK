@@ -16,6 +16,7 @@ namespace Liminal.SDK.XR
 		private const string OculusTouchQuestAndRiftSRightControllerName = "Oculus Touch Controller - Right";
 		private const string OculusTouchRiftLeftControllerName = "UNKNOWN";
 		private const string OculusTouchRiftRightControllerName = "UNKNOWN";
+		// TODO: Also figure out what other models will be needed and add them as we do
 		#endregion
 
 		#region Statics
@@ -23,11 +24,11 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Fields
-		#region Publics
+		#region Public
 
 		#endregion
 
-		#region Privates
+		#region Private
 		/// <summary>
 		/// The root GameObject that represents the GearVr Controller model.
 		/// </summary>
@@ -65,7 +66,7 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Properties
-		#region Publics
+		#region Public
 		public string ActiveControllerName
 		{
 			get => _activeControllerName;
@@ -78,7 +79,6 @@ namespace Liminal.SDK.XR
 					model?.SetActive(false);
 				}
 
-				Debug.Log($"[{GetType().Name}] ActiveControllerName set to '{value}' from '{_activeControllerName}'");
 				_activeControllerName = value;
 
 				if (!string.IsNullOrEmpty(ActiveControllerName))
@@ -96,14 +96,14 @@ namespace Liminal.SDK.XR
 		}
 		#endregion
 
-		#region Privates
+		#region Private
 		private Dictionary<string, GameObject> AllModels
 		{
 			get
 			{
 				if (_allModels.Count == 0)
 				{
-					// TODO: Once each name is determined, uncomment the appropriate line
+					// TODO: Once each name is determined, uncomment the appropriate line. And, fix the name above of course
 					//_allModels.Add(GearVrControllerName, _modelGearVrController);
 					//_allModels.Add(OculusGoControllerName, _modelOculusGoController);
 					_allModels.Add(OculusTouchQuestAndRiftSLeftControllerName, _modelOculusTouchQuestAndRiftSLeftController);
@@ -129,24 +129,10 @@ namespace Liminal.SDK.XR
 				child.gameObject.SetActive(false);
 			}
 
-			//_modelGearVrController?.SetActive(false);
-			//_modelOculusGoController?.SetActive(false);
-			//_modelOculusTouchQuestAndRiftSLeftController?.SetActive(false);
-			//_modelOculusTouchQuestAndRiftSRightController?.SetActive(false);
-			//_modelOculusTouchRiftLeftController?.SetActive(false);
-			//_modelOculusTouchRiftRightController?.SetActive(false);
-
+			// ensure the pointer is re-enabled
 			PointerVisual.transform.gameObject.SetActive(true);
 			PointerVisual.SetActive(true);
 		}
-
-		//private void Update()
-		//{
-		//	Debug.Log($"I am here! I am alive!!!");
-
-		//	LaserPointerVisual laserPointer = (PointerVisual as LaserPointerVisual);
-		//	laserPointer.SetActive(true);
-		//}
 		#endregion
 	}
 }

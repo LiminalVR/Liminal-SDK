@@ -16,6 +16,9 @@ using Liminal.SDK.VR.Devices.GearVR.Avatar;
 
 namespace Liminal.SDK.XR
 {
+	/// <summary>
+	/// TODO: Expand on mappings as we expand on supported inputs through the XR system
+	/// </summary>
 	public class UnityXRHeadset : UnityXRInputDevice, IVRHeadset
 	{
 		#region Constants
@@ -31,23 +34,23 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Fields
-		#region Publics
+		#region Public
 
 		#endregion
 
-		#region Privates
+		#region Private
 
 		#endregion
 		#endregion
 
 		#region Properties
-		#region Publics
+		#region Public
 		public override int ButtonCount => 0;
 		public override bool IsTouching => false;
 		public override VRInputDeviceHand Hand => VRInputDeviceHand.None;
 		#endregion
 
-		#region Privates
+		#region Private
 
 		#endregion
 		#endregion

@@ -22,17 +22,20 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Statics
-		public static EPointerActivationType PointerActivationType = EPointerActivationType.Both;
 		#endregion
 
 		#region Fields
-		#region Publics
+		#region Public
 
 		#endregion
 
-		#region Privates
+		#region Private
 		private IVRAvatar _avatar;
 
+		/// <summary>
+		/// Not in use at the moment
+		/// TODO: Implement GazeInput functionality
+		/// </summary>
 		private GazeInput _gazeInput = null;
 
 		private readonly List<UnityXRControllerVisual> _remotes = new List<UnityXRControllerVisual>();
@@ -40,7 +43,7 @@ namespace Liminal.SDK.XR
 		#endregion
 
 		#region Properties
-		#region Publics
+		#region Public
 		public IVRAvatar Avatar
 		{
 			get
@@ -57,22 +60,12 @@ namespace Liminal.SDK.XR
 		public IVRDevice Device => VRDevice.Device;
 		#endregion
 
-		#region Privates
+		#region Private
 
 		#endregion
 		#endregion
 
 		#region MonoBehaviour
-		//protected void Awake()
-		//{
-		//	Initialize();
-		//}
-
-		private void OnEnable()
-		{
-			TrySetLimbsActive();
-		}
-
 		private void OnDestroy()
 		{
 			// Clean up event handlers
@@ -88,6 +81,9 @@ namespace Liminal.SDK.XR
 			}
 		}
 
+		/// <summary>
+		/// When the parent changes, ensure the Avatar is correct
+		/// </summary>
 		private void OnTransformParentChanged()
 		{
 			_avatar = GetComponentInParent<IVRAvatar>();
@@ -95,14 +91,7 @@ namespace Liminal.SDK.XR
 
 		private void Update()
 		{
-			//RecenterHmdIfRequired();
-			DetectAndUpdateControllerStates();
-
-			//if (OVRUtils.IsOculusQuest)
-			//{
-				DetectPointerState();
-			//}
-
+			// this needs to be called each frame so that the input values are properly updated
 			VRDevice.Device.Update();
 		}
 		#endregion
@@ -127,33 +116,19 @@ namespace Liminal.SDK.XR
 			Avatar.Head.ActiveCameraChanged += OnActiveCameraChanged;
 
 			SetupInitialControllerState();
-		}
 
-		private void DetectPointerState()
-		{
-			var device = VRDevice.Device;
-
-			// This block of code has a lot of Null-Coalescing, which usually is dangerous but in this case we do not want to block the app.
-			// A controller may disconnect and reconnect anytime.
-			switch (PointerActivationType)
-			{
-				case EPointerActivationType.ActiveController:
-					// TODO: NYI
-					break;
-
-				case EPointerActivationType.Both:
-					device?.PrimaryInputDevice?.Pointer?.Activate();
-					device?.SecondaryInputDevice?.Pointer?.Activate();
-					break;
-			}
+			// turn on the pointers
+			Device?.PrimaryInputDevice?.Pointer?.Activate();
+			Device?.SecondaryInputDevice?.Pointer?.Activate();
 		}
 
 		#region Setup
-
 		private void SetupInitialControllerState()
 		{
+			// there are controllers present
 			if (Device.InputDevices.Any(x => x is UnityXRController))
 			{
+				// So enable all of them
 				foreach (var controller in Device.InputDevices)
 				{
 					EnableControllerVisual(controller as UnityXRController);
@@ -188,7 +163,7 @@ namespace Liminal.SDK.XR
 			var xrControllerVisual = instance.GetComponent<UnityXRControllerVisual>();
 			InputDevice inputDevice = default;
 			// assign the name based on the limb
-			if (limb.LimbType.TryLimbToNode(out XRNode node))
+			if (limb.LimbType.TryConvertToXRNode(out XRNode node))
 			{
 				inputDevice = InputDevices.GetDeviceAtXRNode(node);
 
@@ -203,7 +178,7 @@ namespace Liminal.SDK.XR
 			UnityXRDevice xrDevice = Device as UnityXRDevice;
 			IVRInputDevice vrInputDevice = xrDevice.XRInputs.Where(xr => xr.InputDevice == inputDevice).FirstOrDefault();
 
-			var pointerVisual = avatarController.GetComponentInChildren<LaserPointerVisual>(includeInactive:true);
+			var pointerVisual = avatarController.GetComponentInChildren<LaserPointerVisual>(includeInactive: true);
 			pointerVisual?.Bind(vrInputDevice.Pointer);
 			if (pointerVisual != null)
 				vrInputDevice.Pointer.Transform = pointerVisual.transform;
@@ -230,9 +205,15 @@ namespace Liminal.SDK.XR
 				throw new ArgumentNullException("limb");
 			}
 
-			if (limb.LimbType == VRAvatarLimbType.Head)
+			// there is no controller visual is the limb is not a hand
+			switch (limb.LimbType)
 			{
-				return null;
+				// this two cases will catch the hands and allows more types to be added to VRAvatarLimbType without this needing to be changed
+				case VRAvatarLimbType.LeftHand:
+				case VRAvatarLimbType.RightHand:
+					break;
+				default:
+					return null;
 			}
 
 			var prefab = VRAvatarHelper.EnsureLoadPrefab<VRControllerVisual>(ControllerVisualPrefabName);
@@ -243,12 +224,16 @@ namespace Liminal.SDK.XR
 			return instance;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="controller"></param>
 		private void EnableControllerVisual(UnityXRController controller)
 		{
 			if (controller == null)
+			{
 				return;
-
-			Debug.Log($"[{GetType().Name}] EnableControllerVisual(controller:{controller.Name})");
+			}
 
 			// Find the visual for the hand that matches the controller
 			UnityXRControllerVisual remote = _remotes.FirstOrDefault(r => r.ActiveControllerName == controller.InputDevice.name);
@@ -258,10 +243,11 @@ namespace Liminal.SDK.XR
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		private void DisableAllControllerVisuals()
 		{
-			Debug.Log($"[{GetType().Name}] DisableAllControllerVisuals()");
-
 			// Disable all controller visuals
 			foreach (var remote in _remotes)
 			{
@@ -270,86 +256,7 @@ namespace Liminal.SDK.XR
 		}
 		#endregion
 
-		/// <summary>
-		/// Detects and Updates the state of the controllers including the TouchPad on the GearVR headset
-		/// </summary>
-		public void DetectAndUpdateControllerStates()
-		{
-			TrySetLimbsActive();
-			TrySetGazeInputActive(false);
-			//TrySetGazeInputActive(!IsHandControllerActive);
-		}
-
-		/// <summary>
-		/// A temporary method to split Oculus Quest changes with the other devices. 
-		/// </summary>
-		private void TrySetLimbsActive()
-		{
-			TrySetHandsActive(true);
-
-			//if (OVRUtils.IsOculusQuest)
-			//{
-			TrySetHandActive(VRAvatarLimbType.RightHand);
-			TrySetHandActive(VRAvatarLimbType.LeftHand);
-			//}
-			//else
-			//{
-			//    TrySetHandsActive(IsHandControllerActive);
-			//}
-		}
-
-		private void TrySetHandActive(VRAvatarLimbType limbType)
-		{
-			if (limbType.TryLimbToNode(out XRNode node))
-			{
-				var isLimbConnected = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(node).isValid;
-				var limb = Avatar.GetLimb(limbType);
-
-				limb.SetActive(isLimbConnected);
-			}
-		}
-
-		private void TrySetHandsActive(bool active)
-		{
-			if (Avatar != null)
-			{
-				Avatar.SetHandsActive(active);
-			}
-		}
-
-		private void TrySetGazeInputActive(bool active)
-		{
-			// Ignore Always & Never Policy
-			if (_gazeInput != null && _gazeInput.ActivationPolicy == GazeInputActivationPolicy.NoControllers)
-			{
-				if (active)
-				{
-					_gazeInput.Activate();
-				}
-				else
-				{
-					_gazeInput.Deactivate();
-				}
-			}
-		}
-
-		private void RecenterHmdIfRequired()
-		{
-			//throw new NotImplementedException();
-
-			//if (mSettings != null && mSettings.HmdRecenterPolicy != HmdRecenterPolicy.OnControllerRecenter)
-			//    return;
-
-			//if (OVRInput.GetControllerWasRecentered())
-			//{
-			//    // Recenter the camera when the user recenters the controller
-			//    UnityEngine.XR.InputTracking.Recenter();
-			//}
-		}
-
-
 		#region Event Handlers
-		//Notes: Device Connecting is difference than controller being active
 		private void OnInputDeviceConnected(IVRDevice vrDevice, IVRInputDevice inputDevice)
 		{
 			var unityController = inputDevice as UnityXRController;
@@ -357,18 +264,19 @@ namespace Liminal.SDK.XR
 			{
 				// A controller was connected
 				// Disable gaze controls
+				// Enable visual
 				EnableControllerVisual(unityController);
 			}
 		}
 
 		private void OnInputDeviceDisconnected(IVRDevice vrDevice, IVRInputDevice inputDevice)
 		{
+			// if there aren't any more controllers connected
 			if (!vrDevice.InputDevices.Any(x => x is UnityXRController))
 			{
-				// No controllers are connected
+				// Disable all visuals
 				DisableAllControllerVisuals();
 				// Enable gaze controls
-				TrySetGazeInputActive(true);
 			}
 		}
 

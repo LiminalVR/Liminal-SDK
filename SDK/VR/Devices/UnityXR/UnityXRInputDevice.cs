@@ -30,17 +30,17 @@ namespace Liminal.SDK.XR
         #endregion
 
         #region Fields
-        #region Publics
+        #region Public
 
         #endregion
 
-        #region Privates
+        #region Private
 
         #endregion
         #endregion
 
         #region Properties
-        #region Publics
+        #region Public
         public virtual string Name { get => InputDevice.name; }
         public IVRPointer Pointer { get; }
         public abstract int ButtonCount { get; }
@@ -50,7 +50,7 @@ namespace Liminal.SDK.XR
         public InputDevice InputDevice { get; private set; }
         #endregion
 
-        #region Privates
+        #region Private
 
         #endregion
         #endregion
@@ -73,6 +73,13 @@ namespace Liminal.SDK.XR
         public abstract bool HasAxis1D(string axis);
         public abstract bool HasAxis2D(string axis);
         public abstract bool HasButton(string button);
+
+        /// <summary>
+        /// TODO: Potentially determine and store the input device capabilities at this level of 
+        /// code using the assigned InputDevice capabilities and inputFeatures
+        /// </summary>
+        /// <param name="capability"></param>
+        /// <returns></returns>
         public abstract bool HasCapabilities(VRInputDeviceCapability capability);
 
         public abstract void Update(); 

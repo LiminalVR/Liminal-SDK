@@ -25,10 +25,8 @@ namespace Liminal.SDK.Build
         [MenuItem("Liminal/Build Window")]
         public static void OpenBuildWindow()
         {
-            Window = GetWindow(typeof(BuildSettingsWindow), true, "Build Settings");
-
+            Window = GetWindow(typeof(BuildSettingsWindow), false, "Build Settings");
             Window.minSize = new Vector2(_width, _height);
-
             Window.Show();
         }
 
@@ -39,15 +37,43 @@ namespace Liminal.SDK.Build
             AssetDatabase.Refresh();
         }
 
+        [MenuItem("Liminal/Use Legacy SDK")]
+        public static void UseLegacy()
+        {
+            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithoutXR);
+            AssetDatabase.Refresh();
+
+            PlayerSettings.virtualRealitySupported = true;
+            PlayerSettings.SetVirtualRealitySDKs(BuildTargetGroup.Android, new string[] { "Oculus" });
+
+            var currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
+            currentSymbols = currentSymbols.Replace("UNITY_XR", "");
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, $"{currentSymbols}");
+        }
+
+        [MenuItem("Liminal/Use Unity XR")]
+        public static void UseUnityXR()
+        {
+            PlayerSettings.virtualRealitySupported = false;
+            
+            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithXR);
+            AssetDatabase.Refresh();
+            var currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, $"{currentSymbols};UNITY_XR");
+        }
+
         private void OnEnable()
         {
             var fileExists = Directory.Exists(BuildWindowConsts.ConfigFolderPath) || File.Exists(BuildWindowConsts.BuildWindowConfigPath);
 
             if (fileExists)
             {
-                var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
-                _windowConfig = JsonUtility.FromJson<BuildWindowConfig>(json);
-                AssetDatabase.Refresh();
+                if (File.Exists(BuildWindowConsts.BuildWindowConfigPath))
+                {
+                    var json = File.ReadAllText(BuildWindowConsts.BuildWindowConfigPath);
+                    _windowConfig = JsonUtility.FromJson<BuildWindowConfig>(json);
+                    AssetDatabase.Refresh();
+                }
             }
 
             SetupFolderPaths();
@@ -78,6 +104,12 @@ namespace Liminal.SDK.Build
             // boolean true is used to format the resulting string for maximum readability. False would format it for minimum size.
             var configJson = JsonUtility.ToJson(_windowConfig, true);
             File.WriteAllText(BuildWindowConsts.BuildWindowConfigPath, configJson);
+
+
+            foreach (var entry in BuildSettingLookup)
+            {
+                entry.Value.Size = position.size;
+            }
         }
 
         private void SetupMenuWindows()
@@ -110,7 +142,6 @@ namespace Liminal.SDK.Build
             if (!sceneExists)
             {
                 var scenePath = $"{UnityPackageManagerUtils.FullPackageLocation}/{BuildWindowConsts.PackagePreviewAppScenePath}";
-                Debug.Log(scenePath);
                 File.Copy(scenePath, BuildWindowConsts.PreviewAppScenePath);
                 AssetDatabase.Refresh();
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Reflection;
+using App;
 using Liminal.Platform.Experimental.App.BundleLoader;
 using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
@@ -153,6 +154,10 @@ namespace Liminal.Platform.Experimental.App.Experiences
 
             SceneManager.SetActiveScene(CurrentApp.gameObject.scene);
             CurrentApp.gameObject.SetActive(true);
+
+            //# SUPER IMPORTANT
+            var device = DeviceUtils.CreateDevice(CurrentApp);
+            VRDevice.Replace(device);
 
             var method = ExperienceAppReflectionCache.InitializeMethod;
             yield return (IEnumerator)method.Invoke(CurrentApp, null);

@@ -10,6 +10,10 @@ using Valve.VR;
 
 namespace Liminal.SDK.OpenVR
 {
+    public class CoroutineService : MonoBehaviour
+    {
+    }
+
     public class OpenVRDevice : IVRDevice
     {
         private static readonly VRDeviceCapability _capabilities =
@@ -62,10 +66,9 @@ namespace Liminal.SDK.OpenVR
             var leftModel = leftHand.GetComponentInChildren<SteamVR_RenderModel>();
             var rightModel = rightHand.GetComponentInChildren<SteamVR_RenderModel>();
 
-            openVRAvatar.gameObject.SetActive(true);
-            
-            openVRAvatar.StartCoroutine(MigrateModel(leftModel, avatar.SecondaryHand));
-            openVRAvatar.StartCoroutine(MigrateModel(rightModel, avatar.PrimaryHand));
+            var coroutineService = new GameObject("Coroutine Service").AddComponent<CoroutineService>();
+            coroutineService.StartCoroutine(MigrateModel(leftModel, avatar.SecondaryHand));
+            coroutineService.StartCoroutine(MigrateModel(rightModel, avatar.PrimaryHand));
         }
 
         private IEnumerator MigrateModel(SteamVR_RenderModel model, IVRAvatarHand hand)

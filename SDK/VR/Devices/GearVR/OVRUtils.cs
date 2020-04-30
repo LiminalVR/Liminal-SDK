@@ -13,8 +13,8 @@ public static class OVRUtils
     /// When both controllers are connected, Controller.Touch is used.
     /// When one controller is connected, the individual Controller.RTouch is used.
     /// </summary>
-    public static bool IsQuestControllerConnected 
-        => OVRInput.IsControllerConnected(OVRInput.Controller.Touch) || 
+    public static bool IsQuestControllerConnected
+        => OVRInput.IsControllerConnected(OVRInput.Controller.Touch) ||
            OVRInput.IsControllerConnected(OVRInput.Controller.RTouch) ||
            OVRInput.IsControllerConnected(OVRInput.Controller.LTouch);
 
@@ -29,6 +29,22 @@ public static class OVRUtils
             case OVRPlugin.SystemHeadset.GearVR_R323:
             case OVRPlugin.SystemHeadset.GearVR_R324:
             case OVRPlugin.SystemHeadset.GearVR_R325:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public static bool IsRift()
+    {
+        OVRPlugin.SystemHeadset headsetType = OVRPlugin.GetSystemHeadsetType();
+        switch (headsetType)
+        {
+            case OVRPlugin.SystemHeadset.Rift_DK1:
+            case OVRPlugin.SystemHeadset.Rift_DK2:
+            case OVRPlugin.SystemHeadset.Rift_CV1:
+            case OVRPlugin.SystemHeadset.Rift_CB:
+            case OVRPlugin.SystemHeadset.Rift_S: 
                 return true;
             default:
                 return false;

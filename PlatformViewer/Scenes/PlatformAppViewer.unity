@@ -362,12 +362,12 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1260162968766363323, guid: 22276a8657744e04cba8ad0a2caf4195,
+    - target: {fileID: 1260162968766363322, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1260162968766363322, guid: 22276a8657744e04cba8ad0a2caf4195,
+    - target: {fileID: 1260162968766363323, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -612,6 +612,7 @@ GameObject:
   - component: {fileID: 3473043119503296450}
   - component: {fileID: 3473043119503296451}
   - component: {fileID: 3473043119503296449}
+  - component: {fileID: 3473043119503296453}
   m_Layer: 0
   m_Name: '[PlatformAppViewer]'
   m_TagString: Untagged
@@ -619,6 +620,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &3473043119503296453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3473043119503296452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8066ed3b2e9e4c64f9c11142d910e9c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BuildType: 3
+  EditorType: 3
 --- !u!224 &3934831371284879100
 RectTransform:
   m_ObjectHideFlags: 0

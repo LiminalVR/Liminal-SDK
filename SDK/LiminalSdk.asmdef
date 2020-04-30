@@ -2,10 +2,9 @@
     "name": "LiminalSdk",
     "references": [
         "Oculus.VR",
-        "SteamVR",
-        "Unity.XR.Interaction.Toolkit",
-        "UnityEngine.SpatialTracking"
+        "SteamVR"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -13,6 +12,5 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "versionDefines": []
 }

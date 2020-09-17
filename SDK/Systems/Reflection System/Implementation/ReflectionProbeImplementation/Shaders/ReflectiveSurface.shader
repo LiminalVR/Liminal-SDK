@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 
-Shader "Unlit/SkyReflection Per Pixel"
+Shader "Liminal/ReflectiveSurface"
 {
     Properties{
         // normal map texture on the material,

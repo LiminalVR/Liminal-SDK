@@ -1,56 +1,59 @@
-﻿using System.Collections.Generic;
-using UnityEngine.XR;
-
-public static class XRDeviceUtils
+﻿namespace Liminal.Systems
 {
-    public static HashSet<EDeviceModelType> PlanarReflectionSupported = new HashSet<EDeviceModelType>
-    {
-        EDeviceModelType.Go,
-        EDeviceModelType.HtcVive,
-        EDeviceModelType.Quest,
-        EDeviceModelType.AcerAH101,
-        EDeviceModelType.Rift,
-        EDeviceModelType.RiftS
-    };
+    using System.Collections.Generic;
+    using UnityEngine.XR;
 
-    public static EDeviceModelType GetDeviceModelType()
+    public static class XRDeviceUtils
     {
-        var model = XRDevice.model;
-        var type = EDeviceModelType.Unknown;
-        model = model.ToLower();
-
-        if (model.Contains("rift"))
+        public static HashSet<EDeviceModelType> PlanarReflectionSupported = new HashSet<EDeviceModelType>
         {
-            if (model.Contains("rift s"))
-                type = EDeviceModelType.RiftS;
-            else
-                type = EDeviceModelType.Rift;
+            EDeviceModelType.Go,
+            EDeviceModelType.HtcVive,
+            EDeviceModelType.Quest,
+            EDeviceModelType.AcerAH101,
+            EDeviceModelType.Rift,
+            EDeviceModelType.RiftS
+        };
+
+        public static EDeviceModelType GetDeviceModelType()
+        {
+            var model = XRDevice.model;
+            var type = EDeviceModelType.Unknown;
+            model = model.ToLower();
+
+            if (model.Contains("rift"))
+            {
+                if (model.Contains("rift s"))
+                    type = EDeviceModelType.RiftS;
+                else
+                    type = EDeviceModelType.Rift;
+            }
+
+            if (model.Contains("vive"))
+            {
+                if (model.Contains("pro"))
+                    type = EDeviceModelType.HtcVivePro;
+                else if (model.Contains("cosmos"))
+                    type = EDeviceModelType.HtcViveCosmos;
+                else
+                    type = EDeviceModelType.HtcVive;
+            }
+
+            if (model.Contains("go"))
+                type = EDeviceModelType.Go;
+
+            if (model.Contains("quest"))
+                type = EDeviceModelType.Quest;
+
+            if (model.Contains("AcerAH101"))
+                type = EDeviceModelType.AcerAH101;
+
+            return type;
         }
 
-        if (model.Contains("vive"))
+        public static bool SupportsPlanarReflection()
         {
-            if (model.Contains("pro"))
-                type = EDeviceModelType.HtcVivePro;
-            else if (model.Contains("cosmos"))
-                type = EDeviceModelType.HtcViveCosmos;
-            else
-                type = EDeviceModelType.HtcVive;
+            return PlanarReflectionSupported.Contains(GetDeviceModelType());
         }
-
-        if (model.Contains("go"))
-            type = EDeviceModelType.Go;
-
-        if (model.Contains("quest"))
-            type = EDeviceModelType.Quest;
-
-        if (model.Contains("AcerAH101"))
-            type = EDeviceModelType.AcerAH101;
-
-        return type;
-    }
-
-    public static bool SupportsPlanarReflection()
-    {
-        return PlanarReflectionSupported.Contains(GetDeviceModelType());
     }
 }

@@ -1,24 +1,28 @@
-﻿using UnityEngine;
-using UnityEngine.XR;
-
-public class ReflectionSetup : MonoBehaviour
+﻿namespace Liminal.Systems
 {
-    public GameObject DefaultSetup;
-    public GameObject ReflectionProbeSetup;
+    using UnityEngine;
+    using UnityEngine.XR;
 
-    private void Awake()
+    public class ReflectionSetup : MonoBehaviour
     {
-        Debug.Log($"Known Device Name: {XRDeviceUtils.GetDeviceModelType()} - Actual Device Model: {XRDevice.model}");
+        public GameObject DefaultSetup;
+        public GameObject ReflectionProbeSetup;
 
-        if (XRDeviceUtils.SupportsPlanarReflection())
+        private void Awake()
         {
-            DefaultSetup.SetActive(true);
-            ReflectionProbeSetup.SetActive(false);
-        }
-        else
-        {
-            DefaultSetup.SetActive(false);
-            ReflectionProbeSetup.SetActive(true);
+            Debug.Log(
+                $"Known Device Name: {XRDeviceUtils.GetDeviceModelType()} - Actual Device Model: {XRDevice.model}");
+
+            if (XRDeviceUtils.SupportsPlanarReflection())
+            {
+                DefaultSetup.SetActive(true);
+                ReflectionProbeSetup.SetActive(false);
+            }
+            else
+            {
+                DefaultSetup.SetActive(false);
+                ReflectionProbeSetup.SetActive(true);
+            }
         }
     }
 }

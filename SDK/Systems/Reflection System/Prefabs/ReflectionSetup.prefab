@@ -54,6 +54,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 209905471949274389}
     m_Modifications:
+    - target: {fileID: 8478298313052215351, guid: 453ee75aa684ddc43847b4c777451451,
+        type: 3}
+      propertyPath: m_Name
+      value: ReflectionProbeSetup
+      objectReference: {fileID: 0}
     - target: {fileID: 8478298313052215350, guid: 453ee75aa684ddc43847b4c777451451,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -109,15 +114,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8478298313052215351, guid: 453ee75aa684ddc43847b4c777451451,
-        type: 3}
-      propertyPath: m_Name
-      value: ReflectionProbeSetup
-      objectReference: {fileID: 0}
     - target: {fileID: 8478298313068881186, guid: 453ee75aa684ddc43847b4c777451451,
         type: 3}
       propertyPath: m_CullingMask.m_Bits
-      value: 131072
+      value: 256
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 453ee75aa684ddc43847b4c777451451, type: 3}
@@ -140,6 +140,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 209905471949274389}
     m_Modifications:
+    - target: {fileID: 8377758602426716234, guid: 91357e83d72d3564e9b5fd319ddbd8c9,
+        type: 3}
+      propertyPath: m_Name
+      value: PlanarReflectionSetup
+      objectReference: {fileID: 0}
+    - target: {fileID: 8377758602426716234, guid: 91357e83d72d3564e9b5fd319ddbd8c9,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8377758602426716229, guid: 91357e83d72d3564e9b5fd319ddbd8c9,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -195,16 +205,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8377758602426716234, guid: 91357e83d72d3564e9b5fd319ddbd8c9,
-        type: 3}
-      propertyPath: m_Name
-      value: PlanarReflectionSetup
-      objectReference: {fileID: 0}
-    - target: {fileID: 8377758602426716234, guid: 91357e83d72d3564e9b5fd319ddbd8c9,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8377758602426716230, guid: 91357e83d72d3564e9b5fd319ddbd8c9,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -213,7 +213,7 @@ PrefabInstance:
     - target: {fileID: 8377758602426716228, guid: 91357e83d72d3564e9b5fd319ddbd8c9,
         type: 3}
       propertyPath: m_ReflectLayers.m_Bits
-      value: 131072
+      value: 256
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91357e83d72d3564e9b5fd319ddbd8c9, type: 3}

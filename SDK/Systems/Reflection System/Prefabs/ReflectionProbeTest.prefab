@@ -230,4 +230,5 @@ MonoBehaviour:
   Z: 0
   M: -0.12
   YM: -0.12
+  Cam: {fileID: 0}
   Delta: {x: 0, y: 0, z: 0}

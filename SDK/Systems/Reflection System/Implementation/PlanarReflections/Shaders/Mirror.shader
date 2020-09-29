@@ -15,7 +15,7 @@
         _FadeScaleX("Fade Scale X", Float) = 4
 
          MySrcMode("SrcMode", Float) = 1
-         MyDstMode("DstMode", Float) = 0
+         MyDstMode("DstMode", Float) = 1
 
         [MaterialToggle] _EnableTint("_EnableTint", Float) = 0
         [MaterialToggle] _EnableRampAlpha("_EnableRampAlpha", Float) = 1

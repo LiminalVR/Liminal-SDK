@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Reflfection_Mat_1
   m_Shader: {fileID: 4800000, guid: 96345e600b1052a42a646fc6be248d32, type: 3}
-  m_ShaderKeywords: _OFFSETENABLED_ON
+  m_ShaderKeywords: _ENABLERAMPALPHA_ON _OFFSETENABLED_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -68,11 +68,15 @@ Material:
         m_Scale: {x: 15, y: 15}
         m_Offset: {x: 0, y: 0}
     m_Floats:
+    - MyDstMode: 1
+    - MySrcMode: 1
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _Debug: 0
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
+    - _EnableRampAlpha: 1
+    - _EnableTint: 0
     - _FadeDistance: 0
     - _FadeScaleX: 0
     - _GlossMapScale: 1

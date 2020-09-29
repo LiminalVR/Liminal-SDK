@@ -14,6 +14,12 @@
         _FadeDistance("Fade Distance", Float) = 0
         _FadeScaleX("Fade Scale X", Float) = 4
 
+         MySrcMode("SrcMode", Float) = 1
+         MyDstMode("DstMode", Float) = 0
+
+        [MaterialToggle] _EnableTint("_EnableTint", Float) = 0
+        [MaterialToggle] _EnableRampAlpha("_EnableRampAlpha", Float) = 1
+
         [MaterialToggle] _OffsetEnabled("Offset Enabled", Float) = 0
 
         [MaterialToggle] _Quest("Quest", Float) = 0
@@ -36,7 +42,7 @@
             "RenderType" = "Transparent"
         }
 
-        Blend One One
+        Blend[MySrcMode][MyDstMode]
         Cull Off
         ZWrite Off
 
@@ -90,6 +96,10 @@
                 float _Quest;
                 float _Debug;
                 float _RiftS;
+
+
+                float _EnableTint;
+                float _EnableRampAlpha;
 
                 struct appdata
                 {
@@ -199,9 +209,14 @@
                     fixed4 col = saturate(main + refl);
 
                     // Apply ramp to fade toward horizon color
-                    //col = lerp(col, _ColorHorizon, 1 - ramp);
-                    col.a = lerp(1,0, 1 - ramp);
+                    col = lerp(col, _ColorHorizon, 1 - ramp);
+                    
+                    if(_EnableTint)
+                        col *= _Color;
 
+                    if(_EnableRampAlpha)
+                        col.a = lerp(1,0, 1 - ramp);
+                    
                     return col;
                 }
                 ENDCG

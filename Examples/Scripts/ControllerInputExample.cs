@@ -1,4 +1,5 @@
-﻿using Liminal.SDK.VR;
+﻿using Liminal.SDK.Core;
+using Liminal.SDK.VR;
 using Liminal.SDK.VR.Input;
 using System.Text;
 using UnityEngine;
@@ -53,5 +54,10 @@ public class ControllerInputExample : MonoBehaviour
 
         //builder.AppendLine($"{deviceName} Axis2D-One: {inputDevice.GetAxis2D(VRAxis.One)}");
         //builder.AppendLine($"{deviceName} Axis2D-OneRaw: {inputDevice.GetAxis2D(VRAxis.OneRaw)}");
+    }
+
+    public void End() 
+    {
+        ExperienceApp.End();
     }
 }

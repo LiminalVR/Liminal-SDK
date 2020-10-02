@@ -18,7 +18,7 @@ namespace Liminal.SDK.OpenVR
 
         private void Awake()
         {
-            var avatar  = GetComponentInParent<IVRAvatar>();
+            var avatar = GetComponentInParent<IVRAvatar>();
             avatar.InitializeExtensions();
         }
 
@@ -27,7 +27,7 @@ namespace Liminal.SDK.OpenVR
             var eyePosition = InputTracking.GetLocalPosition(XRNode.CenterEye);
             var head = GetComponentInChildren<VRAvatarHead>();
 
-            var headPosition = head.transform.position;
+            var headPosition = head.transform.localPosition;
 
             if (UseHeadY)
                 headPosition.y -= eyePosition.y;
@@ -38,9 +38,6 @@ namespace Liminal.SDK.OpenVR
 
             if (UseHeadXZ)
             {
-                head.transform.localPosition = Vector3.zero;
-                headPosition = new Vector3(head.transform.position.x, headPosition.y, head.transform.position.z);
-
                 headPosition.x -= eyePosition.x;
                 headPosition.z -= eyePosition.z;
             }
@@ -50,7 +47,7 @@ namespace Liminal.SDK.OpenVR
                 headPosition.z = 0;
             }
 
-            head.transform.position = headPosition;
+            head.transform.localPosition = headPosition;
         }
 
         public IVRAvatar Avatar { get; }

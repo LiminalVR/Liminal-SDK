@@ -38,8 +38,8 @@ namespace Liminal.SDK.OpenVR
 
             if (UseHeadXZ)
             {
-                headPosition.x = 0;
-                headPosition.z = 0;
+                head.transform.localPosition = Vector3.zero;
+                headPosition = new Vector3(head.transform.position.x, headPosition.y, head.transform.position.z);
 
                 headPosition.x -= eyePosition.x;
                 headPosition.z -= eyePosition.z;

@@ -26,6 +26,8 @@
         [MaterialToggle] _Rift("Rift", Float) = 0
         [MaterialToggle] _Debug("Debug", Float) = 0
         [MaterialToggle] _RiftS("RiftS", Float) = 0
+        [MaterialToggle] _Vive("Vive", Float) = 0
+        [MaterialToggle] _VivePro("VivePro", Float) = 0
 
          _OffsetRX("RX", Float) = 1.17
          _OffsetRY("RY", Float) = 1
@@ -96,7 +98,8 @@
                 float _Quest;
                 float _Debug;
                 float _RiftS;
-
+                float _Vive;
+                float _VivePro;
 
                 float _EnableTint;
                 float _EnableRampAlpha;
@@ -168,6 +171,16 @@
                                 {
                                     uvRefl.x *= 1.03;
                                 }
+
+                                if (_Vive)
+                                {
+                                    uvRefl.x *= 0.94;
+                                }
+
+                                if (_VivePro)
+                                {
+                                    uvRefl.x *= 0.94;
+                                }
                             }
                         }
                         else
@@ -192,6 +205,18 @@
                                 if(_RiftS)
                                 {
                                     float4 scaleOffset = float4(1, _OffsetRY, 0.02, _OffsetRW);
+                                    uvRefl = (uvRefl - scaleOffset.zw) / scaleOffset.xy;
+                                }
+
+                                if (_Vive)
+                                {
+                                    float4 scaleOffset = float4(1, 1, -0.03, 0);
+                                    uvRefl = (uvRefl - scaleOffset.zw) / scaleOffset.xy;
+                                }
+
+                                if (_VivePro)
+                                {
+                                    float4 scaleOffset = float4(1.05, 1, -0.056, 0);
                                     uvRefl = (uvRefl - scaleOffset.zw) / scaleOffset.xy;
                                 }
                             }

@@ -12,7 +12,8 @@
             EDeviceModelType.Quest,
             EDeviceModelType.AcerAH101,
             EDeviceModelType.Rift,
-            EDeviceModelType.RiftS
+            EDeviceModelType.RiftS,
+            EDeviceModelType.HtcVivePro
         };
 
         public static EDeviceModelType GetDeviceModelType()

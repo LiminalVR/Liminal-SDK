@@ -69,6 +69,9 @@ namespace App
                 case EDeviceModelType.HtcVivePro:
                     m_Renderer.material.SetFloat("_VivePro", 1);
                     break;
+                case EDeviceModelType.Quest:
+                    m_Renderer.material.SetFloat("_Quest", 1);
+                    break;
             }
 #endif
         }

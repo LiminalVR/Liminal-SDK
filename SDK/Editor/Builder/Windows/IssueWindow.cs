@@ -37,17 +37,11 @@ namespace Liminal.SDK.Build
 
                 EditorStyles.label.wordWrap = true;
 
+                CheckUnityEditor();
                 CheckRendering();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
-
                 CheckVRAvatar();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
-
                 CheckTagsAndLayers();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
-
                 CheckIncompatibility();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
@@ -55,7 +49,7 @@ namespace Liminal.SDK.Build
                 if(GUILayout.Button("View Wiki"))
                     Application.OpenURL("https://github.com/LiminalVR/DeveloperWiki/wiki/Requirements-&-Optimisation");
 
-                if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection)
+                if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection && !_showEditorSection)
                     EditorGUIHelper.DrawTitle("No Outstanding Issues");
 
                 GUILayout.FlexibleSpace();
@@ -70,6 +64,21 @@ namespace Liminal.SDK.Build
             scene.GetRootGameObjects(_sceneGameObjects);
         }
 
+        private void CheckUnityEditor()
+        {
+            if (_showEditorSection)
+                EditorGUIHelper.DrawTitle("Unity Editor");
+
+            if (!Application.unityVersion.Contains("2019.1.10f1"))
+            {
+                _showEditorSection = true;
+                EditorGUILayout.LabelField("Please Ensure You Are Using Unity 2019.1.10f1 As Your Development Environment");
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                return;
+            }
+
+            _showEditorSection = false;
+        }
 
         private void CheckRendering()
         {
@@ -86,6 +95,7 @@ namespace Liminal.SDK.Build
                     PlayerSettings.virtualRealitySupported = true;
 
                 EditorGUILayout.EndHorizontal();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 return;
             }
 
@@ -99,6 +109,7 @@ namespace Liminal.SDK.Build
                     PlayerSettings.stereoRenderingPath = StereoRenderingPath.SinglePass;
 
                 EditorGUILayout.EndHorizontal();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 return;
             }
 
@@ -125,6 +136,7 @@ namespace Liminal.SDK.Build
             {
                 _showVRAvatarSection = true;
                 EditorGUILayout.LabelField("Scene Must Contain A VR Avatar");
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 return;
             }
 
@@ -138,6 +150,7 @@ namespace Liminal.SDK.Build
                     avatar.Head.Transform.localEulerAngles = Vector3.zero;
 
                 EditorGUILayout.EndHorizontal();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 return;
             }
 
@@ -186,6 +199,7 @@ namespace Liminal.SDK.Build
                     EditorGUILayout.EndHorizontal();
                 }
 
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 return;
             }
 
@@ -199,6 +213,8 @@ namespace Liminal.SDK.Build
 
             if (allTags.Count() > 7 || allLayers.Count() > 5)
                 EditorGUIHelper.DrawTitle("Tags And Layers");
+            else
+                return;
 
             if (allTags.Count() > 7)
             {
@@ -210,6 +226,8 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.LabelField($"You Have {allLayers.Count() - 5} Custom Layers In Your Layer List. It Is Not Recommended To Rely On Layers, " +
                     $"As Layers Other Than The Default Ones Are Not Carried Through In A Limapp And Will Returns Null References. If You Use Layers, " +
                     $"Make Sure To Refer To Their Number And Not Their String Name.");
+
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
         }
 
         private void CheckIncompatibility()
@@ -228,7 +246,6 @@ namespace Liminal.SDK.Build
                         continue;
 
                     Type type = script.GetType();
-                    Debug.Log(type);
 
                     if (type.Name.ToLower().Contains("postprocessing"))
                     {
@@ -260,6 +277,8 @@ namespace Liminal.SDK.Build
 
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
+
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 return;
             }
 
@@ -301,6 +320,7 @@ namespace Liminal.SDK.Build
         bool _showRenderingSection;
         bool _showVRAvatarSection;
         bool _showIncompatibilitySection;
+        bool _showEditorSection; 
         List<GameObject> _sceneGameObjects = new List<GameObject>();
         Vector2 _scrollPos;
     }

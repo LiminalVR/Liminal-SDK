@@ -3,6 +3,7 @@
     Setup,
     Publishing,
     Build,
+    Issues,
     Preview,
     Settings,
 }

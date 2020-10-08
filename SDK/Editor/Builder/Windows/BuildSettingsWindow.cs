@@ -115,6 +115,7 @@ namespace Liminal.SDK.Build
         private void SetupMenuWindows()
         {
             BuildSettingLookup.AddSafe(BuildSettingMenus.Build, new BuildWindow());
+            BuildSettingLookup.AddSafe(BuildSettingMenus.Issues, new IssueWindow());
             BuildSettingLookup.AddSafe(BuildSettingMenus.Publishing, new PublishConfigurationWindow());
             BuildSettingLookup.AddSafe(BuildSettingMenus.Setup, new SetupWindow());
             BuildSettingLookup.AddSafe(BuildSettingMenus.Preview, new AppPreviewWindow());

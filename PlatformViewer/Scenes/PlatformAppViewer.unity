@@ -266,6 +266,49 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 9115841080957549935}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2130913845
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2130913848}
+  - component: {fileID: 2130913847}
+  m_Layer: 8
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2130913847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130913845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc9266782c67eaa47a7c11d32725a99e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2130913848
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2130913845}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.006812811, y: -0.015640497, z: 0.017760515}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1214683879370670754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,11 +345,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3473043119503296450}
     m_Modifications:
-    - target: {fileID: 1260162970045296579, guid: 22276a8657744e04cba8ad0a2caf4195,
-        type: 3}
-      propertyPath: m_Name
-      value: VRAvatar
-      objectReference: {fileID: 0}
     - target: {fileID: 1260162969423114810, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -361,6 +399,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1260162970045296579, guid: 22276a8657744e04cba8ad0a2caf4195,
+        type: 3}
+      propertyPath: m_Name
+      value: VRAvatar
       objectReference: {fileID: 0}
     - target: {fileID: 1260162968766363322, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
@@ -775,16 +818,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3473043119503296450}
     m_Modifications:
-    - target: {fileID: 4614822932832695013, guid: 702ba41ac8640ff4dbbfc85b033ebc3e,
-        type: 3}
-      propertyPath: m_Name
-      value: CanvasLoadingBar
-      objectReference: {fileID: 0}
-    - target: {fileID: 4614822932832695013, guid: 702ba41ac8640ff4dbbfc85b033ebc3e,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 4614822932832695016, guid: 702ba41ac8640ff4dbbfc85b033ebc3e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -889,6 +922,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4614822932832695013, guid: 702ba41ac8640ff4dbbfc85b033ebc3e,
+        type: 3}
+      propertyPath: m_Name
+      value: CanvasLoadingBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 4614822932832695013, guid: 702ba41ac8640ff4dbbfc85b033ebc3e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 4614822932832695015, guid: 702ba41ac8640ff4dbbfc85b033ebc3e, type: 3}

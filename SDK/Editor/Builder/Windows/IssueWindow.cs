@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using Liminal.SDK.Editor.Build;
 using Liminal.SDK.VR.Avatars;
@@ -18,7 +20,6 @@ namespace Liminal.SDK.Build
     /// </summary>
     public class IssueWindow : BaseWindowDrawer
     {
-        private string _referenceInput;
 
         public override void Draw(BuildWindowConfig config)
         {
@@ -27,9 +28,15 @@ namespace Liminal.SDK.Build
                 EditorGUIHelper.DrawTitle("Issue Resolution");
                 EditorGUILayout.LabelField("This window will help you resolve known issues and edge cases");
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
+
+                GetSceneGameObjects();
+
                 GUILayout.Space(10);
                 
                 _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+
+                EditorStyles.label.wordWrap = true;
+
                 CheckRendering();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
@@ -39,15 +46,14 @@ namespace Liminal.SDK.Build
                 CheckTagsAndLayers();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
+                CheckIncompatibility();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
                 EditorGUILayout.EndScrollView();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-                if (_showRenderingOptions == false && _showRenderingOptions == false)
+                if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection)
                     EditorGUIHelper.DrawTitle("No Outstanding Issues");
-
-                if (GUILayout.Button("Test"))
-                {
-                    DetectMethods();
-                }
 
                 GUILayout.FlexibleSpace();
                
@@ -55,14 +61,21 @@ namespace Liminal.SDK.Build
             }
         }
 
+        private void GetSceneGameObjects()
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            scene.GetRootGameObjects(_sceneGameObjects);
+        }
+
+
         private void CheckRendering()
         {
-            if (_showRenderingOptions)
+            if (_showRenderingSection)
                 EditorGUIHelper.DrawTitle("Rendering");
 
             if (!PlayerSettings.virtualRealitySupported)
             {
-                _showRenderingOptions = true;
+                _showRenderingSection = true;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Virtual Reality Must Be Supported");
 
@@ -75,7 +88,7 @@ namespace Liminal.SDK.Build
 
             if (PlayerSettings.stereoRenderingPath != StereoRenderingPath.SinglePass)
             {
-                _showRenderingOptions = true;
+                _showRenderingSection = true;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Stereo Rendering Mode Must be Set To Single Pass");
 
@@ -86,18 +99,14 @@ namespace Liminal.SDK.Build
                 return;
             }
 
-            _showRenderingOptions = false;
+            _showRenderingSection = false;
         }
 
         private void CheckVRAvatar()
         {
-            var sceneObjects = new List<GameObject>();
-            Scene scene = SceneManager.GetActiveScene();
-            scene.GetRootGameObjects(sceneObjects);
-
             VRAvatar avatar = null;
 
-            foreach (var item in sceneObjects)
+            foreach (var item in _sceneGameObjects)
             {
                 if(item.GetComponentInChildren<VRAvatar>())
                 {
@@ -106,19 +115,19 @@ namespace Liminal.SDK.Build
                 }
             }
 
-            if (_showVRAvatarOptions)
+            if (_showVRAvatarSection)
                 EditorGUIHelper.DrawTitle("VR Avatar");
 
             if (avatar == null)
             {
-                _showVRAvatarOptions = true;
+                _showVRAvatarSection = true;
                 EditorGUILayout.LabelField("Scene Must Contain A VR Avatar");
                 return;
             }
 
             if (avatar.Head.Transform.localEulerAngles != Vector3.zero)
             {
-                _showVRAvatarOptions = true;
+                _showVRAvatarSection = true;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("VR Avatar Head Rotation Must be Zeroed");
 
@@ -150,7 +159,7 @@ namespace Liminal.SDK.Build
 
             if (eyeRotWrong || eyePosWrong)
             {
-                _showVRAvatarOptions = true;
+                _showVRAvatarSection = true;
 
                 if (eyeRotWrong)
                 {
@@ -177,25 +186,92 @@ namespace Liminal.SDK.Build
                 return;
             }
 
-            _showVRAvatarOptions = false;
+            _showVRAvatarSection = false;
         }
 
         private void CheckTagsAndLayers()
         {
+            var allTags = UnityEditorInternal.InternalEditorUtility.tags;
+            var allLayers = UnityEditorInternal.InternalEditorUtility.layers;
 
+            if (allTags.Count() > 7 || allLayers.Count() > 5)
+                EditorGUIHelper.DrawTitle("Tags And Layers");
+
+            if (allTags.Count() > 7)
+            {
+                EditorGUILayout.LabelField($"You Have {allTags.Count() - 7} Custom Tags In Your Tag List. Do Not Use Tags Unless They Are Assigned At Runtime.");
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            }
+
+            if (allLayers.Count() > 5)
+                EditorGUILayout.LabelField($"You Have {allLayers.Count() - 5} Custom Layers In Your Layer List. It Is Not Recommended To Rely On Layers, " +
+                    $"As Layers Other Than The Default Ones Are Not Carried Through In A Limapp And Will Returns Null References. If You Use Layers, " +
+                    $"Make Sure To Refer To Their Number And Not Their String Name.");
+        }
+
+        private void CheckIncompatibility()
+        {
+            if(_showIncompatibilitySection)
+                EditorGUIHelper.DrawTitle("Known Incompatabilities");
+
+            var incompatiblePackages = new List<string>();
+
+            foreach (var item in _sceneGameObjects)
+            {
+                var scripts = item.GetComponentsInChildren<MonoBehaviour>();
+                foreach (var script in scripts)
+                {
+                    if (script == null)
+                        continue;
+
+                    Type type = script.GetType();
+                    Debug.Log(type);
+
+                    if (type.Name.ToLower().Contains("postprocessing"))
+                    {
+                        if (!incompatiblePackages.Contains("Unity Post-Processing"))
+                            incompatiblePackages.Add("Unity Post-Processing");
+                    }
+
+                    if (type.Name.ToLower().Contains("curvy"))
+                    {
+                        if (!incompatiblePackages.Contains("Curvy"))
+                            incompatiblePackages.Add("Curvy");
+                    }
+                }
+            }
+   
+
+            if (incompatiblePackages.Count > 0)
+            {
+                _showIncompatibilitySection = true;
+
+                EditorGUILayout.LabelField($"The Following Packages Are Known To Be Incompatible With The Liminal SDK");
+                EditorGUI.indentLevel++;
+
+                foreach (var item in incompatiblePackages)
+                {
+                    EditorGUILayout.LabelField($"* {item}");
+                }
+
+                EditorGUI.indentLevel--;
+
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
+                return;
+            }
+
+
+            _showIncompatibilitySection = false;
         }
 
         private void DetectMethods()
         {
-            List<GameObject> test = new List<GameObject>();
-            Scene scene = SceneManager.GetActiveScene();
-            scene.GetRootGameObjects(test);
-
             List<MethodInfo> methods = new List<MethodInfo>();
 
             // this finds out if methods are included in scripts, but I need to change it to find if methods are being called in scripts
 
-            foreach (var item in test)
+            foreach (var item in _sceneGameObjects)
             {
                 var scripts = item.GetComponentsInChildren<MonoBehaviour>();
 
@@ -220,9 +296,10 @@ namespace Liminal.SDK.Build
             }
         }
 
-        bool _showRenderingOptions;
-        bool _showVRAvatarOptions;
-        bool _showTagsAndLayersOptions;
+        bool _showRenderingSection;
+        bool _showVRAvatarSection;
+        bool _showIncompatibilitySection;
+        List<GameObject> _sceneGameObjects = new List<GameObject>();
         Vector2 _scrollPos;
     }
 }

@@ -26,7 +26,7 @@ namespace Liminal.SDK.Build
             EditorGUILayout.BeginVertical("Box");
             {
                 EditorGUIHelper.DrawTitle("Issue Resolution");
-                EditorGUILayout.LabelField("This window will help you resolve known issues and edge cases");
+                EditorGUILayout.LabelField("This window will help you Identify and resolve known issues and edge cases");
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
                 GetSceneGameObjects();
@@ -51,6 +51,9 @@ namespace Liminal.SDK.Build
 
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
+                if(GUILayout.Button("View Wiki"))
+                    Application.OpenURL("https://github.com/LiminalVR/DeveloperWiki/wiki/Requirements-&-Optimisation");
 
                 if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection)
                     EditorGUIHelper.DrawTitle("No Outstanding Issues");
@@ -212,7 +215,7 @@ namespace Liminal.SDK.Build
         private void CheckIncompatibility()
         {
             if(_showIncompatibilitySection)
-                EditorGUIHelper.DrawTitle("Known Incompatabilities");
+                EditorGUIHelper.DrawTitle("Known Incompatibilities");
 
             var incompatiblePackages = new List<string>();
 
@@ -240,7 +243,6 @@ namespace Liminal.SDK.Build
                     }
                 }
             }
-   
 
             if (incompatiblePackages.Count > 0)
             {

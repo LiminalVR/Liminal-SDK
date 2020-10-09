@@ -30,15 +30,13 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
                 GetSceneGameObjects();
+                GetCurrentAssemblies();
 
                 GUILayout.Space(10);
                 
                 _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
                 EditorStyles.label.wordWrap = true;
-
-                if (GUILayout.Button("Test Reflection"))
-                    DetectMethods();
 
                 CheckIncompatibility();
                 /*
@@ -68,6 +66,11 @@ namespace Liminal.SDK.Build
         {
             Scene scene = SceneManager.GetActiveScene();
             scene.GetRootGameObjects(_sceneGameObjects);
+        }
+
+        private void GetCurrentAssemblies()
+        {
+            _currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
         }
 
         private void CheckUnityEditor()
@@ -242,8 +245,9 @@ namespace Liminal.SDK.Build
                 EditorGUIHelper.DrawTitle("Known Incompatibilities");
 
             GetIncompatibleAssemblies(out var presentAssemblies, "Unity.Postprocessing.Runtime");
+            GetIncompatibleNamespaces(out var presentNamespaces, "FluffyUnderware.Curvy");
 
-            if (presentAssemblies.Count <= 0)
+            if (presentAssemblies.Count <= 0 && presentNamespaces.Count <= 0)
             {
                 _showIncompatibilitySection = false;
                 return;
@@ -251,10 +255,19 @@ namespace Liminal.SDK.Build
 
             _showIncompatibilitySection = true;
 
-            EditorGUILayout.LabelField($"The Following Packages Are Known To Be Incompatible With The Liminal SDK");
+            DisplayIncompatibleItems("The Following Packages Are Known To Be Incompatible With The Liminal SDK", presentAssemblies);
+            DisplayIncompatibleItems("The Following Namespaces Are Known To Be Incompatible With The Liminal SDK", presentNamespaces);
+        }
+
+        private void DisplayIncompatibleItems(string labelText, List<string> itemsToDisplay)
+        {
+            if (itemsToDisplay.Count <= 0)
+                return;
+
+            EditorGUILayout.LabelField(labelText);
             EditorGUI.indentLevel++;
 
-            foreach (var item in presentAssemblies)
+            foreach (var item in itemsToDisplay)
             {
                 EditorGUILayout.LabelField($"* {item}");
             }
@@ -262,17 +275,16 @@ namespace Liminal.SDK.Build
             EditorGUI.indentLevel--;
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
+            EditorGUILayout.LabelField($"Please Remove These Before Building");
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            return;
         }
 
         private void GetIncompatibleAssemblies(out List<string> presentAssemblies, params string[] assemblies)
         {
             presentAssemblies = new List<string>();
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in _currentAssemblies)
             {
                 foreach (var item in assemblies)
                 {
@@ -282,11 +294,29 @@ namespace Liminal.SDK.Build
             }
         }
 
+        private void GetIncompatibleNamespaces(out List<string> presentNamespaces,params string[] namespaces)
+        {
+            presentNamespaces = new List<string>();
+
+            foreach (Assembly assembly in _currentAssemblies)
+            {
+                foreach (Type type in assembly.GetTypes())
+                {
+                    foreach (var item in namespaces)
+                    {
+                        if (type.Namespace == item)
+                            presentNamespaces.Add(type.Namespace);
+                    }
+                }
+            }
+        }
+
         bool _showRenderingSection;
         bool _showVRAvatarSection;
         bool _showIncompatibilitySection;
         bool _showEditorSection; 
         List<GameObject> _sceneGameObjects = new List<GameObject>();
+        List<Assembly> _currentAssemblies = new List<Assembly>();
         Vector2 _scrollPos;
     }
 }

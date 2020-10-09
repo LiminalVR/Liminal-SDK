@@ -247,7 +247,11 @@ namespace Liminal.SDK.Build
             GetIncompatibleAssemblies(out var presentAssemblies, "Unity.Postprocessing.Runtime");
             GetIncompatibleNamespaces(out var presentNamespaces, "FluffyUnderware.Curvy");
 
-            if (presentAssemblies.Count <= 0 && presentNamespaces.Count <= 0)
+            var allItems = new List<string>();
+            allItems.AddRange(presentAssemblies);
+            allItems.AddRange(presentNamespaces);
+
+            if (allItems.Count <= 0)
             {
                 _showIncompatibilitySection = false;
                 return;
@@ -255,19 +259,28 @@ namespace Liminal.SDK.Build
 
             _showIncompatibilitySection = true;
 
-            DisplayIncompatibleItems("The Following Packages Are Known To Be Incompatible With The Liminal SDK", presentAssemblies);
-            DisplayIncompatibleItems("The Following Namespaces Are Known To Be Incompatible With The Liminal SDK", presentNamespaces);
+            DisplayIncompatibleItems(allItems);
         }
 
-        private void DisplayIncompatibleItems(string labelText, List<string> itemsToDisplay)
+        private void DisplayIncompatibleItems(List<string> itemsToDisplay)
         {
-            if (itemsToDisplay.Count <= 0)
-                return;
-
-            EditorGUILayout.LabelField(labelText);
-            EditorGUI.indentLevel++;
+            var incompatiblePackages = new List<string>();
 
             foreach (var item in itemsToDisplay)
+            {
+                IssuesUtility.PackagesTable.TryGetValue(item, out var value);
+
+                if (!incompatiblePackages.Contains(value))
+                    incompatiblePackages.Add(value);
+            }
+
+            if (incompatiblePackages.Count <= 0)
+                return;
+
+            EditorGUILayout.LabelField("The Following Packages Are Known To Be Incompatible With The Liminal SDK");
+            EditorGUI.indentLevel++;
+
+            foreach (var item in incompatiblePackages)
             {
                 EditorGUILayout.LabelField($"* {item}");
             }
@@ -275,7 +288,7 @@ namespace Liminal.SDK.Build
             EditorGUI.indentLevel--;
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            EditorGUILayout.LabelField($"Please Remove These Before Building");
+            EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
         }

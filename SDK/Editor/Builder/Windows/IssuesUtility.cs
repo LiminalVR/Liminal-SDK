@@ -4,9 +4,10 @@ using UnityEngine;
 
 public static class IssuesUtility
 {
-    public static Dictionary<string, string> PackagesTable = new Dictionary<string, string>()
+    public static Dictionary<string, string> IncompatiblePackagesTable = new Dictionary<string, string>()
     {
         {"Unity.Postprocessing.Runtime","Post Processing"},
-        {"FluffyUnderware.Curvy","Curvy"}
+        {"FluffyUnderware.Curvy","Curvy"},
+        {"DOTween","DOTween"}
     };
 }

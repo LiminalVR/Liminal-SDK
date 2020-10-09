@@ -244,8 +244,8 @@ namespace Liminal.SDK.Build
             if(_showIncompatibilitySection)
                 EditorGUIHelper.DrawTitle("Known Incompatibilities");
 
-            GetIncompatibleAssemblies(out var presentAssemblies, "Unity.Postprocessing.Runtime");
-            GetIncompatibleNamespaces(out var presentNamespaces, "FluffyUnderware.Curvy");
+            GetIncompatibleAssemblies(out var presentAssemblies, IssuesUtility.IncompatiblePackagesTable.Keys.ToArray());
+            GetIncompatibleNamespaces(out var presentNamespaces, IssuesUtility.IncompatiblePackagesTable.Keys.ToArray());
 
             var allItems = new List<string>();
             allItems.AddRange(presentAssemblies);
@@ -268,7 +268,7 @@ namespace Liminal.SDK.Build
 
             foreach (var item in itemsToDisplay)
             {
-                IssuesUtility.PackagesTable.TryGetValue(item, out var value);
+                IssuesUtility.IncompatiblePackagesTable.TryGetValue(item, out var value);
 
                 if (!incompatiblePackages.Contains(value))
                     incompatiblePackages.Add(value);

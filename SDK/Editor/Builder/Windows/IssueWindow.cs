@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Text;
+using Liminal.SDK.Core;
 using Liminal.SDK.Editor.Build;
 using Liminal.SDK.VR.Avatars;
+//using SDILReader;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.VR;
-using UnityEngine.XR;
 
 namespace Liminal.SDK.Build
 {
@@ -37,6 +37,10 @@ namespace Liminal.SDK.Build
                 _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
                 EditorStyles.label.wordWrap = true;
+
+
+                if (GUILayout.Button("dsddadasds"))
+                    test();
 
                 CheckIncompatibility();
                 /*
@@ -299,6 +303,9 @@ namespace Liminal.SDK.Build
 
             foreach (Assembly assembly in _currentAssemblies)
             {
+                if (IssuesUtility.AssembliesToIgnore.Contains(assembly.GetName().Name))
+                    continue;
+
                 foreach (var item in assemblies)
                 {
                     if (assembly.GetName().Name.Equals(item))
@@ -313,12 +320,76 @@ namespace Liminal.SDK.Build
 
             foreach (Assembly assembly in _currentAssemblies)
             {
+                if (IssuesUtility.AssembliesToIgnore.Contains(assembly.GetName().Name))
+                    continue;
+
                 foreach (Type type in assembly.GetTypes())
                 {
                     foreach (var item in namespaces)
                     {
                         if (type.Namespace == item)
                             presentNamespaces.Add(type.Namespace);
+                    }
+                }
+            }
+        }
+
+        private void test()
+        {
+            var title = string.Empty;
+            foreach (Assembly assembly in _currentAssemblies)
+            {
+                if (IssuesUtility.AssembliesToIgnore.Contains(assembly.GetName().Name))
+                    continue;
+
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (!type.Name.Equals("NewBehaviourScript"))
+                        continue;
+
+                    Debug.Log(type.Name);
+
+                    var methodInfos = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+                    foreach (var item in methodInfos)
+                    {
+
+                       if (!item.Name.Equals("lfrhurhrehehwrrehw")&& !item.Name.Equals("heya"))
+                          continue;
+                        Debug.Log(item);
+
+
+                       // var mr = new MethodBodyReader(item);
+
+                        //if (mr == null)
+                           // continue;
+
+                        // get the text representation of the msil
+                        //string msil = mr.GetBodyCode();
+
+                        //Debug.Log(msil);
+
+                        /*
+                        var body = item.GetMethodBody();
+                        //Debug.Log(item.Name);
+                        if (body != null)
+                        {
+                            var ilArray = body.GetILAsByteArray();
+                            var test = string.Empty;
+
+                            foreach (var il in ilArray)
+                            {
+                                test += il;
+                            }
+
+
+                            Debug.Log(item.Name+"  "+test);
+                            foreach (var key in IssuesUtility.ForbiddenFunctionCalls.Keys)
+                            {
+                                if (test.Contains(key))
+                                    Debug.Log($"{type.Name} has forbidden code: {IssuesUtility.ForbiddenFunctionCalls[key]} in function: {item.Name}");
+                            }
+                        }
+                        */
                     }
                 }
             }

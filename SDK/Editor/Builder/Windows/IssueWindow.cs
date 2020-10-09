@@ -37,11 +37,17 @@ namespace Liminal.SDK.Build
 
                 EditorStyles.label.wordWrap = true;
 
+                if (GUILayout.Button("Test Reflection"))
+                    DetectMethods();
+
+                CheckIncompatibility();
+                /*
                 CheckUnityEditor();
                 CheckRendering();
                 CheckVRAvatar();
                 CheckTagsAndLayers();
                 CheckIncompatibility();
+                */
 
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
@@ -235,85 +241,44 @@ namespace Liminal.SDK.Build
             if(_showIncompatibilitySection)
                 EditorGUIHelper.DrawTitle("Known Incompatibilities");
 
-            var incompatiblePackages = new List<string>();
+            GetIncompatibleAssemblies(out var presentAssemblies, "Unity.Postprocessing.Runtime");
 
-            foreach (var item in _sceneGameObjects)
+            if (presentAssemblies.Count <= 0)
             {
-                var scripts = item.GetComponentsInChildren<MonoBehaviour>();
-                foreach (var script in scripts)
-                {
-                    if (script == null)
-                        continue;
-
-                    Type type = script.GetType();
-
-                    if (type.Name.ToLower().Contains("postprocessing"))
-                    {
-                        if (!incompatiblePackages.Contains("Unity Post-Processing"))
-                            incompatiblePackages.Add("Unity Post-Processing");
-                    }
-
-                    if (type.Name.ToLower().Contains("curvy"))
-                    {
-                        if (!incompatiblePackages.Contains("Curvy"))
-                            incompatiblePackages.Add("Curvy");
-                    }
-                }
-            }
-
-            if (incompatiblePackages.Count > 0)
-            {
-                _showIncompatibilitySection = true;
-
-                EditorGUILayout.LabelField($"The Following Packages Are Known To Be Incompatible With The Liminal SDK");
-                EditorGUI.indentLevel++;
-
-                foreach (var item in incompatiblePackages)
-                {
-                    EditorGUILayout.LabelField($"* {item}");
-                }
-
-                EditorGUI.indentLevel--;
-
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
-                EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
-
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                _showIncompatibilitySection = false;
                 return;
             }
 
+            _showIncompatibilitySection = true;
 
-            _showIncompatibilitySection = false;
-        }
+            EditorGUILayout.LabelField($"The Following Packages Are Known To Be Incompatible With The Liminal SDK");
+            EditorGUI.indentLevel++;
 
-        private void DetectMethods()
-        {
-            List<MethodInfo> methods = new List<MethodInfo>();
-
-            // this finds out if methods are included in scripts, but I need to change it to find if methods are being called in scripts
-
-            foreach (var item in _sceneGameObjects)
+            foreach (var item in presentAssemblies)
             {
-                var scripts = item.GetComponentsInChildren<MonoBehaviour>();
-
-                foreach (var script in scripts)
-                {
-                    if (script == null)
-                        continue;
-
-                    Type type = script.GetType();
- 
-                    if (type.GetMethod("test") != null)
-                        methods.Add(type.GetMethod("test"));
-
-                    if (type.GetMethod("temp") != null)
-                        methods.Add(type.GetMethod("temp"));
-                }  
+                EditorGUILayout.LabelField($"* {item}");
             }
 
-            foreach (var item in methods)
+            EditorGUI.indentLevel--;
+
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
+
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            return;
+        }
+
+        private void GetIncompatibleAssemblies(out List<string> presentAssemblies, params string[] assemblies)
+        {
+            presentAssemblies = new List<string>();
+
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                Debug.Log(item);
+                foreach (var item in assemblies)
+                {
+                    if (assembly.GetName().Name.Equals(item))
+                        presentAssemblies.Add(assembly.GetName().Name);
+                }
             }
         }
 

@@ -39,27 +39,21 @@ namespace Liminal.SDK.Build
 
                 EditorStyles.label.wordWrap = true;
 
-
-                if (GUILayout.Button("dsddadasds"))
-                    CheckForForbiddenCalls();
-
-                CheckIncompatibility();
-                /*
+                DisplayForbiddenCalls();
                 CheckUnityEditor();
                 CheckRendering();
                 CheckVRAvatar();
                 CheckTagsAndLayers();
                 CheckIncompatibility();
-                */
 
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-                if(GUILayout.Button("View Wiki"))
-                    Application.OpenURL("https://github.com/LiminalVR/DeveloperWiki/wiki/Requirements-&-Optimisation");
-
                 if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection && !_showEditorSection)
                     EditorGUIHelper.DrawTitle("No Outstanding Issues");
+
+                if (GUILayout.Button("View Wiki"))
+                    Application.OpenURL("https://github.com/LiminalVR/DeveloperWiki/wiki/Requirements-&-Optimisation");
 
                 GUILayout.FlexibleSpace();
                
@@ -76,6 +70,12 @@ namespace Liminal.SDK.Build
         private void GetCurrentAssemblies()
         {
             _currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+        }
+
+        [UnityEditor.Callbacks.DidReloadScripts]
+        private static void ScriptsCompiled()
+        {
+            CheckForForbiddenCalls();
         }
 
         private void CheckUnityEditor()
@@ -333,30 +333,26 @@ namespace Liminal.SDK.Build
             }
         }
 
-        private void CheckForForbiddenCalls()
+        private static void CheckForForbiddenCalls()
         {
             var module = ModuleDefinition.ReadModule($"Library/ScriptAssemblies/Assembly-CSharp.dll");
             var types = module.Types;
-            Dictionary<string, string> MessageLink = new Dictionary<string, string>();
+            ForbiddenCallsAndScript = new Dictionary<string, string>();
 
             foreach (var script in types)
             {
-                Debug.Log($"<color=red>{script.Name}</color>");
-
                 var assets = AssetDatabase.FindAssets(script.Name);
                 var assetPath = AssetDatabase.GUIDToAssetPath(assets.FirstOrDefault());
 
                 foreach (var method in script.Methods)
                 {
                     var forbiddenCalls = CheckMethodForForbiddenCalls(method, script.Name);
-                    forbiddenCalls.ForEach(forbiddenCall => MessageLink.Add($"{forbiddenCall}", $"{assetPath}]"));
+                    forbiddenCalls.ForEach(forbiddenCall => ForbiddenCallsAndScript.Add($"{forbiddenCall}", $"{assetPath}]"));
                 }
             }
-
-            DisplayForbiddenCalls(MessageLink);
         }
 
-        public List<string> CheckMethodForForbiddenCalls(MethodDefinition method, string scriptName)
+        public static List<string> CheckMethodForForbiddenCalls(MethodDefinition method, string scriptName)
         {
             var temp = string.Empty;
             var textOutput = new List<string>();
@@ -390,15 +386,17 @@ namespace Liminal.SDK.Build
             return textOutput;
         }
 
-        private void DisplayForbiddenCalls(Dictionary<string,string> MessageLink)
+        private void DisplayForbiddenCalls()
         {
+            if (ForbiddenCallsAndScript.Count <= 0)
+                return;
+
             EditorGUILayout.LabelField("The Following Function Calls Are Forbidden In The Liminal SDK");
             EditorGUI.indentLevel++;
 
-            foreach (var entry in MessageLink)
+            foreach (var entry in ForbiddenCallsAndScript)
             {
                 EditorGUILayout.LabelField($"* {entry.Key}");
-                Debug.Log(entry.Key);
             }
 
             EditorGUI.indentLevel--;
@@ -413,6 +411,7 @@ namespace Liminal.SDK.Build
         bool _showEditorSection; 
         List<GameObject> _sceneGameObjects = new List<GameObject>();
         List<Assembly> _currentAssemblies = new List<Assembly>();
+        static Dictionary<string, string> ForbiddenCallsAndScript = new Dictionary<string, string>();
         Vector2 _scrollPos;
     }
 }

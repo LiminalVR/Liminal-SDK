@@ -14,12 +14,13 @@ public static class IssuesUtility
     //key is the function call in IL code, value is what the IL code translates into
     public static Dictionary<string, string> ForbiddenFunctionCalls = new Dictionary<string, string>()
     {
-        { "4040010","Application.Quit()"},
-        { "01124","SceneManager.LoadScene()"},
-        { "060010z","DontDestroyOnLoad();"}
+        { "System.Void UnityEngine.Application::Quit()","Application.Quit()"},
+        { "System.Void UnityEngine.SceneManagement.SceneManager::LoadScene(System.String)","SceneManager.LoadScene()"},
+        { "UnityEngine.AsyncOperation UnityEngine.SceneManagement.SceneManager::LoadSceneAsync(System.String)","SceneManager.LoadSceneAsync()"},
+        { "System.Boolean UnityEngine.SceneManagement.SceneManager::UnloadScene(System.String)","SceneManager.UnloadScene()"},
+        { "UnityEngine.AsyncOperation UnityEngine.SceneManagement.SceneManager::UnloadSceneAsync(System.String)","SceneManager.UnloadSceneAsync()"},
+        { "System.Void UnityEngine.Object::DontDestroyOnLoad(UnityEngine.Object)","DontDestroyOnLoad()"}
     };
-
-
 
     public static List<string> AssembliesToIgnore = new List<string>()
     {

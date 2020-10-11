@@ -5,10 +5,11 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
+using Liminal.Cecil.Mono.Cecil;
+using Liminal.Cecil.Mono.Cecil.Cil;
 using Liminal.SDK.Core;
 using Liminal.SDK.Editor.Build;
 using Liminal.SDK.VR.Avatars;
-//using SDILReader;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -40,7 +41,7 @@ namespace Liminal.SDK.Build
 
 
                 if (GUILayout.Button("dsddadasds"))
-                    test();
+                    CheckForForbiddenCalls();
 
                 CheckIncompatibility();
                 /*
@@ -290,10 +291,8 @@ namespace Liminal.SDK.Build
             }
 
             EditorGUI.indentLevel--;
-
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
-
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
         }
 
@@ -334,67 +333,80 @@ namespace Liminal.SDK.Build
             }
         }
 
-        private void test()
+        private void CheckForForbiddenCalls()
         {
-            var title = string.Empty;
-            foreach (Assembly assembly in _currentAssemblies)
+            var module = ModuleDefinition.ReadModule($"Library/ScriptAssemblies/Assembly-CSharp.dll");
+            var types = module.Types;
+            Dictionary<string, string> MessageLink = new Dictionary<string, string>();
+
+            foreach (var script in types)
             {
-                if (IssuesUtility.AssembliesToIgnore.Contains(assembly.GetName().Name))
+                Debug.Log($"<color=red>{script.Name}</color>");
+
+                var assets = AssetDatabase.FindAssets(script.Name);
+                var assetPath = AssetDatabase.GUIDToAssetPath(assets.FirstOrDefault());
+
+                foreach (var method in script.Methods)
+                {
+                    var forbiddenCalls = CheckMethodForForbiddenCalls(method, script.Name);
+                    forbiddenCalls.ForEach(forbiddenCall => MessageLink.Add($"{forbiddenCall}", $"{assetPath}]"));
+                }
+            }
+
+            DisplayForbiddenCalls(MessageLink);
+        }
+
+        public List<string> CheckMethodForForbiddenCalls(MethodDefinition method, string scriptName)
+        {
+            var temp = string.Empty;
+            var textOutput = new List<string>();
+
+            if (!method.HasBody)
+                return textOutput;
+
+            var methodCalls = method.Body.Instructions
+                    .Where(x => x.OpCode == OpCodes.Call)
+                    .ToArray();
+
+            foreach (var item in methodCalls)
+            {
+                var mRef = item.Operand as MethodReference;
+
+                if (mRef == null)
                     continue;
 
-                foreach (Type type in assembly.GetTypes())
+                //Debug.Log(mRef.FullName);
+
+                foreach (var key in IssuesUtility.ForbiddenFunctionCalls.Keys)
                 {
-                    if (!type.Name.Equals("NewBehaviourScript"))
-                        continue;
-
-                    Debug.Log(type.Name);
-
-                    var methodInfos = type.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
-                    foreach (var item in methodInfos)
+                    if (mRef.FullName.Equals(key))
                     {
-
-                       if (!item.Name.Equals("lfrhurhrehehwrrehw")&& !item.Name.Equals("heya"))
-                          continue;
-                        Debug.Log(item);
-
-
-                       // var mr = new MethodBodyReader(item);
-
-                        //if (mr == null)
-                           // continue;
-
-                        // get the text representation of the msil
-                        //string msil = mr.GetBodyCode();
-
-                        //Debug.Log(msil);
-
-                        /*
-                        var body = item.GetMethodBody();
-                        //Debug.Log(item.Name);
-                        if (body != null)
-                        {
-                            var ilArray = body.GetILAsByteArray();
-                            var test = string.Empty;
-
-                            foreach (var il in ilArray)
-                            {
-                                test += il;
-                            }
-
-
-                            Debug.Log(item.Name+"  "+test);
-                            foreach (var key in IssuesUtility.ForbiddenFunctionCalls.Keys)
-                            {
-                                if (test.Contains(key))
-                                    Debug.Log($"{type.Name} has forbidden code: {IssuesUtility.ForbiddenFunctionCalls[key]} in function: {item.Name}");
-                            }
-                        }
-                        */
+                        textOutput.Add($"Please remove {IssuesUtility.ForbiddenFunctionCalls[key]} from method: {method.Name} in script: {scriptName}");
+                        break;
                     }
                 }
             }
+
+            return textOutput;
         }
 
+        private void DisplayForbiddenCalls(Dictionary<string,string> MessageLink)
+        {
+            EditorGUILayout.LabelField("The Following Function Calls Are Forbidden In The Liminal SDK");
+            EditorGUI.indentLevel++;
+
+            foreach (var entry in MessageLink)
+            {
+                EditorGUILayout.LabelField($"* {entry.Key}");
+                Debug.Log(entry.Key);
+            }
+
+            EditorGUI.indentLevel--;
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            EditorGUILayout.LabelField($"Please Remove These Calls Before Building");
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+        }
+        
         bool _showRenderingSection;
         bool _showVRAvatarSection;
         bool _showIncompatibilitySection;

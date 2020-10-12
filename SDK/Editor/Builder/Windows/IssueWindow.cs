@@ -39,24 +39,25 @@ namespace Liminal.SDK.Build
 
                 EditorStyles.label.wordWrap = true;
 
-                DisplayForbiddenCalls();
                 CheckUnityEditor();
+                DisplayForbiddenCalls();
+                CheckIncompatibility();
+                CheckTagsAndLayers();
                 CheckRendering();
                 CheckVRAvatar();
-                CheckTagsAndLayers();
-                CheckIncompatibility();
 
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-                if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection && !_showEditorSection)
+                if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection && !_showEditorSection && !_hasForbiddenCalls)
                     EditorGUIHelper.DrawTitle("No Outstanding Issues");
+
+                EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
                 if (GUILayout.Button("View Wiki"))
                     Application.OpenURL("https://github.com/LiminalVR/DeveloperWiki/wiki/Requirements-&-Optimisation");
 
                 GUILayout.FlexibleSpace();
-               
                 EditorGUILayout.EndVertical();
             }
         }
@@ -86,7 +87,7 @@ namespace Liminal.SDK.Build
             if (!Application.unityVersion.Contains("2019.1.10f1"))
             {
                 _showEditorSection = true;
-                EditorGUILayout.LabelField("Please Ensure You Are Using Unity 2019.1.10f1 As Your Development Environment");
+                EditorGUILayout.LabelField("Ensure you are using Unity 2019.1.10f1 as your development environment");
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 return;
             }
@@ -232,14 +233,14 @@ namespace Liminal.SDK.Build
 
             if (allTags.Count() > 7)
             {
-                EditorGUILayout.LabelField($"You Have {allTags.Count() - 7} Custom Tags In Your Tag List. Do Not Use Tags Unless They Are Assigned At Runtime.");
+                EditorGUILayout.LabelField($"You have {allTags.Count() - 7} custom tags in your tag list. Do not use tags unless they are assigned at runtime.");
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
             }
 
             if (allLayers.Count() > 5)
-                EditorGUILayout.LabelField($"You Have {allLayers.Count() - 5} Custom Layers In Your Layer List. It Is Not Recommended To Rely On Layers, " +
-                    $"As Layers Other Than The Default Ones Are Not Carried Through In A Limapp And Will Returns Null References. If You Use Layers, " +
-                    $"Make Sure To Refer To Their Number And Not Their String Name.");
+                EditorGUILayout.LabelField($"You have {allLayers.Count() - 5} custom layers in your layer list. It is not recommended to rely on layers, " +
+                    $"as layers other than the default ones are not carried through in a limapp and will returns null references. If you use layers, " +
+                    $"make sure to refer to their number and not their string name.");
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
         }
@@ -390,6 +391,10 @@ namespace Liminal.SDK.Build
         {
             if (ForbiddenCallsAndScript.Count <= 0)
                 return;
+
+            EditorGUIHelper.DrawTitle("Forbidden Calls");
+            _hasForbiddenCalls = true;
+
             GUIStyle style = new GUIStyle(GUI.skin.label);
             style.richText = true;
             style.wordWrap = true;
@@ -424,7 +429,8 @@ namespace Liminal.SDK.Build
         bool _showRenderingSection;
         bool _showVRAvatarSection;
         bool _showIncompatibilitySection;
-        bool _showEditorSection; 
+        bool _showEditorSection;
+        bool _hasForbiddenCalls;
         List<GameObject> _sceneGameObjects = new List<GameObject>();
         List<Assembly> _currentAssemblies = new List<Assembly>();
         static Dictionary<string, string> ForbiddenCallsAndScript = new Dictionary<string, string>();

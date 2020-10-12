@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-using System.Text;
-using Liminal.Cecil.Mono.Cecil;
-using Liminal.Cecil.Mono.Cecil.Cil;
-using Liminal.SDK.Core;
-using Liminal.SDK.Editor.Build;
 using Liminal.SDK.VR.Avatars;
 using UnityEditor;
 using UnityEngine;
@@ -27,7 +20,7 @@ namespace Liminal.SDK.Build
             EditorGUILayout.BeginVertical("Box");
             {
                 EditorGUIHelper.DrawTitle("Issue Resolution");
-                EditorGUILayout.LabelField("This window will help you Identify and resolve known issues and edge cases");
+                EditorGUILayout.LabelField("This window will help you identify and resolve known issues and edge cases");
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
                 GetSceneGameObjects();
@@ -65,16 +58,11 @@ namespace Liminal.SDK.Build
             scene.GetRootGameObjects(_sceneGameObjects);
         }
 
-        private static void GetCurrentAssemblies()
-        {
-            _currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-        }
-
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void ScriptsCompiled()
         {
-            CheckForForbiddenCalls();
-            GetCurrentAssemblies();
+            IssuesUtility.CheckForForbiddenCalls("Library/ScriptAssemblies/Assembly-CSharp.dll", ref _forbiddenCallsAndScripts);
+            _currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
         }
 
         private void CheckUnityEditor()
@@ -339,69 +327,18 @@ namespace Liminal.SDK.Build
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
         }
 
-        private static void CheckForForbiddenCalls()
-        {
-            var module = ModuleDefinition.ReadModule($"Library/ScriptAssemblies/Assembly-CSharp.dll");
-            var types = module.Types;
-            ForbiddenCallsAndScript = new Dictionary<string, string>();
-
-            foreach (var script in types)
-            {
-                var assets = AssetDatabase.FindAssets(script.Name);
-                var assetPath = AssetDatabase.GUIDToAssetPath(assets.FirstOrDefault());
-
-                foreach (var method in script.Methods)
-                {
-                    var forbiddenCalls = CheckMethodForForbiddenCalls(method, script.Name);
-                    forbiddenCalls.ForEach(forbiddenCall => ForbiddenCallsAndScript.AddSafe($"{forbiddenCall}", $"{assetPath}"));
-                }
-            }
-        }
-
-        public static List<string> CheckMethodForForbiddenCalls(MethodDefinition method, string scriptName)
-        {
-            var temp = string.Empty;
-            var textOutput = new List<string>();
-
-            if (!method.HasBody)
-                return textOutput;
-
-            var methodCalls = method.Body.Instructions
-                    .Where(x => x.OpCode == OpCodes.Call)
-                    .ToArray();
-
-            foreach (var item in methodCalls)
-            {
-                var mRef = item.Operand as MethodReference;
-
-                if (mRef == null)
-                    continue;
-
-                //Debug.Log(mRef.FullName);
-
-                foreach (var key in IssuesUtility.ForbiddenFunctionCalls.Keys)
-                {
-                    if (mRef.FullName.Equals(key))
-                    {
-                        textOutput.Add($"Please remove <color=red>{IssuesUtility.ForbiddenFunctionCalls[key]}</color> from method: {method.Name} in script: <color=Cyan>{scriptName}</color>");
-                        break;
-                    }
-                }
-            }
-
-            return textOutput;
-        }
-
         private void DisplayForbiddenCalls()
         {
-            if (ForbiddenCallsAndScript.Count <= 0)
+            if (_forbiddenCallsAndScripts.Count <= 0)
                 return;
 
             EditorGUIHelper.DrawTitleFoldout("Forbidden Calls", ref _showForbiddenCalls);
 
             if (!_showForbiddenCalls)
                 return;
+
             EditorGUI.indentLevel++;
+
             GUIStyle style = new GUIStyle(GUI.skin.label)
             {
                 richText = true,
@@ -416,7 +353,7 @@ namespace Liminal.SDK.Build
             EditorGUILayout.LabelField("The Following Function Calls Are Forbidden In The Liminal SDK");
             EditorGUI.indentLevel++;
 
-            foreach (var entry in ForbiddenCallsAndScript)
+            foreach (var entry in _forbiddenCallsAndScripts)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField($"* {entry.Key}", style);
@@ -437,19 +374,14 @@ namespace Liminal.SDK.Build
         }
         
         bool _showRendering;
-
         bool _showVRAvatar;
-
         bool _showIncompatibility;
-
         bool _showEditor;
-
         bool _showTagsAndLayers;
-
         bool _showForbiddenCalls;
         List<GameObject> _sceneGameObjects = new List<GameObject>();
         static List<Assembly> _currentAssemblies = new List<Assembly>();
-        static Dictionary<string, string> ForbiddenCallsAndScript = new Dictionary<string, string>();
+        static Dictionary<string, string> _forbiddenCallsAndScripts = new Dictionary<string, string>();
         Vector2 _scrollPos;
     }
 }

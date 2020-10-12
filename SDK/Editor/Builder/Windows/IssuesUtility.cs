@@ -1,5 +1,9 @@
-﻿using System.Collections;
+﻿using Liminal.Cecil.Mono.Cecil;
+using Liminal.Cecil.Mono.Cecil.Cil;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public static class IssuesUtility
@@ -148,4 +152,66 @@ public static class IssuesUtility
         "Microsoft.GeneratedCode",
         "System.ServiceModel.Internals"
     };
+
+
+    public static void CheckForForbiddenCalls(string modulePath, ref Dictionary<string, string> keyValuePairs)
+    {
+        var module = ModuleDefinition.ReadModule(modulePath);
+
+        if (module == null)
+            return;
+
+        var types = module.Types;
+        keyValuePairs = new Dictionary<string, string>();
+
+        foreach (var script in types)
+        {
+            var assets = AssetDatabase.FindAssets(script.Name);
+            var assetPath = AssetDatabase.GUIDToAssetPath(assets.FirstOrDefault());
+
+            foreach (var method in script.Methods)
+            {
+                var forbiddenCalls = CheckMethodForForbiddenCalls(method, script.Name);
+
+                foreach (var call in forbiddenCalls)
+                    keyValuePairs.AddSafe($"{call}", $"{assetPath}");
+
+                //forbiddenCalls.ForEach(forbiddenCall => keyValuePairs.AddSafe($"{forbiddenCall}", $"{assetPath}"));
+            }
+        }
+    }
+
+    private static List<string> CheckMethodForForbiddenCalls(MethodDefinition method, string scriptName)
+    {
+        var temp = string.Empty;
+        var textOutput = new List<string>();
+
+        if (!method.HasBody)
+            return textOutput;
+
+        var methodCalls = method.Body.Instructions
+                .Where(x => x.OpCode == OpCodes.Call)
+                .ToArray();
+
+        foreach (var item in methodCalls)
+        {
+            var mRef = item.Operand as MethodReference;
+
+            if (mRef == null)
+                continue;
+
+            //Debug.Log(mRef.FullName);
+
+            foreach (var key in IssuesUtility.ForbiddenFunctionCalls.Keys)
+            {
+                if (mRef.FullName.Equals(key))
+                {
+                    textOutput.Add($"Please remove <color=red>{IssuesUtility.ForbiddenFunctionCalls[key]}</color> from method: {method.Name} in script: <color=Cyan>{scriptName}</color>");
+                    break;
+                }
+            }
+        }
+
+        return textOutput;
+    }
 }

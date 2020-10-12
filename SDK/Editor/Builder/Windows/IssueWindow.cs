@@ -268,12 +268,7 @@ namespace Liminal.SDK.Build
 
         private void CheckIncompatibility()
         {
-            GetIncompatibleAssemblies(out var presentAssemblies, IssuesUtility.IncompatiblePackagesTable.Keys.ToArray());
-            GetIncompatibleNamespaces(out var presentNamespaces, IssuesUtility.IncompatiblePackagesTable.Keys.ToArray());
-
-            var allItems = new List<string>();
-            allItems.AddRange(presentAssemblies);
-            allItems.AddRange(presentNamespaces);
+            GetIncompatibleItems(out var allItems, IssuesUtility.IncompatiblePackagesTable.Keys.ToArray());
 
             if (allItems.Count <= 0)
                 return;
@@ -285,6 +280,34 @@ namespace Liminal.SDK.Build
             EditorGUI.indentLevel++;
             DisplayIncompatibleItems(allItems);
             EditorGUI.indentLevel--;
+        }
+
+        private void GetIncompatibleItems(out List<string> incompatibleItems, params string[] packages)
+        {
+            incompatibleItems = new List<string>();
+
+            foreach (Assembly assembly in _currentAssemblies)
+            {
+                if (IssuesUtility.AssembliesToIgnore.Contains(assembly.GetName().Name))
+                    continue;
+
+                //looks for forbidden assemblies
+                foreach (var item in packages)
+                {
+                    if (assembly.GetName().Name.Equals(item))
+                        incompatibleItems.Add(assembly.GetName().Name);
+                }
+
+                //Looks for forbidden namespaces in assemblies
+                foreach (Type type in assembly.GetTypes())
+                {
+                    foreach (var item in packages)
+                    {
+                        if (type.Namespace == item)
+                            incompatibleItems.Add(type.Namespace);
+                    }
+                }
+            }
         }
 
         private void DisplayIncompatibleItems(List<string> itemsToDisplay)
@@ -314,43 +337,6 @@ namespace Liminal.SDK.Build
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
-        }
-
-        private void GetIncompatibleAssemblies(out List<string> presentAssemblies, params string[] assemblies)
-        {
-            presentAssemblies = new List<string>();
-
-            foreach (Assembly assembly in _currentAssemblies)
-            {
-                if (IssuesUtility.AssembliesToIgnore.Contains(assembly.GetName().Name))
-                    continue;
-
-                foreach (var item in assemblies)
-                {
-                    if (assembly.GetName().Name.Equals(item))
-                        presentAssemblies.Add(assembly.GetName().Name);
-                }
-            }
-        }
-
-        private void GetIncompatibleNamespaces(out List<string> presentNamespaces,params string[] namespaces)
-        {
-            presentNamespaces = new List<string>();
-
-            foreach (Assembly assembly in _currentAssemblies)
-            {
-                if (IssuesUtility.AssembliesToIgnore.Contains(assembly.GetName().Name))
-                    continue;
-
-                foreach (Type type in assembly.GetTypes())
-                {
-                    foreach (var item in namespaces)
-                    {
-                        if (type.Namespace == item)
-                            presentNamespaces.Add(type.Namespace);
-                    }
-                }
-            }
         }
 
         private static void CheckForForbiddenCalls()

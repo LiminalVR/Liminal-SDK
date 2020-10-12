@@ -103,6 +103,10 @@ namespace Liminal.SDK.Build
 
                 if (GUILayout.Button("Build"))
                 {
+                    //run checks here.
+
+                    IssuesUtility.CheckForAllIssues();
+
                     var hasBuildIssues = EditorPrefs.GetBool("HasBuildIssues");
 
                     if (hasBuildIssues)

@@ -1,10 +1,14 @@
 ﻿using Liminal.Cecil.Mono.Cecil;
 using Liminal.Cecil.Mono.Cecil.Cil;
+using Liminal.SDK.VR.Avatars;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public static class IssuesUtility
 {
@@ -210,5 +214,136 @@ public static class IssuesUtility
         }
 
         return textOutput;
+    }
+
+    public static bool HasEditorIssues()
+    {
+        if (Application.unityVersion.Equals("2019.1.10f1"))
+            return false;
+
+        EditorPrefs.SetBool("HasBuildIssues", true);
+        return true;
+    }
+
+    public static bool HasRenderingIssues()
+    {
+        if (PlayerSettings.virtualRealitySupported && PlayerSettings.stereoRenderingPath == StereoRenderingPath.SinglePass)
+            return false; 
+        
+        EditorPrefs.SetBool("HasBuildIssues", true);
+        return true;
+    }
+
+    public static bool HasAvatarIssues(VRAvatar avatar)
+    {
+        if (avatar != null)
+        {
+            CheckEyes(avatar, out var posWrong, out var rotWrong, out var eyeList);
+
+            if (!posWrong && !rotWrong && avatar.Head.Transform.localPosition == new Vector3(0, 1.7f, 0) && avatar.Head.Transform.localEulerAngles == Vector3.zero)
+                return false;
+        }
+
+        EditorPrefs.SetBool("HasBuildIssues", true);
+        return true;
+    }
+
+    public static void CheckEyes(VRAvatar avatar, out bool eyePosWrong, out bool eyeRotWrong, out List<Camera> eyes)
+    {
+        eyePosWrong = false;
+        eyeRotWrong = false;
+
+        eyes = new List<Camera>
+            {
+                avatar.Head.CenterEyeCamera,
+                avatar.Head.LeftEyeCamera,
+                avatar.Head.RightEyeCamera
+            };
+
+        foreach (var item in eyes)
+        {
+            if (item.transform.localEulerAngles != Vector3.zero)
+                eyeRotWrong = true;
+
+            if (item.transform.localPosition != Vector3.zero)
+                eyePosWrong = true;
+        }
+    }
+
+    public static bool HasIncompatiblePackages(List<Assembly> currentAssemblies, out List<string> allItems)
+    {
+        GetIncompatibleItems(out allItems, currentAssemblies, IncompatiblePackagesTable.Keys.ToArray());
+
+        if (allItems.Count <= 0)
+            return false;
+
+        EditorPrefs.SetBool("HasBuildIssues", true);
+        return true;
+    }
+
+    public static void GetIncompatibleItems(out List<string> incompatibleItems, List<Assembly> currentAssemblies, params string[] packages)
+    {
+        incompatibleItems = new List<string>();
+
+        foreach (Assembly assembly in currentAssemblies)
+        {
+            if (AssembliesToIgnore.Contains(assembly.GetName().Name))
+                continue;
+
+            //looks for forbidden assemblies
+            foreach (var item in packages)
+            {
+                if (assembly.GetName().Name.Equals(item))
+                    incompatibleItems.Add(assembly.GetName().Name);
+            }
+
+            //Looks for forbidden namespaces in assemblies
+            foreach (Type type in assembly.GetTypes())
+            {
+                foreach (var item in packages)
+                {
+                    if (type.Namespace == item)
+                        incompatibleItems.Add(type.Namespace);
+                }
+            }
+        }
+    }
+
+    public static bool HasForbiddenCalls(Dictionary<string, string> forbiddenCallsAndScripts)
+    {
+        if (forbiddenCallsAndScripts.Count <= 0)
+            return false;
+
+        EditorPrefs.SetBool("HasBuildIssues", true);
+        return true;
+    }
+
+    public static void CheckForAllIssues()
+    {
+        VRAvatar avatar = null;
+        var sceneGameObjects = new List<GameObject>();
+        Scene scene = SceneManager.GetActiveScene();
+        scene.GetRootGameObjects(sceneGameObjects);
+
+        foreach (var item in sceneGameObjects)
+        {
+            if (item.GetComponentInChildren<VRAvatar>())
+            {
+                avatar = item.GetComponentInChildren<VRAvatar>();
+                break;
+            }
+        }
+
+        var forbiddenCallsAndScripts = new Dictionary<string, string>();
+        CheckForForbiddenCalls("Library/ScriptAssemblies/Assembly-CSharp.dll", ref forbiddenCallsAndScripts);
+
+        if (HasEditorIssues() || 
+            HasRenderingIssues() ||
+            HasAvatarIssues(avatar) ||
+            HasIncompatiblePackages(AppDomain.CurrentDomain.GetAssemblies().ToList(), out var allItems) ||
+            HasForbiddenCalls(forbiddenCallsAndScripts))
+            return;
+
+        EditorPrefs.SetBool("HasBuildIssues", false);
     }
 }

@@ -270,11 +270,9 @@ namespace Liminal.SDK.Build
 
             if (allLayers.Count() > 5)
             {
-
-                EditorGUIHelper.DrawSpritedLabel($"You have {allLayers.Count() - 5} custom layers in your layer list. It is not recommended to rely on layers, " +
-                    $"as layers other than the default ones are not carried through in a limapp and will returns null references. " +
-                    $"If you use layers, make sure to refer to their number and not their string name.", WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
-
+                EditorGUIHelper.DrawSpritedLabel($"You have {allLayers.Count() - 5} custom layers in your layer list. If you are working with layers in you code, make sure that you are using " +
+                    $"LayerMask.LayerToName and not LayerMask.NameToLayer as LayerMask.NameToLayer will return null references in the Liminal platform."
+                    , WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
             }
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);

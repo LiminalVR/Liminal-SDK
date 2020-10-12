@@ -97,8 +97,10 @@ namespace Liminal.SDK.Build
 
         private void CheckRendering()
         {
-            if (_showRenderingSection)
-                EditorGUIHelper.DrawTitle("Rendering");
+            EditorGUIHelper.DrawTitleFoldout("Rendering", ref _showRendering);
+
+            if (!_showRendering)
+                return;
 
             if (!PlayerSettings.virtualRealitySupported)
             {
@@ -144,8 +146,10 @@ namespace Liminal.SDK.Build
                 }
             }
 
-            if (_showVRAvatarSection)
-                EditorGUIHelper.DrawTitle("VR Avatar");
+            EditorGUIHelper.DrawTitleFoldout("VR Avatar", ref _showVRAvatar);
+
+            if (!_showVRAvatar)
+                return;
 
             if (avatar == null)
             {
@@ -427,8 +431,11 @@ namespace Liminal.SDK.Build
         }
         
         bool _showRenderingSection;
+        bool _showRendering;
         bool _showVRAvatarSection;
+        bool _showVRAvatar;
         bool _showIncompatibilitySection;
+        bool _showIncompatibility;
         bool _showEditorSection;
         bool _hasForbiddenCalls;
         List<GameObject> _sceneGameObjects = new List<GameObject>();

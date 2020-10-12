@@ -14,6 +14,8 @@ namespace Liminal.SDK.Build
     /// </summary>
     public class IssueWindow : BaseWindowDrawer
     {
+        public bool HasBuildIssues;
+
         public override void OnEnabled()
         {
             base.OnEnabled();
@@ -37,18 +39,19 @@ namespace Liminal.SDK.Build
 
                 GetSceneGameObjects();
 
-                GUILayout.Space(10);
-                
+                GUILayout.Space(10);    
                 _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
-
                 EditorStyles.label.wordWrap = true;
 
+                HasBuildIssues = false;
                 CheckUnityEditor();
                 DisplayForbiddenCalls();
                 CheckIncompatibility();
                 CheckTagsAndLayers();
                 CheckRendering();
                 CheckVRAvatar();
+
+                EditorPrefs.SetBool("HasBuildIssues", HasBuildIssues);
 
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
@@ -82,6 +85,7 @@ namespace Liminal.SDK.Build
             if (Application.unityVersion.Equals("2019.1.10f1"))
                 return;
 
+            HasBuildIssues = true;
             EditorGUIHelper.DrawTitleFoldout("Unity Editor", ref _showEditor);
 
             if (!_showEditor)
@@ -97,6 +101,8 @@ namespace Liminal.SDK.Build
         {
             if (PlayerSettings.virtualRealitySupported && PlayerSettings.stereoRenderingPath == StereoRenderingPath.SinglePass)
                 return;
+
+            HasBuildIssues = true;
 
             EditorGUIHelper.DrawTitleFoldout("Rendering", ref _showRendering);
 
@@ -116,7 +122,6 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUI.indentLevel--;
-                return;
             }
 
             if (PlayerSettings.stereoRenderingPath != StereoRenderingPath.SinglePass)
@@ -130,7 +135,6 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight); 
                 EditorGUI.indentLevel--;
-                return;
             }
 
             EditorGUI.indentLevel--;
@@ -149,13 +153,16 @@ namespace Liminal.SDK.Build
                 }
             }
 
+            //checks if there are no issues and exits if so
             if (avatar != null)
             {
                 CheckEyes(avatar, out var posWrong, out var rotWrong, out var eyeList);
 
-                if (!posWrong && !rotWrong)
+                if (!posWrong && !rotWrong && avatar.Head.Transform.localPosition == new Vector3(0, 1.7f, 0) && avatar.Head.Transform.localEulerAngles == Vector3.zero)
                     return;
             }
+
+            HasBuildIssues = true;
 
             EditorGUIHelper.DrawTitleFoldout("VR Avatar", ref _showVRAvatar);
 
@@ -169,6 +176,7 @@ namespace Liminal.SDK.Build
                 EditorGUIHelper.DrawSpritedLabel("Scene Must Contain A VR Avatar", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUI.indentLevel--;
+                HasBuildIssues = true;
                 return;
             }
 
@@ -260,6 +268,7 @@ namespace Liminal.SDK.Build
 
             if (!_showTagsAndLayers)
                 return;
+
             EditorGUI.indentLevel++;
             if (allTags.Count() > 7)
             {
@@ -286,13 +295,17 @@ namespace Liminal.SDK.Build
             if (allItems.Count <= 0)
                 return;
 
+            HasBuildIssues = true;
             EditorGUIHelper.DrawTitleFoldout("Known Incompatibilities", ref _showIncompatibility);
 
             if (!_showIncompatibility)
                 return;
+
             EditorGUI.indentLevel++;
             DisplayIncompatibleItems(allItems);
             EditorGUI.indentLevel--;
+
+            HasBuildIssues = true;
         }
 
         private void GetIncompatibleItems(out List<string> incompatibleItems, params string[] packages)
@@ -357,6 +370,7 @@ namespace Liminal.SDK.Build
             if (_forbiddenCallsAndScripts.Count <= 0)
                 return;
 
+            HasBuildIssues = true;
             EditorGUIHelper.DrawTitleFoldout("Forbidden Calls", ref _showForbiddenCalls);
 
             if (!_showForbiddenCalls)

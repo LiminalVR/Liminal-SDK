@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Liminal.SDK.Editor.Build;
+using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using Liminal.SDK.Editor.Build;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -104,28 +103,44 @@ namespace Liminal.SDK.Build
 
                 if (GUILayout.Button("Build"))
                 {
-                    SettingsUtils.CopyProjectSettingsToProfile();
-                    EditorSceneManager.OpenScene(_scenePath, OpenSceneMode.Single);
+                    var hasBuildIssues = EditorPrefs.GetBool("HasBuildIssues");
 
-                    switch (_selectedPlatform)
+                    if (hasBuildIssues)
                     {
-                        case BuildPlatform.Current:
-                            AppBuilder.BuildCurrentPlatform();
-                            break;
-
-                        case BuildPlatform.GearVR:
-                            AppBuilder.BuildLimapp(BuildTarget.Android, AppBuildInfo.BuildTargetDevices.GearVR,
-                                _compressionType);
-                            break;
-
-                        case BuildPlatform.Standalone:
-                            AppBuilder.BuildLimapp(BuildTarget.StandaloneWindows, AppBuildInfo.BuildTargetDevices.Emulator,
-                                _compressionType);
-                            break;
+                        if(EditorUtility.DisplayDialog("Build Issues Detected", "Outstanding issues have been detected in your project. " +
+                        "Navigate to Build Settings->Issues for help resolving them", "Build Anyway", "Cancel Build"))
+                        {
+                            Build();
+                        }
                     }
+                    else
+                        Build();
                 }
 
                 EditorGUILayout.EndVertical();
+            }
+        }
+
+        private void Build()
+        {
+            SettingsUtils.CopyProjectSettingsToProfile();
+            EditorSceneManager.OpenScene(_scenePath, OpenSceneMode.Single);
+
+            switch (_selectedPlatform)
+            {
+                case BuildPlatform.Current:
+                    AppBuilder.BuildCurrentPlatform();
+                    break;
+
+                case BuildPlatform.GearVR:
+                    AppBuilder.BuildLimapp(BuildTarget.Android, AppBuildInfo.BuildTargetDevices.GearVR,
+                        _compressionType);
+                    break;
+
+                case BuildPlatform.Standalone:
+                    AppBuilder.BuildLimapp(BuildTarget.StandaloneWindows, AppBuildInfo.BuildTargetDevices.Emulator,
+                        _compressionType);
+                    break;
             }
         }
 

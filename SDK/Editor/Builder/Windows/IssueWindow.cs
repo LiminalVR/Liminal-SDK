@@ -31,7 +31,6 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
                 GetSceneGameObjects();
-                GetCurrentAssemblies();
 
                 GUILayout.Space(10);
                 
@@ -49,15 +48,13 @@ namespace Liminal.SDK.Build
                 EditorGUILayout.EndScrollView();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
 
-                if (!_showRenderingSection && !_showRenderingSection && !_showIncompatibilitySection && !_showEditorSection && !_hasForbiddenCalls)
-                    EditorGUIHelper.DrawTitle("No Outstanding Issues");
-
+                GUILayout.FlexibleSpace();
                 EditorGUILayout.TextArea("", GUI.skin.horizontalSlider);
 
                 if (GUILayout.Button("View Wiki"))
                     Application.OpenURL("https://github.com/LiminalVR/DeveloperWiki/wiki/Requirements-&-Optimisation");
 
-                GUILayout.FlexibleSpace();
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUILayout.EndVertical();
             }
         }
@@ -68,7 +65,7 @@ namespace Liminal.SDK.Build
             scene.GetRootGameObjects(_sceneGameObjects);
         }
 
-        private void GetCurrentAssemblies()
+        private static void GetCurrentAssemblies()
         {
             _currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
         }
@@ -77,34 +74,39 @@ namespace Liminal.SDK.Build
         private static void ScriptsCompiled()
         {
             CheckForForbiddenCalls();
+            GetCurrentAssemblies();
         }
 
         private void CheckUnityEditor()
         {
-            if (_showEditorSection)
-                EditorGUIHelper.DrawTitle("Unity Editor");
-
-            if (!Application.unityVersion.Contains("2019.1.10f1"))
-            {
-                _showEditorSection = true;
-                EditorGUILayout.LabelField("Ensure you are using Unity 2019.1.10f1 as your development environment");
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            if (Application.unityVersion.Equals("2019.1.10f1"))
                 return;
-            }
 
-            _showEditorSection = false;
+            EditorGUIHelper.DrawTitleFoldout("Unity Editor", ref _showEditor);
+
+            if (!_showEditor)
+                return;
+
+            EditorGUI.indentLevel++;
+            EditorGUILayout.LabelField("Ensure you are using Unity 2019.1.10f1 as your development environment");
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            EditorGUI.indentLevel--;
         }
 
         private void CheckRendering()
         {
+            if (PlayerSettings.virtualRealitySupported && PlayerSettings.stereoRenderingPath == StereoRenderingPath.SinglePass)
+                return;
+
             EditorGUIHelper.DrawTitleFoldout("Rendering", ref _showRendering);
 
             if (!_showRendering)
                 return;
 
+            EditorGUI.indentLevel++;
+
             if (!PlayerSettings.virtualRealitySupported)
             {
-                _showRenderingSection = true;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Virtual Reality Must Be Supported");
 
@@ -113,12 +115,12 @@ namespace Liminal.SDK.Build
 
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                EditorGUI.indentLevel--;
                 return;
             }
 
             if (PlayerSettings.stereoRenderingPath != StereoRenderingPath.SinglePass)
             {
-                _showRenderingSection = true;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("Stereo Rendering Mode Must be Set To Single Pass");
 
@@ -126,11 +128,12 @@ namespace Liminal.SDK.Build
                     PlayerSettings.stereoRenderingPath = StereoRenderingPath.SinglePass;
 
                 EditorGUILayout.EndHorizontal();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                GUILayout.Space(EditorGUIUtility.singleLineHeight); 
+                EditorGUI.indentLevel--;
                 return;
             }
 
-            _showRenderingSection = false;
+            EditorGUI.indentLevel--;
         }
 
         private void CheckVRAvatar()
@@ -146,22 +149,33 @@ namespace Liminal.SDK.Build
                 }
             }
 
+            if (avatar != null)
+            {
+                CheckEyes(avatar, out var posWrong, out var rotWrong, out var eyeList);
+
+                if (!posWrong && !rotWrong)
+                    return;
+            }
+
             EditorGUIHelper.DrawTitleFoldout("VR Avatar", ref _showVRAvatar);
 
             if (!_showVRAvatar)
                 return;
 
+            EditorGUI.indentLevel++;
+
             if (avatar == null)
             {
-                _showVRAvatarSection = true;
                 EditorGUILayout.LabelField("Scene Must Contain A VR Avatar");
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                EditorGUI.indentLevel--;
                 return;
             }
 
+            CheckEyes(avatar, out var eyePosWrong, out var eyeRotWrong, out var eyes);
+
             if (avatar.Head.Transform.localEulerAngles != Vector3.zero)
             {
-                _showVRAvatarSection = true;
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("VR Avatar Head Rotation Must be Zeroed");
 
@@ -170,32 +184,10 @@ namespace Liminal.SDK.Build
 
                 EditorGUILayout.EndHorizontal();
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
-                return;
             }
 
-            var eyes = new List<Camera>
+            if (eyePosWrong || eyeRotWrong)
             {
-                avatar.Head.CenterEyeCamera,
-                avatar.Head.LeftEyeCamera,
-                avatar.Head.RightEyeCamera
-            };
-
-            var eyeRotWrong = false;
-            var eyePosWrong = false;
-
-            foreach (var item in eyes)
-            {
-                if (item.transform.localEulerAngles != Vector3.zero)
-                    eyeRotWrong = true;
-
-                if (item.transform.localPosition != Vector3.zero)
-                    eyePosWrong = true;
-            }
-
-            if (eyeRotWrong || eyePosWrong)
-            {
-                _showVRAvatarSection = true;
-
                 if (eyeRotWrong)
                 {
                     EditorGUILayout.BeginHorizontal();
@@ -219,10 +211,31 @@ namespace Liminal.SDK.Build
                 }
 
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
-                return;
             }
 
-            _showVRAvatarSection = false;
+            EditorGUI.indentLevel--;
+        }
+
+        private void CheckEyes(VRAvatar avatar, out bool eyePosWrong, out bool eyeRotWrong, out List<Camera> eyes)
+        {
+            eyePosWrong = false;
+            eyeRotWrong = false;
+
+            eyes = new List<Camera>
+            {
+                avatar.Head.CenterEyeCamera,
+                avatar.Head.LeftEyeCamera,
+                avatar.Head.RightEyeCamera
+            };
+
+            foreach (var item in eyes)
+            {
+                if (item.transform.localEulerAngles != Vector3.zero)
+                    eyeRotWrong = true;
+
+                if (item.transform.localPosition != Vector3.zero)
+                    eyePosWrong = true;
+            }
         }
 
         private void CheckTagsAndLayers()
@@ -230,11 +243,14 @@ namespace Liminal.SDK.Build
             var allTags = UnityEditorInternal.InternalEditorUtility.tags;
             var allLayers = UnityEditorInternal.InternalEditorUtility.layers;
 
-            if (allTags.Count() > 7 || allLayers.Count() > 5)
-                EditorGUIHelper.DrawTitle("Tags And Layers");
-            else
+            if (allTags.Count() <= 7 && allLayers.Count() <= 5)
                 return;
+            
+            EditorGUIHelper.DrawTitleFoldout("Tags And Layers", ref _showTagsAndLayers);
 
+            if (!_showTagsAndLayers)
+                return;
+            EditorGUI.indentLevel++;
             if (allTags.Count() > 7)
             {
                 EditorGUILayout.LabelField($"You have {allTags.Count() - 7} custom tags in your tag list. Do not use tags unless they are assigned at runtime.");
@@ -247,13 +263,11 @@ namespace Liminal.SDK.Build
                     $"make sure to refer to their number and not their string name.");
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            EditorGUI.indentLevel--;
         }
 
         private void CheckIncompatibility()
         {
-            if(_showIncompatibilitySection)
-                EditorGUIHelper.DrawTitle("Known Incompatibilities");
-
             GetIncompatibleAssemblies(out var presentAssemblies, IssuesUtility.IncompatiblePackagesTable.Keys.ToArray());
             GetIncompatibleNamespaces(out var presentNamespaces, IssuesUtility.IncompatiblePackagesTable.Keys.ToArray());
 
@@ -262,14 +276,15 @@ namespace Liminal.SDK.Build
             allItems.AddRange(presentNamespaces);
 
             if (allItems.Count <= 0)
-            {
-                _showIncompatibilitySection = false;
                 return;
-            }
 
-            _showIncompatibilitySection = true;
+            EditorGUIHelper.DrawTitleFoldout("Known Incompatibilities", ref _showIncompatibility);
 
+            if (!_showIncompatibility)
+                return;
+            EditorGUI.indentLevel++;
             DisplayIncompatibleItems(allItems);
+            EditorGUI.indentLevel--;
         }
 
         private void DisplayIncompatibleItems(List<string> itemsToDisplay)
@@ -352,7 +367,7 @@ namespace Liminal.SDK.Build
                 foreach (var method in script.Methods)
                 {
                     var forbiddenCalls = CheckMethodForForbiddenCalls(method, script.Name);
-                    forbiddenCalls.ForEach(forbiddenCall => ForbiddenCallsAndScript.Add($"{forbiddenCall}", $"{assetPath}"));
+                    forbiddenCalls.ForEach(forbiddenCall => ForbiddenCallsAndScript.AddSafe($"{forbiddenCall}", $"{assetPath}"));
                 }
             }
         }
@@ -396,12 +411,16 @@ namespace Liminal.SDK.Build
             if (ForbiddenCallsAndScript.Count <= 0)
                 return;
 
-            EditorGUIHelper.DrawTitle("Forbidden Calls");
-            _hasForbiddenCalls = true;
+            EditorGUIHelper.DrawTitleFoldout("Forbidden Calls", ref _showForbiddenCalls);
 
-            GUIStyle style = new GUIStyle(GUI.skin.label);
-            style.richText = true;
-            style.wordWrap = true;
+            if (!_showForbiddenCalls)
+                return;
+            EditorGUI.indentLevel++;
+            GUIStyle style = new GUIStyle(GUI.skin.label)
+            {
+                richText = true,
+                wordWrap = true
+            };
 
             var btnText = "Open File";
             GUIStyle btn = new GUIStyle(GUI.skin.button);
@@ -428,18 +447,22 @@ namespace Liminal.SDK.Build
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             EditorGUILayout.LabelField($"Please Remove These Calls Before Building");
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            EditorGUI.indentLevel--;
         }
         
-        bool _showRenderingSection;
         bool _showRendering;
-        bool _showVRAvatarSection;
+
         bool _showVRAvatar;
-        bool _showIncompatibilitySection;
+
         bool _showIncompatibility;
-        bool _showEditorSection;
-        bool _hasForbiddenCalls;
+
+        bool _showEditor;
+
+        bool _showTagsAndLayers;
+
+        bool _showForbiddenCalls;
         List<GameObject> _sceneGameObjects = new List<GameObject>();
-        List<Assembly> _currentAssemblies = new List<Assembly>();
+        static List<Assembly> _currentAssemblies = new List<Assembly>();
         static Dictionary<string, string> ForbiddenCallsAndScript = new Dictionary<string, string>();
         Vector2 _scrollPos;
     }

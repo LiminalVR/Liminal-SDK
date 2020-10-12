@@ -153,7 +153,6 @@ public static class IssuesUtility
         "System.ServiceModel.Internals"
     };
 
-
     public static void CheckForForbiddenCalls(string modulePath, ref Dictionary<string, string> keyValuePairs)
     {
         var module = ModuleDefinition.ReadModule(modulePath);
@@ -175,8 +174,6 @@ public static class IssuesUtility
 
                 foreach (var call in forbiddenCalls)
                     keyValuePairs.AddSafe($"{call}", $"{assetPath}");
-
-                //forbiddenCalls.ForEach(forbiddenCall => keyValuePairs.AddSafe($"{forbiddenCall}", $"{assetPath}"));
             }
         }
     }
@@ -202,11 +199,11 @@ public static class IssuesUtility
 
             //Debug.Log(mRef.FullName);
 
-            foreach (var key in IssuesUtility.ForbiddenFunctionCalls.Keys)
+            foreach (var key in ForbiddenFunctionCalls.Keys)
             {
                 if (mRef.FullName.Equals(key))
                 {
-                    textOutput.Add($"Please remove <color=red>{IssuesUtility.ForbiddenFunctionCalls[key]}</color> from method: {method.Name} in script: <color=Cyan>{scriptName}</color>");
+                    textOutput.Add($"Please remove <color=red>{ForbiddenFunctionCalls[key]}</color> from method: {method.Name} in script: <color=Cyan>{scriptName}</color>");
                     break;
                 }
             }

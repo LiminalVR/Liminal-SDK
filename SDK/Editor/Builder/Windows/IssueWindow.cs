@@ -14,6 +14,18 @@ namespace Liminal.SDK.Build
     /// </summary>
     public class IssueWindow : BaseWindowDrawer
     {
+        public override void OnEnabled()
+        {
+            base.OnEnabled();
+            var warningGuids = AssetDatabase.FindAssets("sdk_warning");
+            var errorGuids = AssetDatabase.FindAssets("sdk_error");
+
+            if (warningGuids.Count() != 0)
+                WarningTexture = (Texture2D)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(warningGuids[0]), typeof(Texture2D));
+
+            if (errorGuids.Count() != 0)
+                ErrorTexture = (Texture2D)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(errorGuids[0]), typeof(Texture2D));
+        }
 
         public override void Draw(BuildWindowConfig config)
         {
@@ -76,7 +88,7 @@ namespace Liminal.SDK.Build
                 return;
 
             EditorGUI.indentLevel++;
-            EditorGUILayout.LabelField("Ensure you are using Unity 2019.1.10f1 as your development environment");
+            EditorGUIHelper.DrawSpritedLabel("Ensure you are using Unity 2019.1.10f1 as your development environment", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             EditorGUI.indentLevel--;
         }
@@ -96,7 +108,7 @@ namespace Liminal.SDK.Build
             if (!PlayerSettings.virtualRealitySupported)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Virtual Reality Must Be Supported");
+                EditorGUIHelper.DrawSpritedLabel("Virtual Reality Must Be Supported", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
 
                 if (GUILayout.Button("Enable VR Support"))
                     PlayerSettings.virtualRealitySupported = true;
@@ -110,7 +122,7 @@ namespace Liminal.SDK.Build
             if (PlayerSettings.stereoRenderingPath != StereoRenderingPath.SinglePass)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("Stereo Rendering Mode Must be Set To Single Pass");
+                EditorGUIHelper.DrawSpritedLabel("Stereo Rendering Mode Must be Set To Single Pass", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
 
                 if (GUILayout.Button("Set To Single Pass"))
                     PlayerSettings.stereoRenderingPath = StereoRenderingPath.SinglePass;
@@ -154,7 +166,7 @@ namespace Liminal.SDK.Build
 
             if (avatar == null)
             {
-                EditorGUILayout.LabelField("Scene Must Contain A VR Avatar");
+                EditorGUIHelper.DrawSpritedLabel("Scene Must Contain A VR Avatar", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUI.indentLevel--;
                 return;
@@ -165,13 +177,23 @@ namespace Liminal.SDK.Build
             if (avatar.Head.Transform.localEulerAngles != Vector3.zero)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("VR Avatar Head Rotation Must be Zeroed");
+                EditorGUIHelper.DrawSpritedLabel("VR Avatar Head rotation must be Zeroed", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
 
-                if (GUILayout.Button("Set Head Rotation To 0, 0, 0"))
+                if (GUILayout.Button("Reset Head Rotation"))
                     avatar.Head.Transform.localEulerAngles = Vector3.zero;
 
                 EditorGUILayout.EndHorizontal();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            }
+
+            if (avatar.Head.Transform.localPosition != new Vector3(0, 1.7f, 0))
+            {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUIHelper.DrawSpritedLabel("VR Avatar Head postion should be (0, 1.7f, 0)", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+
+                if (GUILayout.Button("Reset Head Position"))
+                    avatar.Head.Transform.localPosition = new Vector3(0, 1.7f, 0);
+
+                EditorGUILayout.EndHorizontal();
             }
 
             if (eyePosWrong || eyeRotWrong)
@@ -179,9 +201,9 @@ namespace Liminal.SDK.Build
                 if (eyeRotWrong)
                 {
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Eye Local Rotation Must be Zeroed");
+                    EditorGUIHelper.DrawSpritedLabel("Eye Local Rotation Must be Zeroed", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
 
-                    if (GUILayout.Button("Set Local Rotation To 0, 0, 0"))
+                    if (GUILayout.Button("Reset Eye Rotation"))
                         eyes.ForEach(x => x.transform.localEulerAngles = Vector3.zero);
 
                     EditorGUILayout.EndHorizontal();
@@ -190,9 +212,9 @@ namespace Liminal.SDK.Build
                 if(eyePosWrong)
                 {
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Eye Local Position Must be Zeroed");
+                    EditorGUIHelper.DrawSpritedLabel("Eye Local Position Must be Zeroed", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
 
-                    if (GUILayout.Button("Set Local Position To 0, 0, 0"))
+                    if (GUILayout.Button("Reset Eye Position"))
                         eyes.ForEach(x => x.transform.localPosition = Vector3.zero);
 
                     EditorGUILayout.EndHorizontal();
@@ -233,7 +255,7 @@ namespace Liminal.SDK.Build
 
             if (allTags.Count() <= 7 && allLayers.Count() <= 5)
                 return;
-            
+
             EditorGUIHelper.DrawTitleFoldout("Tags And Layers", ref _showTagsAndLayers);
 
             if (!_showTagsAndLayers)
@@ -241,14 +263,19 @@ namespace Liminal.SDK.Build
             EditorGUI.indentLevel++;
             if (allTags.Count() > 7)
             {
-                EditorGUILayout.LabelField($"You have {allTags.Count() - 7} custom tags in your tag list. Do not use tags unless they are assigned at runtime.");
+                EditorGUIHelper.DrawSpritedLabel($"You have {allTags.Count() - 7} custom tags in your tag list. " +
+                    $"Do not use tags unless they are assigned at runtime.", WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
             }
 
             if (allLayers.Count() > 5)
-                EditorGUILayout.LabelField($"You have {allLayers.Count() - 5} custom layers in your layer list. It is not recommended to rely on layers, " +
-                    $"as layers other than the default ones are not carried through in a limapp and will returns null references. If you use layers, " +
-                    $"make sure to refer to their number and not their string name.");
+            {
+
+                EditorGUIHelper.DrawSpritedLabel($"You have {allLayers.Count() - 5} custom layers in your layer list. It is not recommended to rely on layers, " +
+                    $"as layers other than the default ones are not carried through in a limapp and will returns null references. " +
+                    $"If you use layers, make sure to refer to their number and not their string name.", WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+
+            }
 
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             EditorGUI.indentLevel--;
@@ -317,13 +344,13 @@ namespace Liminal.SDK.Build
             EditorGUI.indentLevel++;
 
             foreach (var item in incompatiblePackages)
-            {
-                EditorGUILayout.LabelField($"* {item}");
-            }
+                EditorGUIHelper.DrawSpritedLabel($"{item}", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
 
             EditorGUI.indentLevel--;
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
+
             EditorGUILayout.LabelField($"Please Remove These Packages Before Building");
+
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
         }
 
@@ -339,7 +366,7 @@ namespace Liminal.SDK.Build
 
             EditorGUI.indentLevel++;
 
-            GUIStyle style = new GUIStyle(GUI.skin.label)
+            var style = new GUIStyle(GUI.skin.label)
             {
                 richText = true,
                 wordWrap = true
@@ -349,14 +376,14 @@ namespace Liminal.SDK.Build
             GUIStyle btn = new GUIStyle(GUI.skin.button);
             btn.fixedWidth = btn.CalcSize(new GUIContent(btnText)).x;
             btn.fixedHeight = btn.CalcSize(new GUIContent(btnText)).y;
-
             EditorGUILayout.LabelField("The Following Function Calls Are Forbidden In The Liminal SDK");
             EditorGUI.indentLevel++;
 
             foreach (var entry in _forbiddenCallsAndScripts)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField($"* {entry.Key}", style);
+                GUILayout.Label(ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+                EditorGUILayout.LabelField($"{entry.Key}", style);
 
                 var location = Application.dataPath + "/../" + entry.Value;
 
@@ -372,16 +399,19 @@ namespace Liminal.SDK.Build
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             EditorGUI.indentLevel--;
         }
-        
-        bool _showRendering;
-        bool _showVRAvatar;
-        bool _showIncompatibility;
-        bool _showEditor;
-        bool _showTagsAndLayers;
-        bool _showForbiddenCalls;
-        List<GameObject> _sceneGameObjects = new List<GameObject>();
-        static List<Assembly> _currentAssemblies = new List<Assembly>();
-        static Dictionary<string, string> _forbiddenCallsAndScripts = new Dictionary<string, string>();
-        Vector2 _scrollPos;
+
+        private bool _showRendering;
+        private bool _showVRAvatar;
+        private bool _showIncompatibility;
+        private bool _showEditor;
+        private bool _showTagsAndLayers;
+        private bool _showForbiddenCalls;
+        private List<GameObject> _sceneGameObjects = new List<GameObject>();
+        private static List<Assembly> _currentAssemblies = new List<Assembly>();
+        private static Dictionary<string, string> _forbiddenCallsAndScripts = new Dictionary<string, string>();
+        private Vector2 _scrollPos;
+
+        public Texture2D ErrorTexture;
+        public Texture2D WarningTexture;
     }
 }

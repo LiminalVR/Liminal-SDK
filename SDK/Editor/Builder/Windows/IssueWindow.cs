@@ -347,7 +347,7 @@ namespace Liminal.SDK.Build
                 foreach (var method in script.Methods)
                 {
                     var forbiddenCalls = CheckMethodForForbiddenCalls(method, script.Name);
-                    forbiddenCalls.ForEach(forbiddenCall => ForbiddenCallsAndScript.Add($"{forbiddenCall}", $"{assetPath}]"));
+                    forbiddenCalls.ForEach(forbiddenCall => ForbiddenCallsAndScript.Add($"{forbiddenCall}", $"{assetPath}"));
                 }
             }
         }
@@ -377,7 +377,7 @@ namespace Liminal.SDK.Build
                 {
                     if (mRef.FullName.Equals(key))
                     {
-                        textOutput.Add($"Please remove {IssuesUtility.ForbiddenFunctionCalls[key]} from method: {method.Name} in script: {scriptName}");
+                        textOutput.Add($"Please remove <color=red>{IssuesUtility.ForbiddenFunctionCalls[key]}</color> from method: {method.Name} in script: <color=Cyan>{scriptName}</color>");
                         break;
                     }
                 }
@@ -390,13 +390,29 @@ namespace Liminal.SDK.Build
         {
             if (ForbiddenCallsAndScript.Count <= 0)
                 return;
+            GUIStyle style = new GUIStyle(GUI.skin.label);
+            style.richText = true;
+            style.wordWrap = true;
+
+            var btnText = "Open File";
+            GUIStyle btn = new GUIStyle(GUI.skin.button);
+            btn.fixedWidth = btn.CalcSize(new GUIContent(btnText)).x;
+            btn.fixedHeight = btn.CalcSize(new GUIContent(btnText)).y;
 
             EditorGUILayout.LabelField("The Following Function Calls Are Forbidden In The Liminal SDK");
             EditorGUI.indentLevel++;
 
             foreach (var entry in ForbiddenCallsAndScript)
             {
-                EditorGUILayout.LabelField($"* {entry.Key}");
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField($"* {entry.Key}", style);
+
+                var location = Application.dataPath + "/../" + entry.Value;
+
+                if (GUILayout.Button(btnText, btn))
+                    Application.OpenURL(location);
+
+                EditorGUILayout.EndHorizontal();
             }
 
             EditorGUI.indentLevel--;

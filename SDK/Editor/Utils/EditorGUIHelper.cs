@@ -14,7 +14,7 @@ public static class EditorGUIHelper
     {
         EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(30));
         EditorGUILayout.BeginHorizontal();
-        boolToSet = EditorGUILayout.Foldout(boolToSet, label);
+        boolToSet = EditorGUILayout.Foldout(boolToSet, label, toggleOnLabelClick: true);
         EditorGUILayout.EndHorizontal();
         EditorGUILayout.EndVertical();
     }

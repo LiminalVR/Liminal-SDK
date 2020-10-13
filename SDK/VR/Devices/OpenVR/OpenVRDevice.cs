@@ -5,6 +5,7 @@ using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
 using Liminal.SDK.VR.Pointers;
+using Liminal.Systems;
 using UnityEngine;
 using Valve.VR;
 
@@ -85,6 +86,16 @@ namespace Liminal.SDK.OpenVR
             model.transform.SetParent(controllerVisual.transform);
             model.transform.localPosition = Vector3.zero;
             model.transform.localRotation = Quaternion.identity;
+
+            switch (XRDeviceUtils.GetDeviceModelType())
+            {
+                case EDeviceModelType.HtcVive:
+                case EDeviceModelType.HtcViveCosmos:
+                case EDeviceModelType.HtcVivePro:
+                    model.transform.localPosition = new Vector3(0,0,0.1f);
+                    break;
+            }
+
             var pointerVisual = controllerVisual.GetComponentInChildren<LaserPointerVisual>(includeInactive: true);
             pointerVisual.Bind(hand.InputDevice.Pointer);
             hand.InputDevice.Pointer.Transform = pointerVisual.transform;

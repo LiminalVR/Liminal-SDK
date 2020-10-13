@@ -93,7 +93,7 @@ namespace Liminal.SDK.OpenVR
                 case EDeviceModelType.HtcViveCosmos:
                 case EDeviceModelType.HtcVivePro:
 
-                    hand.Anchor.transform.localPosition = new Vector3(0, 0, -0.1f);
+                    hand.Anchor.transform.localPosition += new Vector3(0, 0, -0.1f);
                     model.transform.localPosition = new Vector3(0,0,0.1f);
 
                     break;

@@ -18,7 +18,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-
+using UnityEngine.XR;
 #if USING_XR_SDK
 using UnityEngine.Experimental.XR;
 #endif

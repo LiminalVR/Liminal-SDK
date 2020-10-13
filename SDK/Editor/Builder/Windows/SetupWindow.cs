@@ -27,11 +27,14 @@ namespace Liminal.SDK.Build
         {
             var baseType = typeof(ExperienceApp);
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            var assembly = assemblies.First(x => x.FullName.Contains("Assembly-CSharp,"));
-            var types = assembly.GetTypes();
-            _generated = types.Any(t => t != baseType && baseType.IsAssignableFrom(t));
+            var assembly = assemblies.FirstOrDefault(x => x.FullName.Contains("Assembly-CSharp,"));
 
-            EditorPrefs.SetInt("GeneratedScripts", _generated ? 1 : 0);
+            if (assembly != null)
+            {
+                var types = assembly.GetTypes();
+                _generated = types.Any(t => t != baseType && baseType.IsAssignableFrom(t));
+                EditorPrefs.SetInt("GeneratedScripts", _generated ? 1 : 0);
+            }
         }
 
         public override void Draw(BuildWindowConfig config)

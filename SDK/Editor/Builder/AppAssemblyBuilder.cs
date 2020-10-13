@@ -312,6 +312,9 @@ namespace Liminal.SDK.Editor.Build
                 if (relativePath.IndexOf("/VR/Devices", StringComparison.OrdinalIgnoreCase) > -1)
                     continue;
 
+                if (relativePath.IndexOf("Frameworks/SteamVR", StringComparison.OrdinalIgnoreCase) > -1)
+                    continue;
+
                 var path = "Assets" + relativePath;
                 list.Add(path);
             }

@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Liminal.Platform.Experimental.App;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Liminal.SDK.Build
 {
@@ -105,10 +107,13 @@ namespace Liminal.SDK.Build
                 {
                     var streamingFile = File.ReadAllBytes(androidStreamingPath);
 
-                    if (!streamingFile.SequenceEqual(androidFile))
+                    if (GUI.changed)
                     {
-                        File.Copy(_appPreviewConfig.AndroidPath, androidStreamingPath, overwrite: true);
-                        AssetDatabase.Refresh();
+                        if (!streamingFile.SequenceEqual(androidFile))
+                        {
+                            File.Copy(_appPreviewConfig.AndroidPath, androidStreamingPath, overwrite: true);
+                            AssetDatabase.Refresh();
+                        }
                     }
                 }
 
@@ -120,12 +125,12 @@ namespace Liminal.SDK.Build
         {
             EditorGUILayout.BeginHorizontal();
             {
-                GUILayout.Label(name, GUILayout.Width(Screen.width * 0.15F));
+                GUILayout.Label(name, GUILayout.Width(Size.x * 0.15F));
 
                 limappPath = File.Exists(limappPath) ? limappPath : Application.dataPath;
-                limappPath = GUILayout.TextField(limappPath, GUILayout.Width(Screen.width * 0.7F));
+                limappPath = GUILayout.TextField(limappPath, GUILayout.Width(Size.x * 0.7F));
 
-                if (GUILayout.Button("...", GUILayout.Width(Screen.width * 0.1F)))
+                if (GUILayout.Button("...", GUILayout.Width(Size.x * 0.1F)))
                 {
                     limappPath = EditorUtility.OpenFilePanelWithFilters("Limapp Directory", limappPath, new string[] { "FileType", "limapp,ulimapp" });
                     limappPath = DirectoryUtils.ReplaceBackWithForwardSlashes(limappPath);

@@ -13,7 +13,8 @@
             EDeviceModelType.AcerAH101,
             EDeviceModelType.Rift,
             EDeviceModelType.RiftS,
-            EDeviceModelType.HtcVivePro
+            EDeviceModelType.HtcVivePro,
+            EDeviceModelType.Quest2
         };
 
         public static EDeviceModelType GetDeviceModelType()
@@ -44,7 +45,12 @@
                 type = EDeviceModelType.Go;
 
             if (model.Contains("quest"))
-                type = EDeviceModelType.Quest;
+            {
+                if (OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.None)
+                    type = EDeviceModelType.Quest2;
+                else
+                    type = EDeviceModelType.Quest;
+            }
 
             if (model.Contains("AcerAH101"))
                 type = EDeviceModelType.AcerAH101;

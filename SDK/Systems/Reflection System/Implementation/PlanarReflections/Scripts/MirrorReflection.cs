@@ -74,6 +74,19 @@ namespace App
                     break;
             }
 #endif
+
+            if (model == EDeviceModelType.Quest2)
+            {
+                m_Renderer.material.SetFloat(s_offsetEnabled, 1);
+
+                m_Renderer.material.SetFloat("_Debug", 1);
+
+                m_Renderer.material.SetFloat("_OffsetRX", 1.104f);
+                m_Renderer.material.SetFloat("_OffsetRY", 1);
+                m_Renderer.material.SetFloat("_OffsetRZ", -0.116f);
+                m_Renderer.material.SetFloat("_OffsetRW", 0);
+                m_Renderer.material.SetFloat("_OffsetX", 0.887f);
+            }
         }
 
         // This is called when it's known that the object will be rendered by some

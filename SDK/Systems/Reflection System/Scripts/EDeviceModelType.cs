@@ -10,6 +10,7 @@
         HtcViveCosmos,
         RiftS,
         Rift,
-        Unknown
+        Unknown,
+        Quest2,
     }
 }

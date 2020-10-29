@@ -51,10 +51,11 @@ namespace App
             m_Renderer.material.SetFloat(s_offsetEnabled, OVRUtils.IsOculusQuest ? 1 : 0);
             m_Renderer.material.SetFloat("_Quest", OVRUtils.IsOculusQuest ? 1 : 0);
 #endif
+            var model = XRDeviceUtils.GetDeviceModelType();
+
 #if UNITY_STANDALONE
             m_Renderer.material.SetFloat(s_offsetEnabled, 1);
 
-            var model = XRDeviceUtils.GetDeviceModelType();
             switch (model)
             {
                 case EDeviceModelType.Rift:
@@ -77,6 +78,8 @@ namespace App
 
             if (model == EDeviceModelType.Quest2)
             {
+                m_Renderer.material.SetFloat("_Quest", 0);
+
                 m_Renderer.material.SetFloat(s_offsetEnabled, 1);
 
                 m_Renderer.material.SetFloat("_Debug", 1);

@@ -1,4 +1,6 @@
-﻿namespace Liminal.Systems
+﻿using UnityEngine;
+
+namespace Liminal.Systems
 {
     using System.Collections.Generic;
     using UnityEngine.XR;
@@ -46,7 +48,9 @@
 
             if (model.Contains("quest"))
             {
-                if (OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.None)
+                var graphicsCardName = SystemInfo.graphicsDeviceName;
+
+                if (graphicsCardName.Contains("650"))
                     type = EDeviceModelType.Quest2;
                 else
                     type = EDeviceModelType.Quest;

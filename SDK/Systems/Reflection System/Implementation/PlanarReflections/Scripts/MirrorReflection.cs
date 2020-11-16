@@ -1,8 +1,4 @@
-﻿using System;
-using Liminal.Systems;
-using UnityEngine;
-using UnityEngine.VR;
-using UnityEngine.XR;
+﻿using Liminal.Systems;
 
 namespace App
 {
@@ -36,6 +32,27 @@ namespace App
 #else
         public Camera Cam => Camera.main;
 #endif
+
+        public ReflectionOffsetModel Ipd58OffsetModel = new ReflectionOffsetModel(1.194927f, -0.186721f, 0.8499745f);
+        public ReflectionOffsetModel Ipd63OffsetModel = new ReflectionOffsetModel(1.077431f, -0.07495025f, 0.9323733f);
+        public ReflectionOffsetModel Ipd68OffsetModel = new ReflectionOffsetModel(1.044061f, -0.006401608f, 1.043458f, -0.03977372f);
+
+        public static ReflectionOffsetModel IpdModel = null;
+
+        private void Awake()
+        {
+            if (IpdModel != null)
+                return;
+
+            if (OVRPlugin.ipd >= 0.058f && OVRPlugin.ipd < 0.063f)
+                IpdModel = Ipd58OffsetModel;
+
+            if (OVRPlugin.ipd >= 0.063f && OVRPlugin.ipd < 0.068f)
+                IpdModel = Ipd63OffsetModel;
+
+            if (OVRPlugin.ipd >= 0.068f)
+                IpdModel = Ipd68OffsetModel;
+        }
 
         private void Start()
         {
@@ -79,16 +96,23 @@ namespace App
             if (model == EDeviceModelType.Quest2)
             {
                 m_Renderer.material.SetFloat("_Quest", 0);
-
                 m_Renderer.material.SetFloat(s_offsetEnabled, 1);
-
                 m_Renderer.material.SetFloat("_Debug", 1);
 
-                m_Renderer.material.SetFloat("_OffsetRX", 1.075417f);
-                m_Renderer.material.SetFloat("_OffsetRY", 1);
-                m_Renderer.material.SetFloat("_OffsetRZ", -0.07420059f);
-                m_Renderer.material.SetFloat("_OffsetRW", 0);
-                m_Renderer.material.SetFloat("_OffsetX", 0.928451f);
+                SetMaterial(IpdModel);
+            }
+
+            void SetMaterial(ReflectionOffsetModel m)
+            {
+                m_Renderer.material.SetFloat("_OffsetRX", m.RX);
+                m_Renderer.material.SetFloat("_OffsetRY", m.RY);
+                m_Renderer.material.SetFloat("_OffsetRZ", m.RZ);
+                m_Renderer.material.SetFloat("_OffsetRW", m.RW);
+                m_Renderer.material.SetFloat("_OffsetX", m.LOffset);
+
+                m_Renderer.material.SetFloat("_UseL", m.UseL ? 1 : 0);
+                m_Renderer.material.SetFloat("_OffsetLX", m.LX);
+                m_Renderer.material.SetFloat("_OffsetLZ", m.LZ);
             }
         }
 

@@ -48,6 +48,7 @@ namespace Liminal.SDK.Build
                 DisplayForbiddenCalls();
                 CheckIncompatibility();
                 CheckTagsAndLayers();
+                CheckDefaultParameters();
                 DisplayRenderingTab();
                 DisplayVRAvatarTab();
 
@@ -63,6 +64,15 @@ namespace Liminal.SDK.Build
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUILayout.EndVertical();
             }
+        }
+
+        private void CheckDefaultParameters()
+        {
+            EditorGUIHelper.DrawTitleFoldout("Default Parameters", ref _showDefaultParameters);
+            if (!_showDefaultParameters)
+                return;
+
+            LimappErrorFinder.Draw();
         }
 
         private void GetSceneGameObjects()
@@ -348,6 +358,7 @@ namespace Liminal.SDK.Build
         private bool _showEditor;
         private bool _showTagsAndLayers;
         private bool _showForbiddenCalls;
+        private bool _showDefaultParameters;
         private List<GameObject> _sceneGameObjects = new List<GameObject>();
         private static List<Assembly> _currentAssemblies = new List<Assembly>();
         private static Dictionary<string, string> _forbiddenCallsAndScripts = new Dictionary<string, string>();

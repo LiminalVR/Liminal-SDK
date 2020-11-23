@@ -44,13 +44,13 @@ namespace App
             if (IpdModel != null)
                 return;
 
-            if (OVRPlugin.ipd >= 0.058f && OVRPlugin.ipd < 0.063f)
+            if (OVRPlugin.ipd >= 0.055f && OVRPlugin.ipd < 0.062f)
                 IpdModel = Ipd58OffsetModel;
 
-            if (OVRPlugin.ipd >= 0.063f && OVRPlugin.ipd < 0.068f)
+            if (OVRPlugin.ipd >= 0.062f && OVRPlugin.ipd < 0.067f)
                 IpdModel = Ipd63OffsetModel;
 
-            if (OVRPlugin.ipd >= 0.068f)
+            if (OVRPlugin.ipd >= 0.067f)
                 IpdModel = Ipd68OffsetModel;
         }
 

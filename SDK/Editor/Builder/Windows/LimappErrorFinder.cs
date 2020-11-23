@@ -8,19 +8,11 @@ using UnityEngine;
 public static class LimappErrorFinder
 {
     private static readonly List<Assembly> _assemblies = new List<Assembly>();
-    private static readonly List<string> _issues = new List<string>();
-    private static Vector2 _issuesScroll;
-    private static Vector2 _assembliesScroll;
+    private static readonly List<LimappIssue> _issues = new List<LimappIssue>();
     private const BindingFlags _methodsBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance;
 
     public static void Draw()
     {
-        if (GUILayout.Button("Find Issues"))
-        {
-            GetAssemblies();
-            GetParameterIssues();
-        }
-
         if (_assemblies.Any())
         {
             DrawLoadedAssemblies();
@@ -28,32 +20,55 @@ public static class LimappErrorFinder
         }
     }
 
+    public static void LocateIssues()
+    {
+        GetAssemblies();
+        GetParameterIssues();
+    }
+
     private static void DrawLoadedAssemblies()
     {
-        GUILayout.Label("Assemblies Loaded", "SettingsHeader");
-        _assembliesScroll = GUILayout.BeginScrollView(_assembliesScroll, (GUIStyle)"CurveEditorBackground", GUILayout.Height(100));
-        foreach (var assembly in _assemblies)
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button(new GUIContent($"{_assemblies.Count} assemblies found", EditorGUIUtility.FindTexture( "d_UnityEditor.InspectorWindow" )), "IconButton"))
         {
-            GUILayout.Label(FormatAssemblyName(assembly.GetName().ToString()), new GUIStyle(EditorStyles.label) { richText = true });
+            string msg = string.Empty;
+            for (var i = 0; i < _assemblies.Count; i++)
+            {
+                var assembly = _assemblies[i];
+                msg += $"{i+1}: {assembly.GetName()}\n\n";
+            }
+
+            EditorUtility.DisplayDialog($"{_assemblies.Count} assemblies found", msg, "Close");
         }
-        GUILayout.EndScrollView();
+
+        GUILayout.EndHorizontal();
+    }
+
+    public struct LimappIssue
+    {
+        public string Issue;
+        public string Location;
     }
 
     private static void DrawIssues()
     {
-        GUILayout.Label("Issues", "SettingsHeader");
+        GUILayout.Label("The following default parameters must be removed before building a Limapp", EditorStyles.boldLabel);
         if (!_issues.Any())
         {
-            GUILayout.Label($"<color=#59db42><b>No issues detected</b></color>", new GUIStyle(EditorStyles.label) { richText = true });
+            GUILayout.Label("<color=#59db42><b>No issues detected</b></color>", new GUIStyle(EditorStyles.label) { richText = true });
             return;
         }
 
-        _issuesScroll = GUILayout.BeginScrollView(_issuesScroll, (GUIStyle)"CurveEditorBackground");
+        GUI.backgroundColor = new Color(0.7f, 0.7f, 0.7f);
         foreach (var issue in _issues)
         {
-            GUILayout.Label(issue, new GUIStyle(EditorStyles.label) { richText = true });
+            if (GUILayout.Button(new GUIContent(issue.Issue, EditorGUIUtility.FindTexture("d_console.erroricon")),
+                new GUIStyle(EditorStyles.helpBox) {richText = true}))
+            {
+                Application.OpenURL(issue.Location);
+            }
         }
-        GUILayout.EndScrollView();
+        GUI.backgroundColor = Color.white;
     }
 
     private static void GetParameterIssues()
@@ -80,7 +95,7 @@ public static class LimappErrorFinder
                         if (parameter.HasDefaultValue)
                         {
                             if (parameter.DefaultValue != null && parameter.ParameterType.Assembly.FullName.Contains("UnityEngine.CoreModule"))
-                                str += $"<color=#f55151><b>{parameter.Name} = {parameter.ParameterType.Assembly.GetName().Name}.{parameter.DefaultValue ?? "null"}</b></color>";
+                                str += $"<color=#f02424><b>{parameter.Name} = {parameter.ParameterType.Assembly.GetName().Name}.{parameter.DefaultValue ?? "null"}</b></color>";
                             else
                                 str += $"{parameter.Name} = {parameter.DefaultValue ?? "null"}";
                         }
@@ -91,17 +106,19 @@ public static class LimappErrorFinder
                             str += ", ";
                     }
 
-                    str += ")\n";
-                    _issues.Add(str);
+                    str += ")";
+                    
+                    var guid = AssetDatabase.FindAssets($"t:Script {type.Name}").FirstOrDefault();
+                    var path = AssetDatabase.GUIDToAssetPath(guid);
+
+                    _issues.Add(new LimappIssue
+                    {
+                        Issue = str,
+                        Location = $"{Application.dataPath}/../{path}"
+                    });
                 }
             }
         }
-    }
-
-    private static string FormatAssemblyName(string assemblyName)
-    {
-        var space = assemblyName.IndexOf(',');
-        return $"<color=#FC0><b>{assemblyName.Insert(space, "</b></color><size=9>")}</size>";
     }
 
     private static void GetAssemblies()

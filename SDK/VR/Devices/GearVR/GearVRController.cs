@@ -161,11 +161,12 @@ namespace Liminal.SDK.VR.Devices.GearVR
         {
             return new Dictionary<string, OVRInput.Button>()
             {
+                { VRButton.One, OVRInput.Button.PrimaryIndexTrigger},
                 { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger},
-                { VRButton.One, OVRInput.Button.One},
-                { VRButton.Three, OVRInput.Button.Three },
-                { VRButton.Four, OVRInput.Button.Four },
-                { VRButton.Touch, OVRInput.Button.PrimaryHandTrigger },
+                { VRButton.Two, OVRInput.Button.PrimaryTouchpad | OVRInput.Button.PrimaryThumbstick },
+                { VRButton.Three, OVRInput.Button.PrimaryHandTrigger },
+                { VRButton.Four, OVRInput.Button.One}, // A / X on Quest controllers
+                { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
                 { VRButton.Back, OVRInput.Button.Back | OVRInput.Button.Two}
             };
         }

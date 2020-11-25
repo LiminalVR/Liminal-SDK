@@ -161,7 +161,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
         {
             return new Dictionary<string, OVRInput.Button>()
             {
-                { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger | OVRInput.Button.One},
+                { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger},
                 { VRButton.One, OVRInput.Button.One},
                 { VRButton.Three, OVRInput.Button.Three },
                 { VRButton.Four, OVRInput.Button.Four },

@@ -39,7 +39,7 @@ namespace Liminal.SDK.Build
 
                 GetSceneGameObjects();
 
-                GUILayout.Space(10);    
+                GUILayout.Space(10);
                 _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
                 EditorStyles.label.wordWrap = true;
 
@@ -48,6 +48,7 @@ namespace Liminal.SDK.Build
                 DisplayForbiddenCalls();
                 CheckIncompatibility();
                 CheckTagsAndLayers();
+                CheckDefaultParameters();
                 DisplayRenderingTab();
                 DisplayVRAvatarTab();
 
@@ -63,6 +64,12 @@ namespace Liminal.SDK.Build
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUILayout.EndVertical();
             }
+        }
+
+        private void CheckDefaultParameters()
+        {
+            EditorGUIHelper.DrawTitleFoldout("Default Parameters", ref _showDefaultParameters,
+                () => LimappErrorFinder.Draw(), LimappErrorFinder.LocateIssues);
         }
 
         private void GetSceneGameObjects()
@@ -83,15 +90,13 @@ namespace Liminal.SDK.Build
             if (!IssuesUtility.HasEditorIssues())
                 return;
 
-            EditorGUIHelper.DrawTitleFoldout("Unity Editor", ref _showEditor);
-
-            if (!_showEditor)
-                return;
-
-            EditorGUI.indentLevel++;
-            EditorGUIHelper.DrawSpritedLabel("Ensure you are using Unity 2019.1.10f1 as your development environment", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            EditorGUI.indentLevel--;
+            EditorGUIHelper.DrawTitleFoldout("Unity Editor", ref _showEditor, () =>
+            {
+                EditorGUI.indentLevel++;
+                EditorGUIHelper.DrawSpritedLabel("Ensure you are using Unity 2019.1.10f1 as your development environment", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                EditorGUI.indentLevel--;
+            });
         }
 
         private void DisplayRenderingTab()
@@ -99,40 +104,38 @@ namespace Liminal.SDK.Build
             if (!IssuesUtility.HasRenderingIssues())
                 return;
 
-            EditorGUIHelper.DrawTitleFoldout("Rendering", ref _showRendering);
-
-            if (!_showRendering)
-                return;
-
-            EditorGUI.indentLevel++;
-
-            if (!PlayerSettings.virtualRealitySupported)
+            EditorGUIHelper.DrawTitleFoldout("Rendering", ref _showRendering, () =>
             {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUIHelper.DrawSpritedLabel("Virtual Reality Must Be Supported", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+                EditorGUI.indentLevel++;
 
-                if (GUILayout.Button("Enable VR Support"))
-                    PlayerSettings.virtualRealitySupported = true;
+                if (!PlayerSettings.virtualRealitySupported)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUIHelper.DrawSpritedLabel("Virtual Reality Must Be Supported", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
 
-                EditorGUILayout.EndHorizontal();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                    if (GUILayout.Button("Enable VR Support"))
+                        PlayerSettings.virtualRealitySupported = true;
+
+                    EditorGUILayout.EndHorizontal();
+                    GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                    EditorGUI.indentLevel--;
+                }
+
+                if (PlayerSettings.stereoRenderingPath != StereoRenderingPath.SinglePass)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUIHelper.DrawSpritedLabel("Stereo Rendering Mode Must be Set To Single Pass", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+
+                    if (GUILayout.Button("Set To Single Pass"))
+                        PlayerSettings.stereoRenderingPath = StereoRenderingPath.SinglePass;
+
+                    EditorGUILayout.EndHorizontal();
+                    GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                    EditorGUI.indentLevel--;
+                }
+
                 EditorGUI.indentLevel--;
-            }
-
-            if (PlayerSettings.stereoRenderingPath != StereoRenderingPath.SinglePass)
-            {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUIHelper.DrawSpritedLabel("Stereo Rendering Mode Must be Set To Single Pass", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
-
-                if (GUILayout.Button("Set To Single Pass"))
-                    PlayerSettings.stereoRenderingPath = StereoRenderingPath.SinglePass;
-
-                EditorGUILayout.EndHorizontal();
-                GUILayout.Space(EditorGUIUtility.singleLineHeight); 
-                EditorGUI.indentLevel--;
-            }
-
-            EditorGUI.indentLevel--;
+            });
         }
 
         private void DisplayVRAvatarTab()
@@ -141,7 +144,7 @@ namespace Liminal.SDK.Build
 
             foreach (var item in _sceneGameObjects)
             {
-                if(item.GetComponentInChildren<VRAvatar>())
+                if (item.GetComponentInChildren<VRAvatar>())
                 {
                     avatar = item.GetComponentInChildren<VRAvatar>();
                     break;
@@ -151,12 +154,9 @@ namespace Liminal.SDK.Build
             if (!IssuesUtility.HasAvatarIssues(avatar))
                 return;
 
-            EditorGUIHelper.DrawTitleFoldout("VR Avatar", ref _showVRAvatar);
-
-            if (!_showVRAvatar)
-                return;
-
-            EditorGUI.indentLevel++;
+            EditorGUIHelper.DrawTitleFoldout("VR Avatar", ref _showVRAvatar, () =>
+            {
+                EditorGUI.indentLevel++;
 
             if (avatar == null)
             {
@@ -203,7 +203,7 @@ namespace Liminal.SDK.Build
                     EditorGUILayout.EndHorizontal();
                 }
 
-                if(eyePosWrong)
+                if (eyePosWrong)
                 {
                     EditorGUILayout.BeginHorizontal();
                     EditorGUIHelper.DrawSpritedLabel("Eye Local Position Must be Zeroed", ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
@@ -218,6 +218,7 @@ namespace Liminal.SDK.Build
             }
 
             EditorGUI.indentLevel--;
+            });
         }
 
         private void CheckTagsAndLayers()
@@ -228,28 +229,26 @@ namespace Liminal.SDK.Build
             if (allTags.Count() <= 7 && allLayers.Count() <= 5)
                 return;
 
-            EditorGUIHelper.DrawTitleFoldout("Tags And Layers", ref _showTagsAndLayers);
-
-            if (!_showTagsAndLayers)
-                return;
-
-            EditorGUI.indentLevel++;
-            if (allTags.Count() > 7)
+            EditorGUIHelper.DrawTitleFoldout("Tags And Layers", ref _showTagsAndLayers, () =>
             {
-                EditorGUIHelper.DrawSpritedLabel($"You have {allTags.Count() - 7} custom tags in your tag list. " +
-                    $"Do not use tags unless they are assigned at runtime.", WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+                EditorGUI.indentLevel++;
+                if (allTags.Count() > 7)
+                {
+                    EditorGUIHelper.DrawSpritedLabel($"You have {allTags.Count() - 7} custom tags in your tag list. " +
+                                                     $"Do not use tags unless they are assigned at runtime.", WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+                    GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                }
+
+                if (allLayers.Count() > 5)
+                {
+                    EditorGUIHelper.DrawSpritedLabel($"You have {allLayers.Count() - 5} custom layers in your layer list. If you are working with layers in you code, make sure that you are using " +
+                                                     $"LayerMask.LayerToName and not LayerMask.NameToLayer as LayerMask.NameToLayer will return null references in the Liminal platform."
+                        , WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+                }
+
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            }
-
-            if (allLayers.Count() > 5)
-            {
-                EditorGUIHelper.DrawSpritedLabel($"You have {allLayers.Count() - 5} custom layers in your layer list. If you are working with layers in you code, make sure that you are using " +
-                    $"LayerMask.LayerToName and not LayerMask.NameToLayer as LayerMask.NameToLayer will return null references in the Liminal platform."
-                    , WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
-            }
-
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            EditorGUI.indentLevel--;
+                EditorGUI.indentLevel--;
+            });
         }
 
         private void CheckIncompatibility()
@@ -257,14 +256,12 @@ namespace Liminal.SDK.Build
             if (!IssuesUtility.HasIncompatiblePackages(_currentAssemblies, out var allItems))
                 return;
 
-            EditorGUIHelper.DrawTitleFoldout("Known Incompatibilities", ref _showIncompatibility);
-
-            if (!_showIncompatibility)
-                return;
-
-            EditorGUI.indentLevel++;
-            DisplayIncompatibleItems(allItems);
-            EditorGUI.indentLevel--;
+            EditorGUIHelper.DrawTitleFoldout("Known Incompatibilities", ref _showIncompatibility, () =>
+            {
+                EditorGUI.indentLevel++;
+                DisplayIncompatibleItems(allItems);
+                EditorGUI.indentLevel--;
+            });
         }
 
         private void DisplayIncompatibleItems(List<string> itemsToDisplay)
@@ -301,45 +298,43 @@ namespace Liminal.SDK.Build
             if (!IssuesUtility.HasForbiddenCalls(_forbiddenCallsAndScripts))
                 return;
 
-            EditorGUIHelper.DrawTitleFoldout("Forbidden Calls", ref _showForbiddenCalls);
-
-            if (!_showForbiddenCalls)
-                return;
-
-            EditorGUI.indentLevel++;
-
-            var style = new GUIStyle(GUI.skin.label)
+            EditorGUIHelper.DrawTitleFoldout("Forbidden Calls", ref _showForbiddenCalls, () =>
             {
-                richText = true,
-                wordWrap = true
-            };
+                EditorGUI.indentLevel++;
 
-            var btnText = "Open File";
-            GUIStyle btn = new GUIStyle(GUI.skin.button);
-            btn.fixedWidth = btn.CalcSize(new GUIContent(btnText)).x;
-            btn.fixedHeight = btn.CalcSize(new GUIContent(btnText)).y;
-            EditorGUILayout.LabelField("The Following Function Calls Are Forbidden In The Liminal SDK");
-            EditorGUI.indentLevel++;
+                var style = new GUIStyle(GUI.skin.label)
+                {
+                    richText = true,
+                    wordWrap = true
+                };
 
-            foreach (var entry in _forbiddenCallsAndScripts)
-            {
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label(ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
-                EditorGUILayout.LabelField($"{entry.Key}", style);
+                var btnText = "Open File";
+                GUIStyle btn = new GUIStyle(GUI.skin.button);
+                btn.fixedWidth = btn.CalcSize(new GUIContent(btnText)).x;
+                btn.fixedHeight = btn.CalcSize(new GUIContent(btnText)).y;
+                EditorGUILayout.LabelField("The Following Function Calls Are Forbidden In The Liminal SDK");
+                EditorGUI.indentLevel++;
 
-                var location = Application.dataPath + "/../" + entry.Value;
+                foreach (var entry in _forbiddenCallsAndScripts)
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    GUILayout.Label(ErrorTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
+                    EditorGUILayout.LabelField($"{entry.Key}", style);
 
-                if (GUILayout.Button(btnText, btn))
-                    Application.OpenURL(location);
+                    var location = Application.dataPath + "/../" + entry.Value;
 
-                EditorGUILayout.EndHorizontal();
-            }
+                    if (GUILayout.Button(btnText, btn))
+                        Application.OpenURL(location);
 
-            EditorGUI.indentLevel--;
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            EditorGUILayout.LabelField($"Please Remove These Calls Before Building");
-            GUILayout.Space(EditorGUIUtility.singleLineHeight);
-            EditorGUI.indentLevel--;
+                    EditorGUILayout.EndHorizontal();
+                }
+
+                EditorGUI.indentLevel--;
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                EditorGUILayout.LabelField($"Please Remove These Calls Before Building");
+                GUILayout.Space(EditorGUIUtility.singleLineHeight);
+                EditorGUI.indentLevel--;
+            });
         }
 
         private bool _showRendering;
@@ -348,6 +343,7 @@ namespace Liminal.SDK.Build
         private bool _showEditor;
         private bool _showTagsAndLayers;
         private bool _showForbiddenCalls;
+        private bool _showDefaultParameters;
         private List<GameObject> _sceneGameObjects = new List<GameObject>();
         private static List<Assembly> _currentAssemblies = new List<Assembly>();
         private static Dictionary<string, string> _forbiddenCallsAndScripts = new Dictionary<string, string>();

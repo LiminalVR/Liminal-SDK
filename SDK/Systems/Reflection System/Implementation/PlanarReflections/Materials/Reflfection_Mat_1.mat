@@ -98,11 +98,13 @@ Material:
     - _Rift: 0
     - _RiftS: 0
     - _RippleSpeed: 0.45
-    - _RippleStrength: 0.21
+    - _RippleStrength: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
+    - _Vive: 0
+    - _VivePro: 0
     - _ZWrite: 1
     m_Colors:
     - _BlowUpColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}

@@ -163,7 +163,9 @@ namespace Liminal.SDK.VR.Devices.GearVR
             {
                 { VRButton.One, OVRInput.Button.PrimaryIndexTrigger},
                 { VRButton.Trigger, OVRInput.Button.PrimaryIndexTrigger},
-                { VRButton.Two, OVRInput.Button.PrimaryTouchpad },
+                { VRButton.Two, OVRInput.Button.PrimaryTouchpad | OVRInput.Button.PrimaryThumbstick },
+                { VRButton.Three, OVRInput.Button.PrimaryHandTrigger },
+                { VRButton.Four, OVRInput.Button.One}, // A / X on Quest controllers
                 { VRButton.Touch, OVRInput.Button.PrimaryTouchpad },
                 { VRButton.Back, OVRInput.Button.Back | OVRInput.Button.Two}
             };

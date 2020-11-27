@@ -34,6 +34,10 @@
          _OffsetRZ("RZ", Float) = -0.173
          _OffsetRW("RW", Float) = 0
          _OffsetX("Offset", Float) =  0.85
+
+         [MaterialToggle] _UseL("UseL", Float) = 0
+         _OffsetLX("LX", Float) = 1.043458
+         _OffsetLZ("LZ", Float) = -0.03977372
     }
         SubShader
         {
@@ -90,6 +94,8 @@
                 float _OffsetRY;
                 float _OffsetRZ;
                 float _OffsetRW;
+                float _OffsetLX;
+                float _OffsetLZ;
 
                 float _OffsetX;
                 float _OffsetEnabled;
@@ -100,6 +106,7 @@
                 float _RiftS;
                 float _Vive;
                 float _VivePro;
+                float _UseL;
 
                 float _EnableTint;
                 float _EnableRampAlpha;
@@ -152,7 +159,15 @@
                         if (unity_StereoEyeIndex == 0) {
                             if(_Debug)
                             {
-                                uvRefl.x *= _OffsetX;
+                                if (_UseL) 
+                                {
+                                    float4 scaleOffset = float4(_OffsetLX, _OffsetRY, _OffsetLZ, _OffsetRW);
+                                    uvRefl = (uvRefl - scaleOffset.zw) / scaleOffset.xy;
+                                }
+                                else 
+                                {
+                                    uvRefl.x *= _OffsetX;
+                                }
                             }
                             else
                             {

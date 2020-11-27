@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System;
+using UnityEditor;
 using UnityEngine;
 
 public static class EditorGUIHelper
@@ -10,12 +11,20 @@ public static class EditorGUIHelper
         EditorGUILayout.EndVertical();
     }
 
-    public static void DrawTitleFoldout(string label, ref bool boolToSet)
+    public static void DrawTitleFoldout(string label, ref bool boolToSet, Action drawContent, Action onFoldout = null)
     {
         EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(30));
         EditorGUILayout.BeginHorizontal();
+        EditorGUI.BeginChangeCheck();
         boolToSet = EditorGUILayout.Foldout(boolToSet, label, toggleOnLabelClick: true);
+        if (EditorGUI.EndChangeCheck() && boolToSet)
+            onFoldout?.Invoke();
+
         EditorGUILayout.EndHorizontal();
+        
+        if (boolToSet)
+            drawContent?.Invoke();
+
         EditorGUILayout.EndVertical();
     }
 

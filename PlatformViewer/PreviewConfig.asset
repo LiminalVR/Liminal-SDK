@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EmulatorPath: W:/Unity/Liminal-SDK/Liminal-SDK-Unity-Package/Assets/_Builds/Emulator
     - Produce Picker-0a3440c8-41f0-4165-8354-2ac741e81e58.limapp
-  AndroidPath: W:/Unity/Liminal-SDK/Liminal-SDK-Unity-Package/Assets
-  AndroidAppFullName: app_999_gearvr_v1.limapp
+  AndroidPath: C:/Users/ticoc/Downloads/ProducePicker-GearVr.limapp
+  AndroidAppFullName: ProducePicker-GearVr.limapp

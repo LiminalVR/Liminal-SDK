@@ -37,6 +37,9 @@ namespace App
                 case ESDKType.OpenVR:
                     return new OpenVRDevice();
 
+                case ESDKType.Pico:
+                    return new PicoVRDevice();
+
                 default:
                     return new EmulatorDevice(VREmulatorDevice.Daydream);
             }

@@ -35,11 +35,12 @@ namespace Liminal.Platform.Experimental.App
 
         private void Start()
         {
+            BetterStreamingAssets.Initialize();
+            return;
             var deviceInitializer = GetComponentInChildren<IVRDeviceInitializer>();
             var device = deviceInitializer.CreateDevice();
             VRDevice.Initialize(device);
             VRDevice.Device.SetupAvatar(Avatar);
-            BetterStreamingAssets.Initialize();
         }
 
         public void Play()
@@ -113,13 +114,19 @@ namespace Liminal.Platform.Experimental.App
 
         private void ResolvePlatformLimapp(out byte[] data, out string fileName)
         {
+
             if (Application.platform == RuntimePlatform.Android)
             {
+                Debug.Log("Doing Android");
+                Debug.Log("PreviewConfig.AndroidAppFullName");
+
                 data = BetterStreamingAssets.ReadAllBytes(PreviewConfig.AndroidAppFullName);
                 fileName = PreviewConfig.AndroidAppFullName;
             }
             else
             {
+                Debug.Log("Doing PC");
+
                 var limappPath = PreviewConfig.EmulatorPath;
                 fileName = Path.GetFileName(limappPath);
                 data = File.ReadAllBytes(limappPath);

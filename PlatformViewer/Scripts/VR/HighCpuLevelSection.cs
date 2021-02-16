@@ -9,12 +9,12 @@ namespace Liminal.Platform.Experimental.VR
 
         public HighCpuLevelSection()
         {
-            originalLevel = VRDevice.Device.CpuLevel;
+            //originalLevel = VRDevice.Device.CpuLevel;
         }
 
         public void Dispose()
         {
-            VRDevice.Device.CpuLevel = originalLevel;
+            //VRDevice.Device.CpuLevel = originalLevel;
         }
     }
 }

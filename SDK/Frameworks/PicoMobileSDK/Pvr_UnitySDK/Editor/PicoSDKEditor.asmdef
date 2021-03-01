@@ -1,0 +1,17 @@
+{
+    "name": "PicoSDKEditor",
+    "references": [
+        "GUID:0deb44cb06382614bbde73c949e5b44e"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

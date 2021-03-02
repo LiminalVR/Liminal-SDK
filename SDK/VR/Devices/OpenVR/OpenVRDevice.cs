@@ -17,9 +17,7 @@ namespace Liminal.SDK.OpenVR
 
     public class OpenVRDevice : IVRDevice
     {
-        private static readonly VRDeviceCapability _capabilities =
-            VRDeviceCapability.Controller | VRDeviceCapability.DualController |
-            VRDeviceCapability.UserPrescenceDetection;
+        private static readonly VRDeviceCapability _capabilities = VRDeviceCapability.Controller | VRDeviceCapability.DualController | VRDeviceCapability.UserPrescenceDetection;
 
         public string Name => "OpenVR";
         public int InputDeviceCount => 3;
@@ -108,4 +106,13 @@ namespace Liminal.SDK.OpenVR
         {
         }
     }
+}
+
+public static class VRDeviceCommonUtils
+{
+    public static VRDeviceCapability GenericDeviceCapability => VRDeviceCapability.Controller | VRDeviceCapability.DualController | VRDeviceCapability.UserPrescenceDetection;
+    public static bool HasCapabilities(VRDeviceCapability a, VRDeviceCapability b) => ((b & a) == a);
+
+    public static VRInputDeviceCapability GenericInputDeviceCapability => VRInputDeviceCapability.DirectionalInput | VRInputDeviceCapability.Touch | VRInputDeviceCapability.TriggerButton;
+    public static bool HasCapabilities(VRInputDeviceCapability a, VRInputDeviceCapability b) => ((b & a) == a);
 }

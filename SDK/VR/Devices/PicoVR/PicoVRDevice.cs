@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Liminal.SDK.Core;
+using Liminal.SDK.OpenVR;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
@@ -38,8 +41,13 @@ namespace Liminal.SDK.PicoVR
         public void SetupAvatar(IVRAvatar avatar)
         {
             // Just add the avatar in the scene first, find it and try to hook up the hands
-            var rig = GameObject.FindObjectOfType<Pvr_UnitySDKManager>();
-            rig.transform.SetParent(avatar.Auxiliaries);
+            //var rig = avatar.Transform.GetComponentInChildren<Pvr_UnitySDKManager>();
+            //var experienceApp = GameObject.FindObjectOfType<ExperienceApp>();
+            //var rig = experienceApp.GetComponentInChildren<Pvr_UnitySDKManager>(includeInactive:true);
+            var rigPrefab = Resources.Load("PicoVRRig");
+            var rig = GameObject.Instantiate(rigPrefab) as GameObject;
+
+            //rig.transform.SetParent(avatar.Auxiliaries);
 
             var pvrControllers = rig.GetComponentInChildren<Pvr_Controller>();
             var leftController = pvrControllers.controller0.GetComponent<Pvr_ControllerModuleInit>();
@@ -50,10 +58,13 @@ namespace Liminal.SDK.PicoVR
 
             BindPointer(leftController, avatar.SecondaryHand);
             BindPointer(rightController, avatar.PrimaryHand);
+
+            avatar.InitializeExtensions();
         }
 
         public void BindPointer(MonoBehaviour controller, IVRAvatarHand hand)
         {
+            // If a laser pointer visual is not found, this means the prefab for each controller don't have a laser in it.
             var pointerVisual = controller.GetComponentInChildren<LaserPointerVisual>(includeInactive: true);
             pointerVisual.Bind(hand.InputDevice.Pointer);
             hand.InputDevice.Pointer.Transform = pointerVisual.transform;

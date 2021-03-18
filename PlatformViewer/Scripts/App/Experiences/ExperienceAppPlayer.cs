@@ -30,6 +30,8 @@ namespace Liminal.Platform.Experimental.App.Experiences
         private BundleAsyncLoadOperationBase _loadOperation;
         private ExperienceStateModel _stateModel = new ExperienceStateModel();
 
+        public VREmulator Emulator;
+
         public bool IsRunning
         {
             get { return _stateModel.State != AppState.NotLoaded; }
@@ -156,7 +158,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             CurrentApp.gameObject.SetActive(true);
 
             //# SUPER IMPORTANT
-            var device = DeviceUtils.CreateDevice(CurrentApp);
+            var device = Emulator.CreateDevice();
             VRDevice.Replace(device);
 
             var method = ExperienceAppReflectionCache.InitializeMethod;

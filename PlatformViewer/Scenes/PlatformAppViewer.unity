@@ -682,6 +682,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0099e3e02b0f9734d90a35916b0c5a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Emulator: {fileID: 3473043119503296453}
 --- !u!4 &3473043119503296450
 Transform:
   m_ObjectHideFlags: 0
@@ -748,7 +749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildType: 4
-  EditorType: 4
+  EditorType: 1
 --- !u!224 &3934831371284879100
 RectTransform:
   m_ObjectHideFlags: 0

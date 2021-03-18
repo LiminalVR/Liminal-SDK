@@ -12,7 +12,7 @@ namespace App
 {
     public static class DeviceUtils
     {
-        public static IVRDevice CreateDevice(ExperienceApp experienceApp = null)
+        public static IVRDevice CreateDevice()
         {
             // TODO Add an environment SDK Configuration.
 #if UNITY_XR

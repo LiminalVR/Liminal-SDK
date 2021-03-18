@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4a3c01ccdeb50541b24baa71f9ecfbd, type: 3}
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
-  EmulatorPath: W:/Unity/LiminalSdk-2019.1/Liminal-SDK-Unity-Package/Assets/_Builds/RippleEffect-Emulator.limapp
-  AndroidPath: W:/Unity/LiminalSdk-2019.1/Liminal-SDK-Unity-Package/Assets/_Builds/ReliefPoint-GearVr.limapp
-  AndroidAppFullName: ReliefPoint-GearVr.limapp
+  EmulatorPath: W:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/RippleEffect-Emulator.limapp
+  AndroidPath: W:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/app_999_android_v1.limapp
+  AndroidAppFullName: app_999_android_v1.limapp

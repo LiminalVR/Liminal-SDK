@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
   EmulatorPath: W:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/RippleEffect-Emulator.limapp
-  AndroidPath: W:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/app_999_android_v1.limapp
-  AndroidAppFullName: app_999_android_v1.limapp
+  AndroidPath: W:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/GearVr
+    - Ion-8f1ba470-0a0d-4a33-9bf7-039cb3d34f53.limapp
+  AndroidAppFullName: GearVr - Ion-8f1ba470-0a0d-4a33-9bf7-039cb3d34f53.limapp

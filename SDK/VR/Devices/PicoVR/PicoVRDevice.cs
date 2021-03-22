@@ -38,6 +38,11 @@ namespace Liminal.SDK.PicoVR
             };
         }
 
+        private GameObject _rig;
+        private Transform _aux;
+
+        public static GameObject Rig;
+
         public void SetupAvatar(IVRAvatar avatar)
         {
             // Just add the avatar in the scene first, find it and try to hook up the hands
@@ -45,11 +50,18 @@ namespace Liminal.SDK.PicoVR
             //var experienceApp = GameObject.FindObjectOfType<ExperienceApp>();
             //var rig = experienceApp.GetComponentInChildren<Pvr_UnitySDKManager>(includeInactive:true);
             var rigPrefab = Resources.Load("PicoVRRig");
-            var rig = GameObject.Instantiate(rigPrefab) as GameObject;
 
-            //rig.transform.SetParent(avatar.Auxiliaries);
+            if (Rig == null)
+            {
+                _rig = GameObject.Instantiate(rigPrefab) as GameObject;
+                Rig = _rig;
+            }
+            else
+                _rig = Rig.gameObject;
 
-            var pvrControllers = rig.GetComponentInChildren<Pvr_Controller>();
+            _aux = avatar.Auxiliaries;
+
+            var pvrControllers = _rig.GetComponentInChildren<Pvr_Controller>();
             var leftController = pvrControllers.controller0.GetComponent<Pvr_ControllerModuleInit>();
             var rightController = pvrControllers.controller1.GetComponent<Pvr_ControllerModuleInit>();
 
@@ -76,7 +88,14 @@ namespace Liminal.SDK.PicoVR
         public event VRInputDeviceEventHandler InputDeviceDisconnected;
         public event VRDeviceEventHandler PrimaryInputDeviceChanged;
 
-        public void Update() { }
+        public void Update()
+        {
+            if (_rig == null)
+                return;
+
+            _rig.transform.position = _aux.position;
+            _rig.transform.rotation = _aux.rotation;
+        }
 
         #endregion
     }

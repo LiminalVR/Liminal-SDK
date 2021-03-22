@@ -42,6 +42,7 @@ namespace Liminal.Platform.Experimental.App
             BetterStreamingAssets.Initialize();
         }
 
+        [ContextMenu("Play")]
         public void Play()
         {
             if(!ExperienceAppPlayer.IsRunning)

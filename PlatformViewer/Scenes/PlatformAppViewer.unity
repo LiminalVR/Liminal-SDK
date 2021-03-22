@@ -749,7 +749,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   BuildType: 4
-  EditorType: 1
+  EditorType: 4
 --- !u!224 &3934831371284879100
 RectTransform:
   m_ObjectHideFlags: 0

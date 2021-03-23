@@ -11,8 +11,8 @@ namespace Liminal.SDK.PicoVR
         public Pvr_ControllerModuleInit Controller;
 
         public bool IsActive => Controller.gameObject.activeInHierarchy;
-        public Vector3 Position => _head.TransformPoint(Controller.transform.localPosition);
-        public Quaternion Rotation => _head.rotation * Controller.transform.localRotation;
+        public Vector3 Position => Controller.transform.position;
+        public Quaternion Rotation => Controller.transform.rotation;
 
         public PicoVRTrackedControllerProxy(Pvr_ControllerModuleInit controller, Transform head, Transform avatar)
         {

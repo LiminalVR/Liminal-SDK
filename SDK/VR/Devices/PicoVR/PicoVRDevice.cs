@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Liminal.SDK.Core;
-using Liminal.SDK.OpenVR;
+﻿using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
@@ -40,15 +36,12 @@ namespace Liminal.SDK.PicoVR
 
         private GameObject _rig;
         private Transform _aux;
+        private Pvr_UnitySDKHeadTrack _head;
 
         public static GameObject Rig;
 
         public void SetupAvatar(IVRAvatar avatar)
         {
-            // Just add the avatar in the scene first, find it and try to hook up the hands
-            //var rig = avatar.Transform.GetComponentInChildren<Pvr_UnitySDKManager>();
-            //var experienceApp = GameObject.FindObjectOfType<ExperienceApp>();
-            //var rig = experienceApp.GetComponentInChildren<Pvr_UnitySDKManager>(includeInactive:true);
             var rigPrefab = Resources.Load("PicoVRRig");
 
             if (Rig == null)
@@ -57,9 +50,24 @@ namespace Liminal.SDK.PicoVR
                 Rig = _rig;
             }
             else
+            {
                 _rig = Rig.gameObject;
+            }
+
+            if (_rig == null)
+            {
+                Debug.LogError("Rig not setup for PicoVRRIg or could not be found. Check VRDevices/PicoVR/Resources/PicoVRRig.prefab");
+                return;
+            }
 
             _aux = avatar.Auxiliaries;
+            _head = _rig.GetComponentInChildren<Pvr_UnitySDKHeadTrack>();
+
+            _rig.transform.position = avatar.Transform.position;
+            _rig.transform.rotation = avatar.Transform.rotation;
+
+            _head.transform.position = avatar.Head.Transform.position;
+            _head.transform.rotation = avatar.Head.Transform.rotation;
 
             var pvrControllers = _rig.GetComponentInChildren<Pvr_Controller>();
             var leftController = pvrControllers.controller0.GetComponent<Pvr_ControllerModuleInit>();
@@ -82,12 +90,6 @@ namespace Liminal.SDK.PicoVR
             hand.InputDevice.Pointer.Transform = pointerVisual.transform;
         }
 
-        #region Unused
-
-        public event VRInputDeviceEventHandler InputDeviceConnected;
-        public event VRInputDeviceEventHandler InputDeviceDisconnected;
-        public event VRDeviceEventHandler PrimaryInputDeviceChanged;
-
         public void Update()
         {
             if (_rig == null)
@@ -96,6 +98,12 @@ namespace Liminal.SDK.PicoVR
             _rig.transform.position = _aux.position;
             _rig.transform.rotation = _aux.rotation;
         }
+
+        #region Unused
+
+        public event VRInputDeviceEventHandler InputDeviceConnected;
+        public event VRInputDeviceEventHandler InputDeviceDisconnected;
+        public event VRDeviceEventHandler PrimaryInputDeviceChanged;
 
         #endregion
     }

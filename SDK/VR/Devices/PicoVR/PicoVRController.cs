@@ -56,7 +56,7 @@ namespace Liminal.SDK.PicoVR
             return map;
         }
 
-        public bool IsTouching => Controller.UPvr_IsTouching(PicoHandId);
+        public bool IsTouching => Mathf.Abs(Controller.UPvr_GetAxis2D(PicoHandId).sqrMagnitude) > 0;
 
         public bool HasAxis1D(string axis) => ControllerMap.ContainsKey(axis);
         public bool HasAxis2D(string axis) => ControllerMap.ContainsKey(axis);
@@ -65,7 +65,7 @@ namespace Liminal.SDK.PicoVR
         public float GetAxis1D(string axis) => Controller.UPvr_GetAxis1D(PicoHandId, ControllerMap[axis]);
 
         // The only axis 2D available is the joystick/touchpad. Pico's GetAxis2D seems to be something different?
-        public Vector2 GetAxis2D(string axis) => Controller.UPvr_GetTouchPadPosition(PicoHandId);
+        public Vector2 GetAxis2D(string axis) => Controller.UPvr_GetAxis2D(PicoHandId);
 
         public bool GetButton(string button) => Controller.UPvr_GetKey(PicoHandId, ControllerMap[button]);
         public bool GetButtonDown(string button) => Controller.UPvr_GetKeyDown(PicoHandId, ControllerMap[button]);

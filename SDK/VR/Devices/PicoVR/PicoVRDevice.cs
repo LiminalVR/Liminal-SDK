@@ -37,6 +37,7 @@ namespace Liminal.SDK.PicoVR
         private GameObject _rig;
         private Transform _aux;
         private Pvr_UnitySDKHeadTrack _head;
+        private IVRAvatar _avatar;
 
         public static GameObject Rig;
 
@@ -60,6 +61,7 @@ namespace Liminal.SDK.PicoVR
                 return;
             }
 
+            _avatar = avatar;
             _aux = avatar.Auxiliaries;
             _head = _rig.GetComponentInChildren<Pvr_UnitySDKHeadTrack>();
 
@@ -75,6 +77,7 @@ namespace Liminal.SDK.PicoVR
 
             avatar.PrimaryHand.TrackedObject = new PicoVRTrackedControllerProxy(rightController, avatar.Head.Transform, avatar.Transform);
             avatar.SecondaryHand.TrackedObject = new PicoVRTrackedControllerProxy(leftController, avatar.Head.Transform, avatar.Transform);
+            avatar.Head.TrackedObject = new PicoVRTrackedHeadsetProxy(_head.transform);
 
             BindPointer(leftController, avatar.SecondaryHand);
             BindPointer(rightController, avatar.PrimaryHand);
@@ -90,11 +93,12 @@ namespace Liminal.SDK.PicoVR
             hand.InputDevice.Pointer.Transform = pointerVisual.transform;
         }
 
+        // This is called once every 0.5 seconds.
         public void Update()
         {
             if (_rig == null)
                 return;
-
+            
             _rig.transform.position = _aux.position;
             _rig.transform.rotation = _aux.rotation;
         }

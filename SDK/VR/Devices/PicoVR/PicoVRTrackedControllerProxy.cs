@@ -21,4 +21,18 @@ namespace Liminal.SDK.PicoVR
             _head = head;
         }
     }
+
+    public class PicoVRTrackedHeadsetProxy : IVRTrackedObjectProxy
+    {
+        public bool IsActive => _head.gameObject.activeInHierarchy;
+        public Vector3 Position => _head.position;
+        public Quaternion Rotation => _head.rotation;
+
+        private Transform _head;
+
+        public PicoVRTrackedHeadsetProxy(Transform head)
+        {
+            _head = head;
+        }
+    }
 }

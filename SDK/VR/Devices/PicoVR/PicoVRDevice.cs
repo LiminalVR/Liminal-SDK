@@ -4,6 +4,7 @@ using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
 using Liminal.SDK.VR.Pointers;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 
 namespace Liminal.SDK.PicoVR
 {
@@ -48,6 +49,7 @@ namespace Liminal.SDK.PicoVR
             if (Rig == null)
             {
                 _rig = GameObject.Instantiate(rigPrefab) as GameObject;
+                Object.DontDestroyOnLoad(_rig);
                 Rig = _rig;
             }
             else
@@ -70,6 +72,15 @@ namespace Liminal.SDK.PicoVR
 
             _head.transform.position = avatar.Head.Transform.position;
             _head.transform.rotation = avatar.Head.Transform.rotation;
+
+            // tell pico camera to copy avatar center eye
+            //var centerEye = avatar.Head.CenterEyeCamera;
+            //var picoEyes = _rig.GetComponentsInChildren<Camera>(includeInactive:true);
+            //foreach (var picoEye in picoEyes)
+            //{
+                //picoEye.CopyFrom(centerEye);
+                //picoEye.depth = -10;
+            //}
 
             var pvrControllers = _rig.GetComponentInChildren<Pvr_Controller>();
             var leftController = pvrControllers.controller0.GetComponent<Pvr_ControllerModuleInit>();

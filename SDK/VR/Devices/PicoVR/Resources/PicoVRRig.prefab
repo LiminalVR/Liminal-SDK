@@ -398,14 +398,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 168586, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
-      propertyPath: m_Name
-      value: PicoVRRig
-      objectReference: {fileID: 0}
-    - target: {fileID: 11442420, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
-      propertyPath: trackingOrigin
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 428262, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -450,13 +442,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 4012638077614798, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
-      propertyPath: m_RootOrder
-      value: 3
-      objectReference: {fileID: 0}
     - target: {fileID: 118676, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 168586, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
+      propertyPath: m_Name
+      value: PicoVRRig
+      objectReference: {fileID: 0}
+    - target: {fileID: 11442420, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
+      propertyPath: trackingOrigin
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4012638077614798, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1387110796695488, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
       propertyPath: m_IsActive
@@ -496,7 +496,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 172220, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8110060, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
       propertyPath: m_Enabled
@@ -504,7 +504,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1207709745205924, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2063796, guid: f4d2c95a82cadba4fb259ca17b5a8404, type: 3}
       propertyPath: m_Enabled

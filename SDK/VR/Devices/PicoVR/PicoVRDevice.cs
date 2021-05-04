@@ -35,7 +35,6 @@ namespace Liminal.SDK.PicoVR
             };
         }
 
-        private GameObject _rig;
         private Transform _aux;
         private Pvr_UnitySDKHeadTrack _head;
         private IVRAvatar _avatar;
@@ -45,19 +44,21 @@ namespace Liminal.SDK.PicoVR
         public void SetupAvatar(IVRAvatar avatar)
         {
             var rigPrefab = Resources.Load("PicoVRRig");
-
+            
             if (Rig == null)
             {
-                _rig = GameObject.Instantiate(rigPrefab) as GameObject;
-                Object.DontDestroyOnLoad(_rig);
-                Rig = _rig;
-            }
-            else
-            {
-                _rig = Rig.gameObject;
+                var pvrRig = Object.FindObjectOfType<Pvr_UnitySDKManager>();
+
+                if (pvrRig == null)
+                    Rig = GameObject.Instantiate(rigPrefab) as GameObject;
+                else
+                    Rig = pvrRig.gameObject;
+
+                Rig.transform.parent = null;
+                Object.DontDestroyOnLoad(Rig);
             }
 
-            if (_rig == null)
+            if (Rig == null)
             {
                 Debug.LogError("Rig not setup for PicoVRRIg or could not be found. Check VRDevices/PicoVR/Resources/PicoVRRig.prefab");
                 return;
@@ -65,24 +66,15 @@ namespace Liminal.SDK.PicoVR
 
             _avatar = avatar;
             _aux = avatar.Auxiliaries;
-            _head = _rig.GetComponentInChildren<Pvr_UnitySDKHeadTrack>();
+            _head = Rig.GetComponentInChildren<Pvr_UnitySDKHeadTrack>();
 
-            _rig.transform.position = avatar.Transform.position;
-            _rig.transform.rotation = avatar.Transform.rotation;
+            Rig.transform.position = avatar.Transform.position;
+            Rig.transform.rotation = avatar.Transform.rotation;
 
             _head.transform.position = avatar.Head.Transform.position;
             _head.transform.rotation = avatar.Head.Transform.rotation;
 
-            // tell pico camera to copy avatar center eye
-            //var centerEye = avatar.Head.CenterEyeCamera;
-            //var picoEyes = _rig.GetComponentsInChildren<Camera>(includeInactive:true);
-            //foreach (var picoEye in picoEyes)
-            //{
-                //picoEye.CopyFrom(centerEye);
-                //picoEye.depth = -10;
-            //}
-
-            var pvrControllers = _rig.GetComponentInChildren<Pvr_Controller>();
+            var pvrControllers = Rig.GetComponentInChildren<Pvr_Controller>();
             var leftController = pvrControllers.controller0.GetComponent<Pvr_ControllerModuleInit>();
             var rightController = pvrControllers.controller1.GetComponent<Pvr_ControllerModuleInit>();
 
@@ -107,11 +99,11 @@ namespace Liminal.SDK.PicoVR
         // This is called once every 0.5 seconds.
         public void Update()
         {
-            if (_rig == null)
+            if (Rig == null)
                 return;
-            
-            _rig.transform.position = _aux.position;
-            _rig.transform.rotation = _aux.rotation;
+
+            Rig.transform.position = _aux.position;
+            Rig.transform.rotation = _aux.rotation;
         }
 
         #region Unused

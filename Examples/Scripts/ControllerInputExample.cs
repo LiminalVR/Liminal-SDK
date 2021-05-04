@@ -38,6 +38,8 @@ public class ControllerInputExample : MonoBehaviour
         builder.AppendLine($"{deviceName} Three: {inputDevice.GetButton(VRButton.Three)}");
         builder.AppendLine($"{deviceName} Four: {inputDevice.GetButton(VRButton.Four)}");
 
+        inputDevice.GetButtonDown(VRButton.One);
+
         /*
         builder.AppendLine($"{deviceName} Axis One: {inputDevice.GetAxis2D(VRAxis.One)}");
         builder.AppendLine($"{deviceName} Axis One Raw: {inputDevice.GetAxis2D(VRAxis.OneRaw)}");

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4a3c01ccdeb50541b24baa71f9ecfbd, type: 3}
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
-  EmulatorPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets
+  EmulatorPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/ReliefPoint-Emulator.limapp
   AndroidPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/GearVr
     - ReliefPoint-0e76e72b-7436-41b2-9169-e735d9d1d2f0.limapp
   AndroidAppFullName: GearVr - ReliefPoint-0e76e72b-7436-41b2-9169-e735d9d1d2f0.limapp

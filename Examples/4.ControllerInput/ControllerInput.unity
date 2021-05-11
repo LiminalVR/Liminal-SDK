@@ -548,6 +548,7 @@ GameObject:
   - component: {fileID: 531037339}
   - component: {fileID: 531037338}
   - component: {fileID: 531037340}
+  - component: {fileID: 531037341}
   m_Layer: 0
   m_Name: '[ExperienceApp]'
   m_TagString: Untagged
@@ -611,6 +612,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BuildType: 4
   EditorType: 4
+--- !u!114 &531037341
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531037337}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28f465b034ff5b8459475582b8065cb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TestTag: Ground
 --- !u!1 &650509772
 GameObject:
   m_ObjectHideFlags: 0
@@ -1376,6 +1390,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScreenFader: {fileID: 1874618200}
+  A: {fileID: 0}
+  B: {fileID: 0}
 --- !u!1 &1081564031
 GameObject:
   m_ObjectHideFlags: 0

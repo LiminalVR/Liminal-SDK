@@ -1,4 +1,5 @@
-﻿using Liminal.SDK.Core;
+﻿using System.Linq;
+using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Input;
 using System.Text;
@@ -23,6 +24,8 @@ public class ControllerInputExample : MonoBehaviour
             InputText.text = inputStringBuilder.ToString();
 
         }
+
+        
     }
 
     public void AppendDeviceInput(StringBuilder builder, IVRInputDevice inputDevice, string deviceName)

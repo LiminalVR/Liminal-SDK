@@ -253,31 +253,36 @@ namespace Liminal.SDK.Build
             });
         }
 
-        private List<(string Tag, GameObject Obj)> _taggedGameObjects = new List<(string Tag, GameObject Obj)>();
+        private List<GameObject> _taggedGameObjects = new List<GameObject>();
         private void ListTaggedObjects(string[] allTags)
         {
+            var customTags = allTags.Skip(7).ToArray();
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             GUILayout.Label("Tagged Objects", EditorStyles.boldLabel);
 
             if (GUILayout.Button("Find Tagged GameObjects", GUILayout.MaxWidth(200)))
             {
-                _taggedGameObjects = new List<(string Tag, GameObject Obj)>();
-                for (var i = 7; i < allTags.Length; i++)
+                _taggedGameObjects = new List<GameObject>();
+                foreach (var obj in _sceneGameObjects)
                 {
-                    var tag = allTags[i];
-                    GUILayout.Label(tag, EditorStyles.centeredGreyMiniLabel);
-                    var objects = GameObject.FindGameObjectsWithTag(tag);
-                    foreach (var o in objects)
-                        _taggedGameObjects.Add((tag, o));
+                    if (customTags.Contains(obj.tag))
+                    {
+                        _taggedGameObjects.Add(obj.gameObject);
+                    }
                 }
             }
 
             foreach (var o in _taggedGameObjects)
             {
-                if (GUILayout.Button($"{o.Obj.name}\t<color=#eeee00>tag = <b>{o.Tag}</b></color>", new GUIStyle("ObjectPickerTab"){richText = true}))
+                string str;
+                str = !o.activeInHierarchy
+                    ? $"<color=#aaa>{o.name}</color>\t<color=#7d7d18>tag = <b>{o.tag}</b></color>"
+                    : $"{o.name}\t<color=#eeee00>tag = <b>{o.tag}</b></color>";
+
+                if (GUILayout.Button(str, new GUIStyle("ObjectPickerTab"){richText = true}))
                 {
-                    Selection.activeGameObject = o.Obj;
-                    EditorGUIUtility.PingObject(o.Obj);
+                    Selection.activeGameObject = o;
+                    EditorGUIUtility.PingObject(o);
                 }
             }
         }

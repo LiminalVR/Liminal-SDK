@@ -246,9 +246,40 @@ namespace Liminal.SDK.Build
                         , WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
                 }
 
+                ListTaggedObjects(allTags);
+
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUI.indentLevel--;
             });
+        }
+
+        private List<(string Tag, GameObject Obj)> _taggedGameObjects = new List<(string Tag, GameObject Obj)>();
+        private void ListTaggedObjects(string[] allTags)
+        {
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            GUILayout.Label("Tagged Objects", EditorStyles.boldLabel);
+
+            if (GUILayout.Button("Find Tagged GameObjects", GUILayout.MaxWidth(200)))
+            {
+                _taggedGameObjects = new List<(string Tag, GameObject Obj)>();
+                for (var i = 7; i < allTags.Length; i++)
+                {
+                    var tag = allTags[i];
+                    GUILayout.Label(tag, EditorStyles.centeredGreyMiniLabel);
+                    var objects = GameObject.FindGameObjectsWithTag(tag);
+                    foreach (var o in objects)
+                        _taggedGameObjects.Add((tag, o));
+                }
+            }
+
+            foreach (var o in _taggedGameObjects)
+            {
+                if (GUILayout.Button($"{o.Obj.name}\t<color=#eeee00>tag = <b>{o.Tag}</b></color>", new GUIStyle("ObjectPickerTab"){richText = true}))
+                {
+                    Selection.activeGameObject = o.Obj;
+                    EditorGUIUtility.PingObject(o.Obj);
+                }
+            }
         }
 
         private void CheckIncompatibility()

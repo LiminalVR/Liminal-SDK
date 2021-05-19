@@ -27,7 +27,10 @@ public static class IssuesUtility
         { "UnityEngine.AsyncOperation UnityEngine.SceneManagement.SceneManager::LoadSceneAsync(System.String)","SceneManager.LoadSceneAsync()"},
         { "System.Boolean UnityEngine.SceneManagement.SceneManager::UnloadScene(System.String)","SceneManager.UnloadScene()"},
         { "UnityEngine.AsyncOperation UnityEngine.SceneManagement.SceneManager::UnloadSceneAsync(System.String)","SceneManager.UnloadSceneAsync()"},
-        { "System.Void UnityEngine.Object::DontDestroyOnLoad(UnityEngine.Object)","DontDestroyOnLoad()"}
+        { "System.Void UnityEngine.Object::DontDestroyOnLoad(UnityEngine.Object)","DontDestroyOnLoad()"},
+        { "UnityEngine.GameObject[] UnityEngine.GameObject::FindGameObjectsWithTag(System.String)","FindGameObjectsWithTag()"},
+        { "UnityEngine.GameObject UnityEngine.GameObject::FindGameObjectWithTag(System.String)","FindGameObjectWithTag()"},
+        { "System.Boolean UnityEngine.Component::CompareTag(System.String)", "CompareTag()"},
     };
 
     public static List<string> AssembliesToIgnore = new List<string>()
@@ -200,7 +203,7 @@ public static class IssuesUtility
 
             if (mRef == null)
                 continue;
-
+            
             //Debug.Log(mRef.FullName);
 
             foreach (var key in ForbiddenFunctionCalls.Keys)

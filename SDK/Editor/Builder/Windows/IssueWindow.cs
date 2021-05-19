@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Liminal.Cecil.Mono.Cecil;
 using Liminal.SDK.VR.Avatars;
 using UnityEditor;
 using UnityEngine;
@@ -256,15 +257,20 @@ namespace Liminal.SDK.Build
         private List<GameObject> _taggedGameObjects = new List<GameObject>();
         private void ListTaggedObjects(string[] allTags)
         {
-            var customTags = allTags.Skip(7).ToArray();
             GUILayout.Space(EditorGUIUtility.singleLineHeight);
             GUILayout.Label("Tagged Objects", EditorStyles.boldLabel);
-
+            
             if (GUILayout.Button("Find Tagged GameObjects", GUILayout.MaxWidth(200)))
             {
+                var customTags = allTags.Skip(7).ToArray();
+                var allObjs = Resources.FindObjectsOfTypeAll<GameObject>();
+
                 _taggedGameObjects = new List<GameObject>();
-                foreach (var obj in _sceneGameObjects)
+                foreach (var obj in allObjs)
                 {
+                    if(obj == null)
+                        continue;
+
                     if (customTags.Contains(obj.tag))
                     {
                         _taggedGameObjects.Add(obj.gameObject);

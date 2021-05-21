@@ -16,11 +16,15 @@ namespace Liminal.Systems
             EDeviceModelType.Rift,
             EDeviceModelType.RiftS,
             EDeviceModelType.HtcVivePro,
-            EDeviceModelType.Quest2
+            EDeviceModelType.Quest2,
+            EDeviceModelType.Pico
         };
 
         public static EDeviceModelType GetDeviceModelType()
         {
+            // Not sure what the value is but this port is strictly just Pico so it's OK.
+            return EDeviceModelType.Pico;
+
             var model = XRDevice.model;
             var type = EDeviceModelType.Unknown;
             model = model.ToLower();

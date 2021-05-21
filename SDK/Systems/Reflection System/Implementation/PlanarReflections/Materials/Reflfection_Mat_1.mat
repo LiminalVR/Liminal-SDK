@@ -86,6 +86,8 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OffsetEnabled: 1
+    - _OffsetLX: 1.043458
+    - _OffsetLZ: -0.03977372
     - _OffsetRW: 0
     - _OffsetRX: 1.17
     - _OffsetRY: 1
@@ -103,6 +105,7 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
+    - _UseL: 0
     - _Vive: 0
     - _VivePro: 0
     - _ZWrite: 1

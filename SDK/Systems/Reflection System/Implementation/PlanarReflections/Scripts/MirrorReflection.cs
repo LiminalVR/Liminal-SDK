@@ -30,8 +30,10 @@ namespace App
 #if SMOOTH_CAM
         public Camera Cam => GameObject.Find("SmoothCam").GetComponent<Camera>();
 #else
-        public Camera Cam => Camera.main;
+        public Camera Cam => PrimaryEye.Instance?.Camera ?? Camera.main;
 #endif
+
+        public Camera OverrideCamera;
 
         public ReflectionOffsetModel Ipd58OffsetModel = new ReflectionOffsetModel(1.194927f, -0.186721f, 0.8499745f);
         public ReflectionOffsetModel Ipd63OffsetModel = new ReflectionOffsetModel(1.077431f, -0.07495025f, 0.9323733f);
@@ -100,6 +102,14 @@ namespace App
                 m_Renderer.material.SetFloat("_Debug", 1);
 
                 SetMaterial(IpdModel);
+            }
+
+            if (model == EDeviceModelType.Pico)
+            {
+                m_Renderer.material.SetFloat("_Quest", 0);
+                m_Renderer.material.SetFloat(s_offsetEnabled, 1);
+                m_Renderer.material.SetFloat("_Debug", 1);
+                m_Renderer.material.SetFloat("_OffsetX", 1);
             }
 
             void SetMaterial(ReflectionOffsetModel m)

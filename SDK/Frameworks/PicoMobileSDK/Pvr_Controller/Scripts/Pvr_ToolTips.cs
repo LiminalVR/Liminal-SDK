@@ -67,6 +67,7 @@ public class Pvr_ToolTips : MonoBehaviour
     private void Awake()
     {
         tooltips = transform.GetComponent<Pvr_ToolTips>();
+        gameObject.SetActive(false);
     }
 
     void Update()

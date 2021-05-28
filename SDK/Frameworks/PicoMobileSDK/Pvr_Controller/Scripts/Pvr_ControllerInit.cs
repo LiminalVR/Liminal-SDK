@@ -12,6 +12,7 @@ using Pvr_UnitySDKAPI;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Liminal.SDK.VR.Pointers;
 using LitJson;
 
 public class Pvr_ControllerInit : MonoBehaviour
@@ -456,5 +457,19 @@ public class Pvr_ControllerInit : MonoBehaviour
         fileStream.Dispose();
         fileStream = null;
         return binary;
+    }
+
+    [ContextMenu("Hide")]
+    public void Hide()
+    {
+        foreach (Transform t in transform)
+            t.gameObject.SetActive(false);
+    }
+
+    [ContextMenu("Show")]
+    public void Show()
+    {
+        foreach (Transform t in transform)
+            t.gameObject.SetActive(true);
     }
 }

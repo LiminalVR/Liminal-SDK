@@ -13,6 +13,5 @@ MonoBehaviour:
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
   EmulatorPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/ReliefPoint-Emulator.limapp
-  AndroidPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/GearVr
-    - ReliefPoint-0e76e72b-7436-41b2-9169-e735d9d1d2f0.limapp
-  AndroidAppFullName: GearVr - ReliefPoint-0e76e72b-7436-41b2-9169-e735d9d1d2f0.limapp
+  AndroidPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/AboveTheClouds-GearVr.limapp
+  AndroidAppFullName: AboveTheClouds-GearVr.limapp

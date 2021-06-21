@@ -154,6 +154,7 @@ namespace Liminal.SDK.Editor.Build
 
             // CJS: This `should` be the same as the block above?!?
             asmDef.Write(outputPath, new WriterParameters(){WriteSymbols = true});
+
             //asmDef.Write(outputPath + ".foo", new WriterParameters(){WriteSymbols = true});
         }
         

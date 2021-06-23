@@ -11,6 +11,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Build;
+using UnityEditor.AddressableAssets.Settings;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -203,12 +204,14 @@ namespace Liminal.SDK.Editor.Build
 
 
                 // We need to replace it with addressable
-                var settings = AddressableAssetSettingsDefaultObject.Settings;
-                if (settings == null)
-                    return;
+                //var settings = AddressableAssetSettingsDefaultObject.Settings;
+                //if (settings == null)
+                //    return;
 
-                var context = new AddressablesDataBuilderInput(settings);
-                settings.ActivePlayerDataBuilder.BuildData<AddressablesPlayerBuildResult>(context);
+                //var context = new AddressablesDataBuilderInput(settings);
+                //settings.ActivePlayerDataBuilder.BuildData<AddressablesPlayerBuildResult>(context);
+
+
 
                 // Scene Processor, replaces Assembly-Csharp with new AssemblyName.
 

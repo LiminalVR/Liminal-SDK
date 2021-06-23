@@ -40,12 +40,32 @@ namespace Liminal.Platform.Experimental.App
             VRDevice.Initialize(device);
             VRDevice.Device.SetupAvatar(Avatar);
             BetterStreamingAssets.Initialize();
+
+            var mem = System.GC.GetTotalMemory(true);
+            Debug.Log($"Memory Used when app first started {mem}");
+
+            StartCoroutine(PlayForSeconds(10));
+        }
+
+        private IEnumerator PlayForSeconds(float seconds)
+        {
+            while (true)
+            {
+                Play();
+                yield return new WaitForSeconds(seconds);
+                Stop();
+
+                yield return new WaitForSeconds(3);
+            }
         }
 
         [ContextMenu("Play")]
         public void Play()
         {
-            if(!ExperienceAppPlayer.IsRunning)
+            var mem = System.GC.GetTotalMemory(true);
+            Debug.Log($"Memory Before Play {mem}");
+
+            if (!ExperienceAppPlayer.IsRunning)
                 StartCoroutine(PlayRoutine());
         }
 
@@ -110,6 +130,9 @@ namespace Liminal.Platform.Experimental.App
             yield return ExperienceAppPlayer.Unload();
             Avatar.SetActive(true);
             SceneContainer.SetActive(true);
+
+            var mem = System.GC.GetTotalMemory(true);
+            Debug.Log($"Memory After Play {mem}");
         }
 
         private void ResolvePlatformLimapp(out byte[] data, out string fileName)

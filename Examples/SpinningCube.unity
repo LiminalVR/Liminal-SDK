@@ -239,8 +239,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Speed: 50
+  Speed2: 5
+  Probability: {fileID: 11400000, guid: 2614685c0c47bc04abe1ff8b650d6f36, type: 2}
   Data:
     SpeedMultipler: 50
+    Number: 5
+    Extra:
+      Prefab: {fileID: 2014227395}
 --- !u!1 &1717466329
 GameObject:
   m_ObjectHideFlags: 0
@@ -735,6 +740,12 @@ Transform:
 --- !u!20 &2014227394 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 1260162969970794154, guid: 22276a8657744e04cba8ad0a2caf4195,
+    type: 3}
+  m_PrefabInstance: {fileID: 2014227392}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &2014227395 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1260162969793040547, guid: 22276a8657744e04cba8ad0a2caf4195,
     type: 3}
   m_PrefabInstance: {fileID: 2014227392}
   m_PrefabAsset: {fileID: 0}

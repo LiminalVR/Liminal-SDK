@@ -68,22 +68,22 @@ namespace Liminal.SDK.VR.Devices.GearVR
                     case VRAxis.TwoRaw:
                         var rawAxis = Controller == OVRInput.Controller.LTouch ?
                             OVRInput.RawAxis1D.LIndexTrigger : OVRInput.RawAxis1D.RIndexTrigger;
-                        return OVRInput.Get(rawAxis, base.ControllerMask);
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, base.ControllerMask);
 
                     case VRAxis.Two:
                         var allAxis = Controller == OVRInput.Controller.LTouch ?
                             OVRInput.Axis1D.PrimaryIndexTrigger : OVRInput.Axis1D.SecondaryIndexTrigger;
-                        return OVRInput.Get(allAxis, Controller);
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, Controller);
 
                     case VRAxis.ThreeRaw:
                         var threeRawAxis = Controller == OVRInput.Controller.LTouch ?
                             OVRInput.RawAxis1D.LHandTrigger : OVRInput.RawAxis1D.RHandTrigger;
-                        return OVRInput.Get(threeRawAxis, base.ControllerMask);
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, base.ControllerMask);
 
                     case VRAxis.Three:
                         var threeAxis = Controller == OVRInput.Controller.LTouch ?
                             OVRInput.Axis1D.PrimaryHandTrigger : OVRInput.Axis1D.SecondaryHandTrigger;
-                        return OVRInput.Get(threeAxis, Controller);
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, Controller);
 
                     default:
                         return 0;

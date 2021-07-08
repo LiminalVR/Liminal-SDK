@@ -1199,9 +1199,9 @@ public class Pvr_UnitySDKManager : MonoBehaviour
 
     private void OnApplicationPause(bool pause)
     {
-        Debug.Log("OnApplicationPause-------------------------" + (pause ? "true" : "false"));
-
-        
+		bool unityPause = pause;
+        Debug.Log("OnApplicationPause-------------------------" + (unityPause ? "true" : "false"));
+       
 #if UNITY_ANDROID && !UNITY_EDITOR
         if (Pvr_UnitySDKAPI.System.UPvr_IsPicoActivity() && !Pvr_UnitySDKRender.Instance.isShellMode)
         {
@@ -1209,18 +1209,39 @@ public class Pvr_UnitySDKManager : MonoBehaviour
             Debug.Log("OnApplicationPause-------------------------Activity Pause State:" + state);
             pause = state;
         }
-
-        if (pause)
-        { 
-            onResume = false;
-            OnPause();
-        }
-        else
-        {             
-            onResume = true;
-            GL.InvalidateState();
-            StartCoroutine(OnResume());
-        }
+		if(unityPause == pause)
+        {
+			if (pause)
+			{ 
+				onResume = false;
+				OnPause();
+			}
+			else
+			{             
+				onResume = true;
+				GL.InvalidateState();
+				StartCoroutine(OnResume());
+			}
+		}
+		else
+		{
+			if (pause)
+			{ 
+				Debug.Log("OnApplicationPause-------------------------Activity pause Unity resume");
+				GL.InvalidateState();
+				StartCoroutine(OnResume());
+				onResume = false;
+				OnPause();
+			}
+			else
+			{    
+				Debug.Log("OnApplicationPause-------------------------Activity resume Unity pause");		
+				OnPause();		
+				onResume = true;
+				GL.InvalidateState();
+				StartCoroutine(OnResume());
+			}
+		}
 #endif
 
         
@@ -1372,7 +1393,7 @@ public class Pvr_UnitySDKManager : MonoBehaviour
         if (SystemDebugFFRLevel == -1)
         {
             Pvr_UnitySDKAPI.Render.UPvr_GetIntConfig((int)GlobalIntConfigs.EnableFFRBYSYS, ref SystemFFRLevel);
-            if (SystemFFRLevel != -1)
+            if (SystemFFRLevel != -1 && SystemFFRLevel >= (int)Pvr_UnitySDKEyeManager.Instance.FoveationLevel)
             {
                 Pvr_UnitySDKAPI.Render.SetFoveatedRenderingLevel((EFoveationLevel)(SystemFFRLevel));
                 Debug.Log("DISFT OnResume Get System ffr level is : " + SystemFFRLevel);

@@ -65,13 +65,13 @@ public class Pvr_TouchPadScroll : MonoBehaviour
 
         if (isHoving)
         {            
-            if(Pvr_ControllerManager.controllerlink.GetControllerType() == 4)
+            if(Pvr_ControllerManager.controllerlink.GetControllerType() == 3)
             {
-                ComputeNeo2Pos();
+                ComputeTouchPos();
             }
             else
             {
-                ComputePos();
+                ComputeRockerPos();
             }
 
             if ((currPos - tarPos).sqrMagnitude <= 10)
@@ -82,7 +82,7 @@ public class Pvr_TouchPadScroll : MonoBehaviour
         }
     }
 
-    void ComputePos()
+    void ComputeTouchPos()
     {
         mainHand = Controller.UPvr_GetMainHandNess();
         currPos = scrollRect.content.localPosition;
@@ -134,7 +134,7 @@ public class Pvr_TouchPadScroll : MonoBehaviour
         }
     }
 
-    void ComputeNeo2Pos()
+    void ComputeRockerPos()
     {
         mainHand = Controller.UPvr_GetMainHandNess();
         currPos = scrollRect.content.localPosition;

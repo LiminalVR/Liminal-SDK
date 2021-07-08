@@ -36,7 +36,7 @@ namespace Pvr_UnitySDKAPI
         GetWaitFrameNum,
         GetResetFrameNum,
         EnableFFRBYSYS,
-
+        RotControllerMode,
     };
 
     public enum GlobalFloatConfigs
@@ -136,6 +136,13 @@ namespace Pvr_UnitySDKAPI
     {
         MultiPass,
         SinglePass,
+    }
+
+    public enum ExtraLatencyMode
+    {
+        ExtraLatencyModeOff = 0,
+        ExtraLatencyModeOn = 1,
+        ExtraLatencyModeDynamic = 2
     }
 
     #region EyeTracking 
@@ -295,6 +302,14 @@ namespace Pvr_UnitySDKAPI
 
         [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
         private static extern bool Pvr_SetTrackingOriginType(TrackingOrigin trackingOriginType);
+        [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool Pvr_GetAcceleration(ref float x, ref float y, ref float z);
+        [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool Pvr_GetAngularVelocity(ref float x, ref float y, ref float z);
+        [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool Pvr_GetVelocity(ref float x, ref float y, ref float z);
+        [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern bool Pvr_GetAngularAcceleration(ref float x, ref float y, ref float z);
 #endif
 
 
@@ -532,6 +547,42 @@ namespace Pvr_UnitySDKAPI
             ret = Pvr_SetTrackingOriginType(trackingOriginType);
 #endif
             return ret;
+        }
+
+        public static Vector3 UPvr_GetAcceleration()
+        {
+            float x = 0, y = 0, z = 0;
+#if ANDROID_DEVICE
+            Pvr_GetAcceleration(ref x, ref y, ref z);
+#endif
+            return new Vector3(-x, -y, z);
+        }
+
+        public static Vector3 UPvr_AngularVelocity()
+        {
+            float x = 0, y = 0, z = 0;
+#if ANDROID_DEVICE
+            Pvr_GetAngularVelocity(ref x, ref y, ref z);
+#endif
+            return new Vector3(x, y, z);
+        }
+
+        public static Vector3 UPvr_GetVelocity()
+        {
+            float x = 0, y = 0, z = 0;
+#if ANDROID_DEVICE
+            Pvr_GetVelocity(ref x, ref y, ref z);
+#endif
+            return new Vector3(-x, -y, z);
+        }
+
+        public static Vector3 UPvr_GetAngularAcceleration()
+        {
+            float x = 0, y = 0, z = 0;
+#if ANDROID_DEVICE
+            Pvr_GetAngularAcceleration(ref x, ref y, ref z);
+#endif
+            return new Vector3(x, y, z);
         }
         #endregion
 
@@ -886,7 +937,7 @@ namespace Pvr_UnitySDKAPI
         public const string LibFileName = "Pvr_UnitySDK";
 #endif
 
-        public const string UnitySDKVersion = "2.8.8.5";
+        public const string UnitySDKVersion = "2.8.10.4";
 
 #if ANDROID_DEVICE
 		[DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
@@ -960,6 +1011,10 @@ namespace Pvr_UnitySDKAPI
         public static extern bool Pvr_GetEyeTrackingAutoIPD(ref float autoIPD);
         [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
         public static extern int PVR_GetHmdAudioStatus();
+        [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern float Pvr_GetPredictedDisplayTime();
+        [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
+        public static extern bool Pvr_SetExtraLatencyMode(int mode);
 #endif
 
 
@@ -1736,6 +1791,31 @@ namespace Pvr_UnitySDKAPI
             return value;
         }
 
+
+        public static bool UPvr_SetExtraLatencyMode(ExtraLatencyMode mode)
+        {
+            bool result = false;
+#if ANDROID_DEVICE
+                result = Pvr_SetExtraLatencyMode((int)mode);
+#endif
+            return result;
+        }
+
+        public static float UPvr_GetPredictedDisplayTime()
+        {
+            float time = 0;
+#if !UNITY_EDITOR && UNITY_ANDROID
+                try
+                {
+                    time = Pvr_GetPredictedDisplayTime();
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("UPvr_GetPredictedDisplayTime :" + e.ToString());
+                }
+#endif
+            return time;
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -1804,6 +1884,9 @@ namespace Pvr_UnitySDKAPI
 
         [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
         private static extern void Pvr_SetGuardianSystemDisable(bool value);
+
+        [DllImport(LibFileName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern int Pvr_GetDialogState();
 #endif
 
         /// <summary>
@@ -1841,12 +1924,17 @@ namespace Pvr_UnitySDKAPI
         /// </summary>
         public enum BoundaryTrackingState
         {
-            PVR_NOREASON = 0,
-            PVRRELOCATION_IN_PROGRESS,
-            PVRLOW_FEATURE_COUNT_ERROR,
-            PVRLOW_LIGHT_ERROR,
-            PVRBRIGHT_LIGHT_ERROR,
-            PVRSTEREO_CAMERA_CALIBRATION_ERROR
+            LostNoReason = 3,
+            LostCamera,
+            LostHighLight,
+            LostLowLight,
+            LostLowFeatureCount,
+            LostReLocation,
+            LostInitialization,
+            LostNoCamera,
+            LostNoIMU,
+            LostIMUJitter,
+            LostUnknown
         };
 
         public static float UPvr_GetFloorHeight()
@@ -1882,7 +1970,7 @@ namespace Pvr_UnitySDKAPI
 
         public static BoundaryTrackingState UPvr_GetTrackingState()
         {
-            BoundaryTrackingState state = BoundaryTrackingState.PVR_NOREASON;
+            BoundaryTrackingState state = BoundaryTrackingState.LostNoReason;
 #if ANDROID_DEVICE
             state =  (BoundaryTrackingState)Pvr_GetTrackingState();
 #endif
@@ -2159,6 +2247,26 @@ namespace Pvr_UnitySDKAPI
                 PLOG.E("UPvr_SetGuardianSystemDisableError :" + e.ToString());
             }
 #endif
+        }
+
+        /// <summary>
+        /// Get Boundary Dialog State
+        /// </summary>
+        /// <returns>NothingDialog = -1,GobackDialog = 0,ToofarDialog = 1,LostDialog = 2,LostNoReason = 3,LostCamera = 4,LostHighLight = 5,LostLowLight = 6,LostLowFeatureCount = 7,LostReLocation = 8</returns>
+        public static int UPvr_GetDialogState()
+        {
+            var state = 0;
+#if ANDROID_DEVICE
+            try
+            {
+                state = Pvr_GetDialogState();
+            }
+            catch (Exception e)
+            {
+                PLOG.E("UPvr_GetDialogStateError :" + e.ToString());
+            }
+#endif
+            return state;
         }
     }
 

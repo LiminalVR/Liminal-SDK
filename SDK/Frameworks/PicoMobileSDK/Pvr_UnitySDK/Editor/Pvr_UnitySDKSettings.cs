@@ -20,7 +20,6 @@ public class Pvr_UnitySDKQualitySettings
     [InitializeOnLoadMethod]
     static void UnitySDKQualitySettings()    
     {
-		PlayerSettings.Android.blitType = AndroidBlitType.Never;
         Pvr_UnitySDKManagerEditor.HeadDofChangedEvent += UpdateXMLHeadDof;
 
 	    Pvr_UnitySDKManagerEditor.MSAAChange += UpdateXMLMsaa;

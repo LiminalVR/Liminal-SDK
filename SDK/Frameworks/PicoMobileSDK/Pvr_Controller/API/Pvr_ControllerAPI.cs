@@ -101,19 +101,21 @@ namespace Pvr_UnitySDKAPI
     /// </summary>
     public enum Pvr_KeyCode
     {
-        APP = 1,
-        TOUCHPAD = 2,
-        HOME = 3,
-        VOLUMEUP = 4,
-        VOLUMEDOWN = 5,
-        TRIGGER = 6,
-        A = 7,
-        B = 8,
-        X = 9,
-        Y = 10,
-        Left = 11,
-        Right = 12,
-        Thumbrest = 13
+        None = 0,
+        APP = 0x00000001,
+        TOUCHPAD = 0x00000002,
+        HOME = 0x00000004,
+        VOLUMEUP = 0x00000008,
+        VOLUMEDOWN = 0x00000010,
+        TRIGGER = 0x00000020,
+        A = 0x00000040,
+        B = 0x00000080,
+        X = 0x00000100,
+        Y = 0x00000200,
+        Left = 0x00000400,
+        Right = 0x00000800,
+        Thumbrest = 0x00001000,
+        Any = ~None,
     }
 
     /// <summary>
@@ -145,6 +147,7 @@ namespace Pvr_UnitySDKAPI
     {
         /**************************** Public Static Funcations *******************************************/
         #region Public Static Funcation  
+        private const float JOYSTICK_THRESHOLD = 0.4f;
 
         /// <summary>
         /// Get the touch pad position data.
@@ -221,11 +224,13 @@ namespace Pvr_UnitySDKAPI
                         {
                             var postion = new Vector2(Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.x / 128.0f - 1,
                                 Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.y / 128.0f - 1);
+                            if (postion.x > 1.0f || postion.x < -1.0f || postion.y > 1.0f || postion.y < -1.0f)
+                            {
+                                return Vector2.zero;
+                            }
                             return postion;
                         }
-
                         return Vector2.zero;
-
                     }
                 case 1:
                     {
@@ -233,13 +238,188 @@ namespace Pvr_UnitySDKAPI
                         {
                             var postion = new Vector2(Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.x / 128.0f - 1,
                                 Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.y / 128.0f - 1);
+                            if (postion.x > 1.0f || postion.x < -1.0f || postion.y > 1.0f || postion.y < -1.0f)
+                            {
+                                return Vector2.zero;
+                            }
                             return postion;
                         }
-
                         return Vector2.zero;
                     }
             }
             return Vector2.zero;
+        }
+
+        /// <summary>
+        /// Get the up state of the joystick.
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        public static bool UPvr_GetJoystickUp(int hand)
+        {
+            switch (hand)
+            {
+                case 0:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.y / 128.0f - 1;
+
+                            if (y > JOYSTICK_THRESHOLD && y > Math.Abs(x))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+
+                    }
+                case 1:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.y / 128.0f - 1;
+
+                            if (y > JOYSTICK_THRESHOLD && y > Math.Abs(x))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get the down state of the joystick.
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        public static bool UPvr_GetJoystickDown(int hand)
+        {
+            switch (hand)
+            {
+                case 0:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.y / 128.0f - 1;
+
+                            if (-y > JOYSTICK_THRESHOLD && -y > Math.Abs(x))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+
+                    }
+                case 1:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.y / 128.0f - 1;
+
+                            if (-y > JOYSTICK_THRESHOLD && -y > Math.Abs(x))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get the left state of the joystick.
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        public static bool UPvr_GetJoystickLeft(int hand)
+        {
+            switch (hand)
+            {
+                case 0:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.y / 128.0f - 1;
+
+                            if (-x > JOYSTICK_THRESHOLD && -x > Math.Abs(y))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+
+                    }
+                case 1:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.y / 128.0f - 1;
+
+                            if (-x > JOYSTICK_THRESHOLD && -x > Math.Abs(y))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get the right state of the joystick.
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        public static bool UPvr_GetJoystickRight(int hand)
+        {
+            switch (hand)
+            {
+                case 0:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller0.TouchPadPosition.y / 128.0f - 1;
+
+                            if (x > JOYSTICK_THRESHOLD && x > Math.Abs(y))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+
+                    }
+                case 1:
+                    {
+                        if (Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition != Vector2.zero)
+                        {
+                            float x = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.x / 128.0f - 1;
+                            float y = Pvr_ControllerManager.controllerlink.Controller1.TouchPadPosition.y / 128.0f - 1;
+
+                            if (x > JOYSTICK_THRESHOLD && x > Math.Abs(y))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+            }
+            return false;
         }
 
         public static ControllerState UPvr_GetControllerState(int hand)
@@ -288,6 +468,28 @@ namespace Pvr_UnitySDKAPI
         }
 
         /// <summary>
+        /// Get the controller predict rotation data.
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        /// <param name="predictTime">ms</param>
+        public static Quaternion UPvr_GetControllerPredictRotation(int hand, float predictTime)
+        {
+            var data = Pvr_ControllerManager.controllerlink.GetControllerPredictSensorData(hand, predictTime);
+            return new Quaternion(data[0], data[1], data[2], data[3]);
+        }
+
+        /// <summary>
+        /// Get the controller predict position data.
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        /// <param name="predictTime">ms</param>
+        public static Vector3 UPvr_GetControllerPredictPosition(int hand, float predictTime)
+        {
+            var data = Pvr_ControllerManager.controllerlink.GetControllerPredictSensorData(hand, predictTime);
+            return new Vector3(data[4] / 1000.0f, data[5] / 1000.0f, -data[6] / 1000.0f);
+        }
+
+        /// <summary>
         /// Get the value of the trigger key 
         /// </summary>
         /// <param name="hand">0,1</param>
@@ -305,7 +507,7 @@ namespace Pvr_UnitySDKAPI
         }
 
         /// <summary>
-        /// Get the power of the controller, 0-4
+        /// Get the power of the controller, 1-5
         /// </summary>
         /// <param name="hand">0,1</param>
         public static int UPvr_GetControllerPower(int hand)
@@ -316,6 +518,22 @@ namespace Pvr_UnitySDKAPI
                     return Pvr_ControllerManager.controllerlink.Controller0.Battery;
                 case 1:
                     return Pvr_ControllerManager.controllerlink.Controller1.Battery;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Get the power of the controller, 1-100
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        public static int UPvr_GetControllerPowerByPercent(int hand)
+        {
+            switch (hand)
+            {
+                case 0:
+                    return Pvr_ControllerManager.controllerlink.Controller0.Battery * 20;
+                case 1:
+                    return Pvr_ControllerManager.controllerlink.Controller1.Battery * 20;
             }
             return 0;
         }
@@ -360,59 +578,104 @@ namespace Pvr_UnitySDKAPI
         /// <param name="key">Pvr_KeyCode</param>
         public static bool UPvr_GetKey(int hand, Pvr_KeyCode key)
         {
+            bool isPressed = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.App.State;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Home.State;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.State;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.State;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.State;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.State;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.State;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.State;
-                    case Pvr_KeyCode.Left:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Left.State;
-                    default:
-                        return false;
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.App.State;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.Home.State;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.Touch.State;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.State;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.State;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.State;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.X.State;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.Y.State;
+                }
+
+                if ((Pvr_KeyCode.Left & key) == Pvr_KeyCode.Left)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller0.Left.State;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.App.State;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Home.State;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.State;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.State;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.State;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.State;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.State;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.State;
-                    case Pvr_KeyCode.Right:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Right.State;
-                    default:
-                        return false;
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.App.State;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.Home.State;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.Touch.State;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.State;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.State;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.State;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.A.State;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.B.State;
+                }
+
+                if ((Pvr_KeyCode.Right & key) == Pvr_KeyCode.Right)
+                {
+                    isPressed |= Pvr_ControllerManager.controllerlink.Controller1.Right.State;
                 }
             }
-            return false;
+
+            return isPressed;
         }
 
         /// <summary>
@@ -422,59 +685,104 @@ namespace Pvr_UnitySDKAPI
         /// <param name="key">Pvr_KeyCode</param>
         public static bool UPvr_GetKeyDown(int hand, Pvr_KeyCode key)
         {
+            bool isPressedDown = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.App.PressedDown;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Home.PressedDown;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.PressedDown;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.PressedDown;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.PressedDown;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.PressedDown;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.PressedDown;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.PressedDown;
-                    case Pvr_KeyCode.Left:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Left.PressedDown;
-                    default:
-                        return false;
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.App.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.Home.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.Touch.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.X.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.Y.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.Left & key) == Pvr_KeyCode.Left)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller0.Left.PressedDown;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.App.PressedDown;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Home.PressedDown;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.PressedDown;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.PressedDown;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.PressedDown;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.PressedDown;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.PressedDown;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.PressedDown;
-                    case Pvr_KeyCode.Right:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Right.PressedDown;
-                    default:
-                        return false;
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.App.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.Home.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.Touch.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.A.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.B.PressedDown;
+                }
+
+                if ((Pvr_KeyCode.Right & key) == Pvr_KeyCode.Right)
+                {
+                    isPressedDown |= Pvr_ControllerManager.controllerlink.Controller1.Right.PressedDown;
                 }
             }
-            return false;
+
+            return isPressedDown;
         }
 
         /// <summary>
@@ -484,100 +792,165 @@ namespace Pvr_UnitySDKAPI
         /// <param name="key">Pvr_KeyCode</param>
         public static bool UPvr_GetKeyUp(int hand, Pvr_KeyCode key)
         {
+            bool isPressedUp = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.App.PressedUp;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Home.PressedUp;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.PressedUp;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.PressedUp;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.PressedUp;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.PressedUp;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.PressedUp;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.PressedUp;
-                    case Pvr_KeyCode.Left:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Left.PressedUp;
-                    default:
-                        return false;
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.App.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.Home.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.Touch.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.X.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.Y.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.Left & key) == Pvr_KeyCode.Left)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller0.Left.PressedUp;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.App.PressedUp;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Home.PressedUp;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.PressedUp;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.PressedUp;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.PressedUp;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.PressedUp;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.PressedUp;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.PressedUp;
-                    case Pvr_KeyCode.Right:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Right.PressedUp;
-                    default:
-                        return false;
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.App.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.Home.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.Touch.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.A.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.B.PressedUp;
+                }
+
+                if ((Pvr_KeyCode.Right & key) == Pvr_KeyCode.Right)
+                {
+                    isPressedUp |= Pvr_ControllerManager.controllerlink.Controller1.Right.PressedUp;
                 }
             }
-            return false;
+
+            return isPressedUp;
         }
 
         public static bool UPvr_GetTouch(int hand, Pvr_KeyCode key)
         {
+            bool isTouch = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
                 {
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.Touch;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.Touch;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.Touch;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.Touch;
-                    case Pvr_KeyCode.Thumbrest:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Thumbrest.Touch;
-                    default:
-                        return false;
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller0.Touch.Touch;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.Touch;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller0.X.Touch;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller0.Y.Touch;
+                }
+
+                if ((Pvr_KeyCode.Thumbrest & key) == Pvr_KeyCode.Thumbrest)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller0.Thumbrest.Touch;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
                 {
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.Touch;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.Touch;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.Touch;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.Touch;
-                    case Pvr_KeyCode.Thumbrest:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Thumbrest.Touch;
-                    default:
-                        return false;
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller1.Touch.Touch;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.Touch;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller1.A.Touch;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller1.B.Touch;
+                }
+
+                if ((Pvr_KeyCode.Thumbrest & key) == Pvr_KeyCode.Thumbrest)
+                {
+                    isTouch |= Pvr_ControllerManager.controllerlink.Controller1.Thumbrest.Touch;
                 }
             }
-            return false;
+            return isTouch;
         }
 
         /// <summary>
@@ -587,43 +960,63 @@ namespace Pvr_UnitySDKAPI
         /// <param name="key">Pvr_KeyCode</param>
         public static bool UPvr_GetTouchDown(int hand, Pvr_KeyCode key)
         {
+            bool isTouchDown = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
                 {
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.TouchDown;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.TouchDown;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.TouchDown;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.TouchDown;
-                    case Pvr_KeyCode.Thumbrest:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Thumbrest.TouchDown;
-                    default:
-                        return false;
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller0.Touch.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller0.X.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller0.Y.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.Thumbrest & key) == Pvr_KeyCode.Thumbrest)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller0.Thumbrest.TouchDown;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
                 {
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.TouchDown;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.TouchDown;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.TouchDown;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.TouchDown;
-                    case Pvr_KeyCode.Thumbrest:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Thumbrest.TouchDown;
-                    default:
-                        return false;
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller1.Touch.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller1.A.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller1.B.TouchDown;
+                }
+
+                if ((Pvr_KeyCode.Thumbrest & key) == Pvr_KeyCode.Thumbrest)
+                {
+                    isTouchDown |= Pvr_ControllerManager.controllerlink.Controller1.Thumbrest.TouchDown;
                 }
             }
-            return false;
+            return isTouchDown;
         }
 
         /// <summary>
@@ -633,43 +1026,63 @@ namespace Pvr_UnitySDKAPI
         /// <param name="key">Pvr_KeyCode</param>
         public static bool UPvr_GetTouchUp(int hand, Pvr_KeyCode key)
         {
+            bool isTouchUp = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
                 {
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.TouchUp;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.TouchUp;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.TouchUp;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.TouchUp;
-                    case Pvr_KeyCode.Thumbrest:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Thumbrest.TouchUp;
-                    default:
-                        return false;
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller0.Touch.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller0.X.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller0.Y.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.Thumbrest & key) == Pvr_KeyCode.Thumbrest)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller0.Thumbrest.TouchUp;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
                 {
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.TouchUp;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.TouchUp;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.TouchUp;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.TouchUp;
-                    case Pvr_KeyCode.Thumbrest:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Thumbrest.TouchUp;
-                    default:
-                        return false;
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller1.Touch.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller1.A.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller1.B.TouchUp;
+                }
+
+                if ((Pvr_KeyCode.Thumbrest & key) == Pvr_KeyCode.Thumbrest)
+                {
+                    isTouchUp |= Pvr_ControllerManager.controllerlink.Controller1.Thumbrest.TouchUp;
                 }
             }
-            return false;
+            return isTouchUp;
         }
 
         /// <summary>
@@ -679,59 +1092,104 @@ namespace Pvr_UnitySDKAPI
         /// <param name="key">Pvr_KeyCode</param>
         public static bool UPvr_GetKeyClick(int hand, Pvr_KeyCode key)
         {
+            bool isClick = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.App.Click;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Home.Click;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.Click;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.Click;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.Click;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.Click;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.Click;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.Click;
-                    case Pvr_KeyCode.Left:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Left.Click;
-                    default:
-                        return false;
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.App.Click;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.Home.Click;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.Touch.Click;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.Click;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.Click;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.Click;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.X.Click;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.Y.Click;
+                }
+
+                if ((Pvr_KeyCode.Left & key) == Pvr_KeyCode.Left)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller0.Left.Click;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.App.Click;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Home.Click;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.Click;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.Click;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.Click;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.Click;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.Click;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.Click;
-                    case Pvr_KeyCode.Right:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Right.Click;
-                    default:
-                        return false;
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.App.Click;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.Home.Click;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.Touch.Click;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.Click;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.Click;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.Click;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.A.Click;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.B.Click;
+                }
+
+                if ((Pvr_KeyCode.Right & key) == Pvr_KeyCode.Right)
+                {
+                    isClick |= Pvr_ControllerManager.controllerlink.Controller1.Right.Click;
                 }
             }
-            return false;
+
+            return isClick;
         }
 
         /// <summary>
@@ -741,59 +1199,103 @@ namespace Pvr_UnitySDKAPI
         /// <param name="key">Pvr_KeyCode</param>
         public static bool UPvr_GetKeyLongPressed(int hand, Pvr_KeyCode key)
         {
+            bool isLongPressed = false;
+
             if (hand == 0)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.App.LongPressed;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Home.LongPressed;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Touch.LongPressed;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.LongPressed;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.LongPressed;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Trigger.LongPressed;
-                    case Pvr_KeyCode.X:
-                        return Pvr_ControllerManager.controllerlink.Controller0.X.LongPressed;
-                    case Pvr_KeyCode.Y:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Y.LongPressed;
-                    case Pvr_KeyCode.Left:
-                        return Pvr_ControllerManager.controllerlink.Controller0.Left.LongPressed;
-                    default:
-                        return false;
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.App.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.Home.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.Touch.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.VolumeUp.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.VolumeDown.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.Trigger.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.X & key) == Pvr_KeyCode.X)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.X.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.Y & key) == Pvr_KeyCode.Y)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.Y.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.Left & key) == Pvr_KeyCode.Left)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller0.Left.LongPressed;
                 }
             }
             if (hand == 1)
             {
-                switch (key)
+                if ((Pvr_KeyCode.APP & key) == Pvr_KeyCode.APP)
                 {
-                    case Pvr_KeyCode.APP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.App.LongPressed;
-                    case Pvr_KeyCode.HOME:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Home.LongPressed;
-                    case Pvr_KeyCode.TOUCHPAD:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Touch.LongPressed;
-                    case Pvr_KeyCode.VOLUMEUP:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.LongPressed;
-                    case Pvr_KeyCode.VOLUMEDOWN:
-                        return Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.LongPressed;
-                    case Pvr_KeyCode.TRIGGER:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Trigger.LongPressed;
-                    case Pvr_KeyCode.A:
-                        return Pvr_ControllerManager.controllerlink.Controller1.A.LongPressed;
-                    case Pvr_KeyCode.B:
-                        return Pvr_ControllerManager.controllerlink.Controller1.B.LongPressed;
-                    case Pvr_KeyCode.Right:
-                        return Pvr_ControllerManager.controllerlink.Controller1.Right.LongPressed;
-                    default:
-                        return false;
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.App.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.HOME & key) == Pvr_KeyCode.HOME)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.Home.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.TOUCHPAD & key) == Pvr_KeyCode.TOUCHPAD)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.Touch.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEUP & key) == Pvr_KeyCode.VOLUMEUP)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.VolumeUp.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.VOLUMEDOWN & key) == Pvr_KeyCode.VOLUMEDOWN)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.VolumeDown.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.TRIGGER & key) == Pvr_KeyCode.TRIGGER)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.Trigger.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.A & key) == Pvr_KeyCode.A)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.A.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.B & key) == Pvr_KeyCode.B)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.B.LongPressed;
+                }
+
+                if ((Pvr_KeyCode.Right & key) == Pvr_KeyCode.Right)
+                {
+                    isLongPressed |= Pvr_ControllerManager.controllerlink.Controller1.Right.LongPressed;
                 }
             }
-            return false;
+            return isLongPressed;
         }
 
         /// <summary>
@@ -910,6 +1412,17 @@ namespace Pvr_UnitySDKAPI
         }
 
         /// <summary>
+        /// Vibrate controller 
+        /// </summary>
+        /// <param name="strength">0-1</param>
+        /// <param name="time">ms,0-65535</param>
+        /// <param name="hand">0,1</param>
+        public static void UPvr_VibrateController(float strength, int time, int hand)
+        {
+            Pvr_ControllerManager.controllerlink.VibrateController(strength, time, hand);
+        }
+
+        /// <summary>
         /// get controller binding state
         /// </summary>
         /// <param name="hand">0,1</param>
@@ -921,7 +1434,7 @@ namespace Pvr_UnitySDKAPI
 
         /// <summary>
         /// Get the controller Velocity, Obtain the controller's pose data.
-        /// unit:mm/s
+        /// unit:m/s
         /// </summary>
         public static Vector3 UPvr_GetVelocity(int hand)
         {
@@ -939,7 +1452,7 @@ namespace Pvr_UnitySDKAPI
 
         /// <summary>
         /// Get the controller Acceleration.
-        /// mm/s^2
+        /// m/s^2
         /// </summary>
         public static Vector3 UPvr_GetAcceleration(int hand)
         {
@@ -1198,6 +1711,24 @@ namespace Pvr_UnitySDKAPI
         {
             return Pvr_ControllerManager.controllerlink.getControllerSensorStatus(id);
         }
+
+        /// <summary>
+        /// Set the controller origin offset data.
+        /// </summary>
+        /// <param name="hand">0,1</param>
+        /// <param name="offset">m</param>
+        public static void UPvr_SetControllerOriginOffset(int hand, Vector3 offset)
+        {
+            if (hand == 0)
+            {
+                Pvr_Controller.originOffsetL = offset;
+            }
+            else if (hand == 1)
+            {
+                Pvr_Controller.originOffsetR = offset;
+            }
+        }
+
         /**************************** Private Static Funcations *******************************************/
         #region Private Static Funcation
 #if ANDROID_DEVICE

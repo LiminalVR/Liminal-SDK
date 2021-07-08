@@ -130,7 +130,6 @@ public class Pvr_SDKSetting : EditorWindow
         EditorApplication.update += Update;
     }
 
-    [MenuItem("Pvr_UnitySDK" + "/Pico SDK Setting")]
     static void Init()
     {
         IsIgnoreWindow();

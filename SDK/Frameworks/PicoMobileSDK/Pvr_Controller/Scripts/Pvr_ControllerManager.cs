@@ -44,7 +44,12 @@ public class Pvr_ControllerManager : MonoBehaviour
     private bool controllerServicestate;
     private float disConnectTime;
     public bool LengthAdaptiveRay;
-
+    private float[] sensorData = new float[28];
+    private int[] keyData = new int[134];
+    private float[] g2SensorData = new float[4];
+    private int[] g2KeyData = new int[47];
+    private int keyOffset = 0;
+    private int rotControllerMode = 1;
     #endregion
 
     //Service Start Success
@@ -146,6 +151,7 @@ public class Pvr_ControllerManager : MonoBehaviour
             Invoke("CheckControllerService", 10.0f);
         }
 #endif
+        Render.UPvr_GetIntConfig((int)GlobalIntConfigs.RotControllerMode, ref rotControllerMode);
     }
 
     void Update()
@@ -153,8 +159,8 @@ public class Pvr_ControllerManager : MonoBehaviour
 #if UNITY_ANDROID
         if (controllerlink.neoserviceStarted)
         {
-            var sensorData = controllerlink.GetControllerSensorData();
-            var keyData = controllerlink.GetControllerKeyData();
+            sensorData = controllerlink.GetControllerSensorData();
+            keyData = controllerlink.GetControllerKeyData();
 
             if (controllerlink.controller0Connected)
             {
@@ -165,14 +171,20 @@ public class Pvr_ControllerManager : MonoBehaviour
                     sensorData[2] = -sensorData[2];
                     sensorData[3] = -sensorData[3];
                     controllerlink.Controller0.Rotation.Set(sensorData[0], sensorData[1], sensorData[2], sensorData[3]);
+                    if (rotControllerMode == 0)
+                    {
+                        controllerlink.Controller0.Rotation *= Quaternion.Euler(34.0f, 0, 0);
+                    }
                     controllerlink.Controller0.Position.Set(sensorData[4] / 1000.0f, sensorData[5] / 1000.0f, -sensorData[6] / 1000.0f);
                 }
                 else
                 {
-                    controllerlink.Controller0.Rotation.Set(sensorData[7], sensorData[8], sensorData[9],
-                        sensorData[10]);
-                    controllerlink.Controller0.Position.Set(sensorData[11] / 1000.0f, sensorData[12] / 1000.0f,
-                        -sensorData[13] / 1000.0f);
+                    controllerlink.Controller0.Rotation.Set(sensorData[7], sensorData[8], sensorData[9], sensorData[10]);
+                    if (rotControllerMode == 0)
+                    {
+                        controllerlink.Controller0.Rotation *= Quaternion.Euler(34.0f, 0, 0);
+                    }
+                    controllerlink.Controller0.Position.Set(sensorData[11] / 1000.0f, sensorData[12] / 1000.0f, -sensorData[13] / 1000.0f);
                 }
 
                 if (!controllerlink.Controller0.isShowBoundary)
@@ -209,14 +221,20 @@ public class Pvr_ControllerManager : MonoBehaviour
                     sensorData[16] = -sensorData[16];
                     sensorData[17] = -sensorData[17];
                     controllerlink.Controller1.Rotation.Set(sensorData[14], sensorData[15], sensorData[16], sensorData[17]);
+                    if (rotControllerMode == 0)
+                    {
+                        controllerlink.Controller1.Rotation *= Quaternion.Euler(34.0f, 0, 0);
+                    }
                     controllerlink.Controller1.Position.Set(sensorData[18] / 1000.0f, sensorData[19] / 1000.0f, -sensorData[20] / 1000.0f);
                 }
                 else
                 {
-                    controllerlink.Controller1.Rotation.Set(sensorData[21], sensorData[22], sensorData[23],
-                        sensorData[24]);
-                    controllerlink.Controller1.Position.Set(sensorData[25] / 1000.0f, sensorData[26] / 1000.0f,
-                        -sensorData[27] / 1000.0f);
+                    controllerlink.Controller1.Rotation.Set(sensorData[21], sensorData[22], sensorData[23], sensorData[24]);
+                    if (rotControllerMode == 0)
+                    {
+                        controllerlink.Controller1.Rotation *= Quaternion.Euler(34.0f, 0, 0);
+                    }
+                    controllerlink.Controller1.Position.Set(sensorData[25] / 1000.0f, sensorData[26] / 1000.0f, -sensorData[27] / 1000.0f);
                 }
 
                 if (!controllerlink.Controller1.isShowBoundary)
@@ -246,11 +264,11 @@ public class Pvr_ControllerManager : MonoBehaviour
         //Goblin controller
         if (controllerlink.goblinserviceStarted && controllerlink.controller0Connected)
         {
-            var pose0 = controllerlink.GetHBControllerPoseData();
-            controllerlink.Controller0.Rotation.Set(pose0[0], pose0[1], pose0[2], pose0[3]);
+            g2SensorData = controllerlink.GetHBControllerPoseData();
+            controllerlink.Controller0.Rotation.Set(g2SensorData[0], g2SensorData[1], g2SensorData[2], g2SensorData[3]);
 
-            var key0 = controllerlink.GetHBControllerKeyData();
-            TransformData(controllerlink.Controller0, 0, key0);
+            g2KeyData = controllerlink.GetHBControllerKeyData();
+            TransformData(controllerlink.Controller0, 0, g2KeyData);
         }
 
         SetSystemKey();
@@ -271,7 +289,7 @@ public class Pvr_ControllerManager : MonoBehaviour
             }
             if (controllerlink.goblinserviceStarted)
             {
-                controllerlink.StopLark2Receiver();
+                controllerlink.StopReceiver();
             }
         }
         else
@@ -286,7 +304,7 @@ public class Pvr_ControllerManager : MonoBehaviour
             }
             if (controllerlink.goblinserviceStarted)
             {
-                controllerlink.StartLark2Receiver();
+                controllerlink.StartReceiver();
                 controllerlink.controller0Connected = GetControllerConnectionState(0) == 1;
                 controllerlink.controllerType = controllerlink.GetControllerType();
                 controllerlink.handness = (Pvr_Controller.UserHandNess)controllerlink.getHandness();
@@ -325,15 +343,6 @@ public class Pvr_ControllerManager : MonoBehaviour
     /************************************ Public Interfaces  *********************************/
 #region Public Interfaces
 
-   
-    public void StopLark2Service()
-    {
-        if (controllerlink != null)
-        {
-            controllerlink.StopLark2Service();
-        }
-    }
-  
     public Vector3 GetAngularVelocity(int num)
     {
         if (controllerlink != null)
@@ -385,8 +394,7 @@ public class Pvr_ControllerManager : MonoBehaviour
     }
     public static int GetControllerConnectionState(int num)
     {
-        var sta = controllerlink.GetControllerConnectionState(num);
-        return sta;
+        return controllerlink.GetControllerConnectionState(num);
     }
     public void ConnectBLE()
     {
@@ -936,17 +944,17 @@ public class Pvr_ControllerManager : MonoBehaviour
     /// </summary>
     private void TransformData(ControllerHand hand, int handId, int[] data)
     {
-        var offset = handId == 1 ? 67 : 0;
+        keyOffset = handId == 1 ? 67 : 0;
 
-        hand.TouchPadPosition.x = data[0 + offset];
-        hand.TouchPadPosition.y = data[5 + offset];
+        hand.TouchPadPosition.x = data[0 + keyOffset];
+        hand.TouchPadPosition.y = data[5 + keyOffset];
 
-        TransSingleKey(hand.Home, 10 + offset, data);
-        TransSingleKey(hand.App, 15 + offset, data);
-        TransSingleKey(hand.Touch, 20 + offset, data);
-        TransSingleKey(hand.VolumeUp, 25 + offset, data);
-        TransSingleKey(hand.VolumeDown, 30 + offset, data);
-        TransSingleKey(hand.Trigger, 35 + offset, data);
+        TransSingleKey(hand.Home, 10 + keyOffset, data);
+        TransSingleKey(hand.App, 15 + keyOffset, data);
+        TransSingleKey(hand.Touch, 20 + keyOffset, data);
+        TransSingleKey(hand.VolumeUp, 25 + keyOffset, data);
+        TransSingleKey(hand.VolumeDown, 30 + keyOffset, data);
+        TransSingleKey(hand.Trigger, 35 + keyOffset, data);
 
         if (controllerlink.goblinserviceStarted && !controllerlink.neoserviceStarted)
         {
@@ -958,7 +966,7 @@ public class Pvr_ControllerManager : MonoBehaviour
             hand.TriggerNum = controllerlink.GetCVTriggerValue(handId);
         }
 
-        hand.Battery = data[40 + offset];
+        hand.Battery = data[40 + keyOffset];
 
         if (data.Length == 47)
         {
@@ -970,26 +978,24 @@ public class Pvr_ControllerManager : MonoBehaviour
             switch (handId)
             {
                 case 0:
-                    TransSingleKey(hand.X, 45 + offset, data);
-                    TransSingleKey(hand.Y, 50 + offset, data);
-                    TransSingleKey(hand.Left, 60 + offset, data);
+                    TransSingleKey(hand.X, 45 + keyOffset, data);
+                    TransSingleKey(hand.Y, 50 + keyOffset, data);
+                    TransSingleKey(hand.Left, 60 + keyOffset, data);
                     break;
                 case 1:
-                    TransSingleKey(hand.A, 45 + offset, data);
-                    TransSingleKey(hand.B, 50 + offset, data);
-                    TransSingleKey(hand.Right, 55 + offset, data);
+                    TransSingleKey(hand.A, 45 + keyOffset, data);
+                    TransSingleKey(hand.B, 50 + keyOffset, data);
+                    TransSingleKey(hand.Right, 55 + keyOffset, data);
                     break;
             }
 
-            hand.SwipeDirection = (SwipeDirection)data[65 + offset];
-            hand.TouchPadClick = (TouchPadClick)data[66 + offset];
+            hand.SwipeDirection = (SwipeDirection)data[65 + keyOffset];
+            hand.TouchPadClick = (TouchPadClick)data[66 + keyOffset];
         }
 
         hand.GripValue = controllerlink.GetNeo3GripValue(handId);
 
-        var touchData = controllerlink.GetNeo3TouchData(handId);
-
-        TransformTouchData(hand,handId,touchData);
+        TransformTouchData(hand,handId, controllerlink.GetNeo3TouchData(handId));
     }
 
     private void TransSingleKey(PvrControllerKey key, int beginIndex, int[] data)

@@ -21,6 +21,10 @@ public class Pvr_InputModule : PointerInputModule
     [Pvr_EnumFlags]
     public ConfirmBtn confirmBtn = ConfirmBtn.TouchPad;
 
+
+    private List<RaycastResult> rayCasts = new List<RaycastResult>();
+    private RaycastResult rayCastResult = new RaycastResult();
+
     public virtual void Initialise()
     {
         pointers.Clear();
@@ -77,15 +81,13 @@ public class Pvr_InputModule : PointerInputModule
 
     protected virtual List<RaycastResult> CheckRaycasts(Pvr_UIPointer pointer)
     {
-        var raycastResult = new RaycastResult();
-        raycastResult.worldPosition = pointer.GetOriginPosition();
-        raycastResult.worldNormal = pointer.GetOriginForward();
+        rayCastResult.worldPosition = pointer.GetOriginPosition();
+        rayCastResult.worldNormal = pointer.GetOriginForward();
 
-        pointer.pointerEventData.pointerCurrentRaycast = raycastResult;
+        pointer.pointerEventData.pointerCurrentRaycast = rayCastResult;
 
-        List<RaycastResult> raycasts = new List<RaycastResult>();
-        eventSystem.RaycastAll(pointer.pointerEventData, raycasts);
-        return raycasts;
+        eventSystem.RaycastAll(pointer.pointerEventData, rayCasts);
+        return rayCasts;
     }
 
     protected virtual bool CheckTransformTree(Transform target, Transform source)

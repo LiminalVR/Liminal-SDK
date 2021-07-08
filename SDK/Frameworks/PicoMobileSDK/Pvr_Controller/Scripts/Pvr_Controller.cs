@@ -166,13 +166,13 @@ public class Pvr_Controller : MonoBehaviour
                 if (controller0 != null)
                 {
                     controller0.transform.localRotation = Controller.UPvr_GetControllerQUA(0);
-                    controller0.transform.localPosition = Controller.UPvr_GetControllerPOS(0);
+                    controller0.transform.localPosition = Controller.UPvr_GetControllerPOS(0) + Controller.UPvr_GetControllerQUA(0) * originOffsetL;
                     UpdateControlloerRay(true, false);
                 }
                 if (controller1 != null)
                 {
                     controller1.transform.localRotation = Controller.UPvr_GetControllerQUA(1);
-                    controller1.transform.localPosition = Controller.UPvr_GetControllerPOS(1);
+                    controller1.transform.localPosition = Controller.UPvr_GetControllerPOS(1) + Controller.UPvr_GetControllerQUA(1) * originOffsetR;
                     UpdateControlloerRay(false, true);
                 }
             }
@@ -394,5 +394,7 @@ public class Pvr_Controller : MonoBehaviour
     public static Quaternion wristRotation { get; set; }
     public static Vector3 shoulderPosition { get; set; }
     public static Quaternion shoulderRotation { get; set; }
+    public static Vector3 originOffsetL { get; set; }
+    public static Vector3 originOffsetR { get; set; }
 
 }

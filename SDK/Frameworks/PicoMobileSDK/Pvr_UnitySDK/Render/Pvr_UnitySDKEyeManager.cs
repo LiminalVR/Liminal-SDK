@@ -168,17 +168,19 @@ public class Pvr_UnitySDKEyeManager : MonoBehaviour
     #region Unity API
     private void Awake()
     {
+        // #PICO EDITTED
+
         if (this.MonoEyeCamera == null)
         {
             this.MonoEyeCamera = this.GetComponent<Camera>();
         }
         if (this.LeftEyeCamera == null)
         {
-            this.LeftEyeCamera = this.gameObject.transform.Find("LeftEye").GetComponent<Camera>();
+            //this.LeftEyeCamera = this.gameObject.transform.Find("LeftEye").GetComponent<Camera>();
         }
         if (this.RightEyeCamera == null)
         {
-            this.RightEyeCamera = this.gameObject.transform.Find("RightEye").GetComponent<Camera>();
+            //this.RightEyeCamera = this.gameObject.transform.Find("RightEye").GetComponent<Camera>();
         }
         if (this.BothEyeCamera == null)
         {

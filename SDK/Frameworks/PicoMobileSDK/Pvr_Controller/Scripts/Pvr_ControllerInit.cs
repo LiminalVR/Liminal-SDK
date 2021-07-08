@@ -457,4 +457,19 @@ public class Pvr_ControllerInit : MonoBehaviour
         fileStream = null;
         return binary;
     }
+
+    // #PICO EDITTED
+    [ContextMenu("Hide")]
+    public void Hide()
+    {
+        foreach (Transform t in transform)
+            t.gameObject.SetActive(false);
+    }
+
+    [ContextMenu("Show")]
+    public void Show()
+    {
+        foreach (Transform t in transform)
+            t.gameObject.SetActive(true);
+    }
 }

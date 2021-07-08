@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System;
 using System.Collections.Generic;
 using Pvr_UnitySDKAPI;
+using UnityEngine.Rendering;
+using UnityEngine.Experimental.Rendering;
 
 public class Pvr_UnitySDKEyeManager : MonoBehaviour
 {
@@ -61,12 +63,6 @@ public class Pvr_UnitySDKEyeManager : MonoBehaviour
     // wait for a number of frames, because custom splash screen(2D loading) need display time when first start-up.
     private readonly int WaitSplashScreenFrames = 3;
     private int frameNum = 0;
-
-    // boundary limit 30FPS flag
-    private bool isFrameRateLimitForBoundary;
-    private int lastBoundaryState = 0;
-    private int recordTargetFrameRate;
-    private int limitTargetFrameRate = 30;
 
     [SerializeField]
     [HideInInspector]
@@ -178,11 +174,11 @@ public class Pvr_UnitySDKEyeManager : MonoBehaviour
         }
         if (this.LeftEyeCamera == null)
         {
-            //this.LeftEyeCamera = this.gameObject.transform.Find("LeftEye").GetComponent<Camera>();
+            this.LeftEyeCamera = this.gameObject.transform.Find("LeftEye").GetComponent<Camera>();
         }
         if (this.RightEyeCamera == null)
         {
-            //this.RightEyeCamera = this.gameObject.transform.Find("RightEye").GetComponent<Camera>();
+            this.RightEyeCamera = this.gameObject.transform.Find("RightEye").GetComponent<Camera>();
         }
         if (this.BothEyeCamera == null)
         {
@@ -262,14 +258,17 @@ public class Pvr_UnitySDKEyeManager : MonoBehaviour
         {
             StartCoroutine(ScreenFade(1, 0));
         }
+
+#if UNITY_2019_1_OR_NEWER
+        if (GraphicsSettings.renderPipelineAsset != null)
+        {
+            RenderPipelineManager.endCameraRendering += MyPostRender;
+        }
+#endif
     }
 
     void Start()
     {
-        // record
-        this.isFrameRateLimitForBoundary = BoundarySystem.UPvr_GetFrameRateLimit();
-        this.recordTargetFrameRate = Application.targetFrameRate;
-
 #if !UNITY_EDITOR && UNITY_ANDROID
         SetCamerasEnableByStereoRendering();
         SetupMonoCamera();
@@ -285,35 +284,6 @@ public class Pvr_UnitySDKEyeManager : MonoBehaviour
 #if UNITY_EDITOR
         SetCameraEnableEditor();
 #endif
-        // boundary limit FPS
-        if (isFrameRateLimitForBoundary)
-        {
-            int currentBoundaryState = BoundarySystem.UPvr_GetSeeThroughState();
-
-            if (currentBoundaryState != this.lastBoundaryState)
-            {
-                if (currentBoundaryState == 2 || currentBoundaryState == 1) // limit framerate
-                {
-                    if (Application.targetFrameRate != this.limitTargetFrameRate)
-                    {                 
-                        // record
-                        this.recordTargetFrameRate = Application.targetFrameRate;
-                        // limit FPS
-                        Application.targetFrameRate = this.limitTargetFrameRate;
-                    }
-
-                }
-                else // recover
-                {
-                    Application.targetFrameRate = this.recordTargetFrameRate;
-                }
-
-                this.lastBoundaryState = currentBoundaryState;
-            }
-        }
-
-
-
         if (Pvr_UnitySDKRender.Instance.StereoRenderPath == StereoRenderingPathPico.SinglePass)
         {
             for (int i = 0; i < Eyes.Length; i++)
@@ -350,9 +320,21 @@ public class Pvr_UnitySDKEyeManager : MonoBehaviour
         Pvr_UnitySDKManager.eventEnterVRMode -= SetEyeTrackingMode;
     }
 
+    public void MyPostRender(ScriptableRenderContext context, Camera camera)
+    {
+        if (camera.gameObject != this.gameObject)
+            return;
+        OnPostRender();
+    }
     void OnDisable()
     {
         StopAllCoroutines();
+#if UNITY_2019_1_OR_NEWER
+        if (GraphicsSettings.renderPipelineAsset != null)
+        {
+            RenderPipelineManager.endCameraRendering -= MyPostRender;
+        }
+#endif
     }
 
     void OnDestroy()

@@ -44,7 +44,7 @@ namespace Liminal.Platform.Experimental.App
             var mem = System.GC.GetTotalMemory(true);
             Debug.Log($"Memory Used when app first started {mem}");
 
-            StartCoroutine(PlayForSeconds(10));
+            //StartCoroutine(PlayForSeconds(10));
         }
 
         private IEnumerator PlayForSeconds(float seconds)

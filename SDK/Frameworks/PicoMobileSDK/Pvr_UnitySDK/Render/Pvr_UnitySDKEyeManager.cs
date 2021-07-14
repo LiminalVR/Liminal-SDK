@@ -176,11 +176,11 @@ public class Pvr_UnitySDKEyeManager : MonoBehaviour
         }
         if (this.LeftEyeCamera == null)
         {
-            //this.LeftEyeCamera = this.gameObject.transform.Find("LeftEye").GetComponent<Camera>();
+            this.LeftEyeCamera = this.gameObject.transform.Find("LeftEye").GetComponent<Camera>();
         }
         if (this.RightEyeCamera == null)
         {
-            //this.RightEyeCamera = this.gameObject.transform.Find("RightEye").GetComponent<Camera>();
+            this.RightEyeCamera = this.gameObject.transform.Find("RightEye").GetComponent<Camera>();
         }
         if (this.BothEyeCamera == null)
         {

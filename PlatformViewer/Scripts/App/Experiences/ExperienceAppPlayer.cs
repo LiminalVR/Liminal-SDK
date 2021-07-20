@@ -3,6 +3,7 @@ using System.Collections;
 using System.Reflection;
 using App;
 using Liminal.Platform.Experimental.App.BundleLoader;
+using Liminal.Platform.Experimental.App.BundleLoader.Impl;
 using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
 using Liminal.SDK.VR;
@@ -176,9 +177,11 @@ namespace Liminal.Platform.Experimental.App.Experiences
             yield return ShutDownAppRoutine();
 
             UnloadAssetBundle();
+            BundleAsyncLoadOperation.LogMemory("After Clearing Asset Bundle");
 
             if (requireUnload)
                 yield return CleanUp();
+            BundleAsyncLoadOperation.LogMemory("After Cleaning Up");
 
             ExperienceAppUnloaded?.Invoke(completed);
         }
@@ -222,6 +225,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             {
                 ExperienceApp.AssetBundle.Unload(unloadAllLoadedObjects: true);
                 ExperienceAppReflectionCache.AssetBundleField.SetValue(null, null);
+                
             }
         }
 

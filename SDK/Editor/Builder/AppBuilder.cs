@@ -222,8 +222,7 @@ namespace Liminal.SDK.Editor.Build
 
                 var platformName = GetAppPlatformOutputName(buildInfo);
                 var extension = GetFileExtension(buildInfo.CompressionType);
-                var appFilename = string.Format("app_{0}_{1}_v{2}.{3}", appManifest.Id, platformName,
-                    appManifest.Version, extension);
+                var appFilename = string.Format("app_{0}_{1}_v{2}.{3}", appManifest.Id, platformName, appManifest.Version, extension);
                 var appPackPath = Path.Combine(outputPath, appFilename);
                 var appPack = new AppPack()
                 {

@@ -69,6 +69,7 @@ namespace Liminal.Platform.Experimental.App
                 StartCoroutine(PlayRoutine());
         }
 
+        [ContextMenu("Stop")]
         public void Stop()
         {
             StartCoroutine((StopRoutine()));

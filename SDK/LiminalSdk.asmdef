@@ -4,9 +4,26 @@
         "Oculus.VR",
         "SteamVR",
         "UnityEngine.SpatialTracking",
-        "UnityEngine.UI"
+        "UnityEngine.UI",
+        "Unity.XR.Interaction.Toolkit"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Android",
+        "Editor",
+        "iOS",
+        "LinuxStandalone64",
+        "Lumin",
+        "macOSStandalone",
+        "PS4",
+        "Stadia",
+        "Switch",
+        "tvOS",
+        "WSA",
+        "WebGL",
+        "WindowsStandalone32",
+        "WindowsStandalone64",
+        "XboxOne"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

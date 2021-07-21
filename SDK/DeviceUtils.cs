@@ -1,6 +1,5 @@
 ﻿using Liminal.SDK.Core;
 using Liminal.SDK.OpenVR;
-using Liminal.SDK.PicoVR;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Devices.Emulator;
 using Liminal.SDK.VR.Devices.GearVR;
@@ -37,9 +36,6 @@ namespace App
 
                 case ESDKType.OpenVR:
                     return new OpenVRDevice();
-
-                case ESDKType.Pico:
-                    return new PicoVRDevice();
 
                 default:
                     return new EmulatorDevice(VREmulatorDevice.Daydream);

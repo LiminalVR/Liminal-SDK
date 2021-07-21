@@ -45,7 +45,7 @@ namespace Valve.VR
 
         public static void Update()
         {
-
+            return;
             if (SteamVR_Settings.instance.autoEnableVR)
             {
                 bool enabledVR = false;

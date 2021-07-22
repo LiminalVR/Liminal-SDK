@@ -9,6 +9,8 @@ using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 using Object = UnityEngine.Object;
 using UnityEngine.Assertions;
+using System.Linq;
+using Liminal.SDK.VR.Pointers;
 
 namespace Liminal.SDK.XR
 {
@@ -37,7 +39,7 @@ namespace Liminal.SDK.XR
 		public int InputDeviceCount => mInputDevicesList.Count;
 
 		public IVRHeadset Headset { get; }
-		public IEnumerable<IVRInputDevice> InputDevices { get => mInputDevicesList; }
+		public IEnumerable<IVRInputDevice> InputDevices { get; }
 		private readonly List<IVRInputDevice> mInputDevicesList = new List<IVRInputDevice>();
 
 		public IVRInputDevice PrimaryInputDevice { get; private set;  }
@@ -70,37 +72,26 @@ namespace Liminal.SDK.XR
 		public UnityXRDevice()
 		{
 			Headset = new UnityXRHeadset();
-			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right);
-			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
+			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right, XRNode.RightHand);
+			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left, XRNode.LeftHand);
 
-			UpdateConnectedControllers();
+			InputDevices = new List<IVRInputDevice>
+			{
+				PrimaryInputDevice,
+				SecondaryInputDevice,
+			};
+
+			XRInputs.Add(mRightController);
+			XRInputs.Add(mLeftController);
 		}
-#endregion
-
-		private UnityXRControllerMask GetControllerMask()
-		{
-			UnityXRControllerMask mask = UnityXRControllerMask.None;
-			
-			foreach (var kvp in mNodes)
-			{ 
-				if (UnityEngine.XR.InputDevices.GetDeviceAtXRNode(kvp.Key).isValid)
-					mask |= kvp.Value;
-			}
-
-			return mask;
-		}
+		#endregion
 
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
 		/// </summary>
 		public void Update ()
 		{
-			// check if the controller state has changed
-			if (mControllerMask != GetControllerMask())
-			    UpdateConnectedControllers();
 
-			foreach (var input in XRInputs)
-				input.Update();
 		}
 
 		public bool HasCapabilities(VRDeviceCapability capabilities)
@@ -115,152 +106,78 @@ namespace Liminal.SDK.XR
             var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
             unityAvatar.gameObject.SetActive(true);
 
-			var rig = CreateXrRig(avatar);
+			var rig = CreateXRRig(avatar);
 			SetupManager(avatar);
             SetupCameraRig(avatar, rig);
-            SetupControllers(avatar, rig);
 
-            unityAvatar.Initialize();
+			unityAvatar.Initialize(avatar, this);
+
+			SetupControllers(avatar, rig);
 		}
 
-        private Transform CreateXrRig(IVRAvatar avatar)
+        private XRRig CreateXRRig(IVRAvatar avatar)
         {
-            var rig = new GameObject("Rig");
-            rig.transform.SetParent(avatar.Transform);
-            rig.transform.position = avatar.Head.Transform.position;
-            rig.transform.rotation = avatar.Head.Transform.rotation;
+			var xrRig = GameObject.FindObjectOfType<XRRig>();
+			xrRig.transform.SetParent(avatar.Transform);
+			xrRig.transform.position = avatar.Head.Transform.position;
+			xrRig.transform.rotation = avatar.Head.Transform.rotation;
 
-            return rig.transform;
+            return xrRig;
         }
 
-        private void SetupControllers(IVRAvatar avatar, Transform rig)
+		private void SetupControllers(IVRAvatar avatar, XRRig rig)
         {
-            // allow the UnityXRAvatar to handle the rest of the setup
-            UpdateConnectedControllers();
+			var controllers = rig.GetComponentsInChildren<XRController>().ToList();
+			var leftHand = controllers.FirstOrDefault(x => x.controllerNode == XRNode.LeftHand);
+			var rightHand = controllers.FirstOrDefault(x => x.controllerNode == XRNode.RightHand);
 
-			// need to go in 
-            var primaryHandPrefab = Resources.Load("RightHand Controller");
-            var primaryHand = Object.Instantiate(primaryHandPrefab, rig) as GameObject;
-            var secondaryHandPrefab = Resources.Load("LeftHand Controller");
-            var secondaryHand = Object.Instantiate(secondaryHandPrefab, rig) as GameObject;
-            SetupControllers(PrimaryInputDevice, avatar.PrimaryHand, primaryHand.transform);
-            SetupControllers(SecondaryInputDevice, avatar.SecondaryHand, secondaryHand.transform);
-			
-            SetDefaultPointerActivation();
+			avatar.PrimaryHand.TrackedObject = new UnityXRTrackedControllerProxy(rightHand, avatar);
+			avatar.SecondaryHand.TrackedObject = new UnityXRTrackedControllerProxy(leftHand, avatar);
+
+			// Bind left
+
+			// Bind right
+
+			ActivatePointer(avatar.PrimaryHand);
+			ActivatePointer(avatar.SecondaryHand);
+		}
+
+		public void ActivatePointer(IVRAvatarHand hand)
+        {
+			var laserPointerPrefab = Resources.Load("LaserPointer");
+			var pointerVisualGO = (GameObject)GameObject.Instantiate(laserPointerPrefab, hand.Transform);
+			var pointerVisual = pointerVisualGO.GetComponent<LaserPointerVisual>();
+			pointerVisual.Bind(hand.InputDevice.Pointer);
+
+			// Apparently it's binding to the wrong one.
+			var device = hand.InputDevice as UnityXRController;
+			Debug.Log($"Binding: Input Device: {device.Node}, Hand: {device.Hand}, Avatar Device: {hand.Transform.name}");
+
+			hand.InputDevice.Pointer.Transform = pointerVisual.transform;
 		}
 
         private void SetupManager(IVRAvatar avatar)
         {
             var interactionManager = GameObject.FindObjectOfType<XRInteractionManager>();
-            if (interactionManager != null)
-                return;
-
-            var manager = new GameObject("XRInteractionManager").AddComponent<XRInteractionManager>();
+            var manager = interactionManager ?? new GameObject("XRInteractionManager").AddComponent<XRInteractionManager>();
 			GameObject.DontDestroyOnLoad(manager.gameObject);
         }
 
-        private void SetupCameraRig(IVRAvatar avatar, Transform rig)
+        private void SetupCameraRig(IVRAvatar avatar, XRRig xrRig)
         {
-            var avatarGo = avatar.Transform.gameObject;
-            var xrRig = avatarGo.AddComponent<XRRig>();
-            var centerEye = avatar.Head.CenterEyeCamera.gameObject;
-            var eyeDriver = centerEye.AddComponent<TrackedPoseDriver>();
-            eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
-            eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
-            xrRig.cameraGameObject = centerEye.gameObject;
-            xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+			var centerEye = avatar.Head.CenterEyeCamera.gameObject;
+			xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+			xrRig.cameraGameObject = centerEye.gameObject;
 
-            avatar.Head.Transform.SetParent(rig.transform);
-            avatar.Head.Transform.localPosition = Vector3.zero;
-        }
+			// Attach Eye Driver to the head.
+			var eyeDriver = avatar.Head.Transform.GetComponent<TrackedPoseDriver>();
+			if (eyeDriver == null)
+				eyeDriver = avatar.Head.Transform.gameObject.AddComponent<TrackedPoseDriver>();
 
-		public void SetupControllers(IVRInputDevice inputDevice, IVRAvatarHand hand, Transform xrHand)
-		{
-			hand.Transform.SetParent(xrHand);
-			hand.Transform.localPosition = Vector3.zero;
-			hand.Transform.localRotation = Quaternion.identity;
-        }
-
-		private void SetDefaultPointerActivation()
-		{
-			PrimaryInputDevice?.Pointer?.Activate();
-			SecondaryInputDevice?.Pointer?.Activate();
-		}
-
-		private void UpdateConnectedControllers()
-		{
-			var allControllers = new List<IVRInputDevice>();
-			var disconnectedList = new List<IVRInputDevice>();
-			var connectedList = new List<IVRInputDevice>();
-			XRInputs.Clear();
-
-			var ctrlMask = GetControllerMask();
-
-#region Controllers
-			bool isRightHandPresent = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.RightHand).isValid;
-
-			if (isRightHandPresent)
-			{
-				mRightController = mRightController ?? new UnityXRController(VRInputDeviceHand.Right);
-				if (!mInputDevicesList.Contains(mRightController))
-				{
-					connectedList.Add(mRightController);
-				}
-
-				XRInputs.Add(mRightController);
-				allControllers.Add(mRightController);
-			}
-			else
-			{
-				//if (mInputDevicesList.Contains(mRightController))
-				//{
-				disconnectedList.Add(mRightController);
-				//}
-			}
-
-			bool isLeftHandPresent = UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.LeftHand).isValid;
-
-			if (isLeftHandPresent)
-			{
-				mLeftController = mLeftController ?? new UnityXRController(VRInputDeviceHand.Left);
-
-				if (!mInputDevicesList.Contains(mLeftController))
-				{
-					connectedList.Add(mLeftController);
-				}
-
-				XRInputs.Add(mLeftController);
-				allControllers.Add(mLeftController);
-			}
-			else
-			{
-				//if (mInputDevicesList.Contains(mLeftController))
-				//{
-				disconnectedList.Add(mLeftController);
-				//}
-			} 
-#endregion
-
-			mInputDevicesList.Clear();
-			mInputDevicesList.AddRange(allControllers);
-			mControllerMask = ctrlMask;
-
-			disconnectedList.ForEach(device => InputDeviceDisconnected?.Invoke(this, device));
-			connectedList.ForEach(device => InputDeviceConnected?.Invoke(this, device));
-
-			UpdateInputDevices();
-		}
-
-		private void UpdateInputDevices()
-		{
-			//UnityEngine.XR.InputDevices.GetDeviceAtXRNode(XRNode.)
-
-			// determined by handedness?
-			PrimaryInputDevice = mRightController;
-			SecondaryInputDevice = mLeftController;
-
-			PrimaryInputDeviceChanged?.Invoke(this);
+			eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
+			eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
 		}
 	}
 }
+
 #endif

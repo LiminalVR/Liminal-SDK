@@ -332,10 +332,12 @@ namespace Liminal.SDK.XR
 			{ VRAxis.Three, new Axis1DInputFeature(CommonUsages.grip) },
 		};
 
-		public UnityXRController(VRInputDeviceHand hand) : base(OVRUtils.GetControllerType(hand))
-		{
-			mHand = hand;
+		public XRNode Node;
 
+		public UnityXRController(VRInputDeviceHand hand, XRNode node) : base(OVRUtils.GetControllerType(hand))
+		{
+			Node = node;
+			mHand = hand;
 			Pointer?.Activate();
 
 			foreach (var pairs in _inputFeatures.ToArray())
@@ -368,7 +370,7 @@ namespace Liminal.SDK.XR
 			return new InputDevicePointer(this);
 		}
 
-		public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Hand == VRInputDeviceHand.Right ? XRNode.RightHand : XRNode.LeftHand);
+		public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Node);
 
 		public override bool HasCapabilities(VRInputDeviceCapability capabilities)
 		{

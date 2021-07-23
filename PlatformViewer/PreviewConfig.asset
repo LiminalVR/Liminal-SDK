@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4a3c01ccdeb50541b24baa71f9ecfbd, type: 3}
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
-  EmulatorPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/app_999_emulator_v1.limapp
+  EmulatorPath: D:/Unity/LiminalSdk-2019.1-Pico/Liminal-SDK-Unity-Package/Assets/_Builds/Emulator
+    - Descent -b4d19eaa-e8b1-4748-8f5f-3248fa090f34.limapp
   AndroidPath: D:/Unity/PlatformApp-v3-2019.1.10 - Pico/Platform/Assets/StreamingAssets/Resources/GearVr
     - Duel-5905d7ce-4d17-4a92-a604-c63c7114f6f5.limapp
   AndroidAppFullName: GearVr - Duel-5905d7ce-4d17-4a92-a604-c63c7114f6f5.limapp

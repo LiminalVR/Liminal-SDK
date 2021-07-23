@@ -194,8 +194,11 @@ namespace Liminal.SDK.Editor.Build
                 // Build asset bundles
                 UpdateProgressBar("Building Limapp", "Building scene AssetBundle", 0.4F);
                 Debug.Log("[Liminal.Build] Building scene AssetBundle...");
+
+                // Try ChunckBase instead.
                 BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.ForceRebuildAssetBundle, buildInfo.BuildTarget);
 
+                // Replace all Assembly-CSHarp dll with asmName.dll
                 // Run post-processor on the asset bundle
                 var sceneBundlePath = Path.Combine(outputPath, "appscene");
                 var sceneBundleProc = new SceneBundleProcessor(BuildConsts.ProjectAssemblyName, asmName);

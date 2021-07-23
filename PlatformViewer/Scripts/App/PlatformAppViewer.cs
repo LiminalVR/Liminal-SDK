@@ -11,6 +11,16 @@ using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.Core.Fader;
+using Liminal.SDK.Serialization;
+using Liminal.Platform.Experimental.App.BundleLoader.Impl;
+using UnityEngine.SceneManagement;
+using Limapp.Test;
+using Liminal.Platform.Experimental.Services;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement;
+using UnityEngine.ResourceManagement.ResourceLocations;
+using System.Collections.Generic;
+using UnityEngine.ResourceManagement.ResourceProviders;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
@@ -41,10 +51,7 @@ namespace Liminal.Platform.Experimental.App
             VRDevice.Device.SetupAvatar(Avatar);
             BetterStreamingAssets.Initialize();
 
-            var mem = System.GC.GetTotalMemory(true);
-            Debug.Log($"Memory Used when app first started {mem}");
-
-            //StartCoroutine(PlayForSeconds(10));
+            CoroutineService.Instance.StartCoroutine(Test());
         }
 
         private IEnumerator PlayForSeconds(float seconds)
@@ -62,9 +69,6 @@ namespace Liminal.Platform.Experimental.App
         [ContextMenu("Play")]
         public void Play()
         {
-            var mem = System.GC.GetTotalMemory(true);
-            Debug.Log($"Memory Before Play {mem}");
-
             if (!ExperienceAppPlayer.IsRunning)
                 StartCoroutine(PlayRoutine());
         }
@@ -131,9 +135,6 @@ namespace Liminal.Platform.Experimental.App
             yield return ExperienceAppPlayer.Unload();
             Avatar.SetActive(true);
             SceneContainer.SetActive(true);
-
-            var mem = System.GC.GetTotalMemory(true);
-            Debug.Log($"Memory After Play {mem}");
         }
 
         private void ResolvePlatformLimapp(out byte[] data, out string fileName)
@@ -155,6 +156,71 @@ namespace Liminal.Platform.Experimental.App
         {
             var isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
             isEmulator.SetValue(null, false);
+        }
+
+        // TEST
+        public IEnumerator Test()
+        {
+            for (int i = 0; i < 20; i++)
+            {
+                ResolvePlatformLimapp(out _limappData, out string fileName);
+                yield return Unpack(_limappData);
+                yield return new WaitForSeconds(3);
+            }
+
+            //yield return Unpack(_limappData);
+        }
+
+        // Pass in a .limapp
+        public IEnumerator Unpack(byte[] bytes)
+        {
+            BundleAsyncLoadOperation.LogMemory("[Loading]");
+
+            var unpacker = new AppUnpacker();
+            unpacker.UnpackAsync(bytes);
+            bytes = null;
+
+            yield return new WaitUntil(() => unpacker.IsDone);
+
+            var data = unpacker?.Data;
+
+            var assemblies = data.Assemblies;
+            var assetBundleRequest = AssetBundle.LoadFromMemoryAsync(data.SceneBundle);
+
+            yield return assetBundleRequest;
+
+            BundleAsyncLoadOperation.LogMemory("[Loaded]");
+
+            var assetBundle = assetBundleRequest.assetBundle;
+
+            // The scene part
+            var sceneName = assetBundle.GetAllScenePaths()[0];
+            // down this as a unity scene?
+               
+            yield return CacheUtils.Clean();
+
+            //var op = Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+            var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+            yield return op;
+
+            yield return new WaitForSeconds(2);
+
+            var scene = SceneManager.GetSceneByName(sceneName);
+            var rootObjects = scene.GetRootGameObjects();
+            foreach(var o in rootObjects)
+                Destroy(o);
+
+            var assets = Resources.FindObjectsOfTypeAll<Object>();
+            foreach (var a in assets)
+                Destroy(a);
+
+            yield return SceneManager.UnloadSceneAsync(sceneName);
+
+            yield return CacheUtils.Clean();
+            assetBundleRequest.assetBundle.Unload(true);
+            yield return CacheUtils.Clean();
+
+            BundleAsyncLoadOperation.LogMemory("[Unloaded]");
         }
     }
 }

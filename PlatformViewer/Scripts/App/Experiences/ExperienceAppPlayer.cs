@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Reflection;
 using App;
+using Limapp.Test;
 using Liminal.Platform.Experimental.App.BundleLoader;
 using Liminal.Platform.Experimental.App.BundleLoader.Impl;
+using Liminal.Platform.Experimental.Services;
 using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
 using Liminal.SDK.VR;
@@ -176,12 +178,12 @@ namespace Liminal.Platform.Experimental.App.Experiences
             Cancel();
             yield return ShutDownAppRoutine();
 
+            yield return CacheUtils.Clean();
+
             UnloadAssetBundle();
-            BundleAsyncLoadOperation.LogMemory("After Clearing Asset Bundle");
 
             if (requireUnload)
                 yield return CleanUp();
-            BundleAsyncLoadOperation.LogMemory("After Cleaning Up");
 
             ExperienceAppUnloaded?.Invoke(completed);
         }
@@ -236,12 +238,37 @@ namespace Liminal.Platform.Experimental.App.Experiences
             yield return Resources.UnloadUnusedAssets();
             GC.Collect();
             Time.timeScale = 1f;
+
+            yield return CacheUtils.Clean();
         }
 
         private void EnsureEmulatorFlagIsFalse()
         {
             _isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
             _isEmulator.SetValue(null, false);
+        }
+    }
+}
+
+
+namespace Limapp.Test
+{
+    public static class CacheUtils
+    {
+        public static Coroutine Clean(int iteration = 4)
+        {
+            return CoroutineService.Instance.StartCoroutine(Routine());
+
+            IEnumerator Routine()
+            {
+                for (int i = 0; i < iteration; i++)
+                {
+                    Caching.ClearCache();
+                    yield return Resources.UnloadUnusedAssets();
+                    GC.Collect();
+                    yield return new WaitForSeconds(0.2F);
+                }
+            }
         }
     }
 }

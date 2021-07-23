@@ -203,7 +203,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
         public static void LogMemory(string s)
         {
             var mem = System.GC.GetTotalMemory(true);
-            Debug.Log($"memory {s}: {mem}");
+            Debug.Log($"memory {s}: {mem/1e+6}");
         }
 
         private IEnumerator LoadAppScene(byte[] bytes)

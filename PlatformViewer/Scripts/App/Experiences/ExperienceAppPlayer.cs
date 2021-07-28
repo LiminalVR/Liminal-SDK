@@ -25,7 +25,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
         public event Action<bool> ExperienceAppUnloaded;
         public event Action<bool> ExperienceAppEnded;
 
-        public ExperienceApp CurrentApp { get; private set; }
+        public ExperienceApp CurrentApp { get; set; }
 
         private FieldInfo _isEmulator;
 
@@ -124,7 +124,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             ExperienceAppLoaded?.Invoke(operationBase.Experience, operationBase.ExperienceApp);
         }
 
-        private Coroutine InitializeApp()
+        public Coroutine InitializeApp()
         {
             _stateModel.SetState(AppState.Running);
             _stateModel.SetStartTime(Time.realtimeSinceStartup);
@@ -240,6 +240,10 @@ namespace Liminal.Platform.Experimental.App.Experiences
             Time.timeScale = 1f;
 
             yield return CacheUtils.Clean();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         private void EnsureEmulatorFlagIsFalse()

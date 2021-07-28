@@ -117,8 +117,20 @@ namespace Liminal.SDK.XR
 
         private XRRig CreateXRRig(IVRAvatar avatar)
         {
-			var xrRig = GameObject.FindObjectOfType<XRRig>();
-			xrRig.transform.SetParent(avatar.Transform);
+			// Maybe a way to pass in one?
+			// Instantiate a new one
+            var xrRig = avatar.Transform.GetComponentInChildren<XRRig>(true);
+            if(xrRig == null)
+                GameObject.FindObjectOfType<XRRig>();
+			
+            if (xrRig == null)
+            {
+                var xrRigPrefab = Resources.Load("XR Rig");
+                var rigObject = GameObject.Instantiate(xrRigPrefab) as GameObject;
+                xrRig = rigObject.GetComponent<XRRig>();
+            }
+
+            xrRig.transform.SetParent(avatar.Transform);
 			xrRig.transform.position = avatar.Head.Transform.position;
 			xrRig.transform.rotation = avatar.Head.Transform.rotation;
 

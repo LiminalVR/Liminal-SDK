@@ -179,6 +179,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
             }
 
             yield return LoadAppScene(mAppPack.SceneBundle);
+            
         }
 
         private IEnumerator LoadAppAssembly(byte[] bytes)

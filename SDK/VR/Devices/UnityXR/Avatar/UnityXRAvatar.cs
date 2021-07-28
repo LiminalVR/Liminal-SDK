@@ -31,6 +31,11 @@ namespace Liminal.SDK.XR
 
         private void Update()
         {
+            if (Device == null)
+            {
+                Debug.Log("No device found");
+                return;
+            }
             foreach (var input in Device.XRInputs)
                 input.Update();
         }

@@ -2,10 +2,9 @@
     "name": "Platform",
     "references": [
         "External",
-        "LiminalSdk",
-        "Unity.Addressables",
-        "Unity.ResourceManager"
+        "LiminalSdk"
     ],
+    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -13,6 +12,5 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+    "versionDefines": []
 }

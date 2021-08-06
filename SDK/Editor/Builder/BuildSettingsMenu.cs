@@ -6,6 +6,7 @@
     Issues,
     Preview,
     Settings,
+    Explorer
 }
 
 

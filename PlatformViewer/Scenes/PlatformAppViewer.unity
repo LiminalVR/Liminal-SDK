@@ -362,11 +362,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1260162968766363323, guid: 22276a8657744e04cba8ad0a2caf4195,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1260162968516261969, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -462,6 +457,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 101.16
       objectReference: {fileID: 0}
+    - target: {fileID: 1260162968766363322, guid: 22276a8657744e04cba8ad0a2caf4195,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1260162968766363323, guid: 22276a8657744e04cba8ad0a2caf4195,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1260162968470769514, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_LocalRotation.x
@@ -480,11 +485,6 @@ PrefabInstance:
     - target: {fileID: 1260162968470769514, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1260162968766363322, guid: 22276a8657744e04cba8ad0a2caf4195,
-        type: 3}
-      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:
@@ -682,7 +682,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0099e3e02b0f9734d90a35916b0c5a02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Emulator: {fileID: 3473043119503296453}
 --- !u!4 &3473043119503296450
 Transform:
   m_ObjectHideFlags: 0
@@ -717,6 +716,10 @@ MonoBehaviour:
   PreviewConfig: {fileID: 11400000, guid: 3a4df585a93abb54287991a55599773e, type: 2}
   LoadingBar: {fileID: 2038825751}
   SceneContainer: {fileID: 7260775234727785935}
+  UseOriginal: 0
+  AppIds: 2a00000057000000590000005900000063000000900000001e0000001a0000006900000076000000
+  ExperienceApp: {fileID: 0}
+  Playing: 0
 --- !u!1 &3473043119503296452
 GameObject:
   m_ObjectHideFlags: 0
@@ -748,8 +751,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8066ed3b2e9e4c64f9c11142d910e9c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BuildType: 4
-  EditorType: 4
+  BuildType: 2
+  EditorType: 1
 --- !u!224 &3934831371284879100
 RectTransform:
   m_ObjectHideFlags: 0

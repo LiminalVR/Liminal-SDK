@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using App;
+using Limapp.Test;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Liminal.Platform.Experimental.App.Experiences;
@@ -12,20 +14,10 @@ using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.Core.Fader;
-using Liminal.SDK.Serialization;
 using Liminal.Platform.Experimental.App.BundleLoader.Impl;
-using UnityEngine.SceneManagement;
-using Limapp.Test;
 using Liminal.Platform.Experimental.Services;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement;
-using UnityEngine.ResourceManagement.ResourceLocations;
-using System.Collections.Generic;
-using UnityEngine.ResourceManagement.ResourceProviders;
-using System.Linq;
-using Liminal.SDK.VR.Input;
-using UnityEngine.AddressableAssets.ResourceLocators;
-using Object = UnityEngine.Object;
+using Liminal.SDK.Serialization;
+using UnityEngine.SceneManagement;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
@@ -43,8 +35,6 @@ namespace Liminal.Platform.Experimental.App
 
         private byte[] _limappData;
 
-        public bool Extract;
-        public bool ExtractForceAndroid;
         public bool UseOriginal;
 
         private void OnValidate()
@@ -60,257 +50,26 @@ namespace Liminal.Platform.Experimental.App
             VRDevice.Device.SetupAvatar(Avatar);
             BetterStreamingAssets.Initialize();
 
-            if (UseOriginal)
-            {
-                CoroutineService.Instance.StartCoroutine(LoopPlay());
-                return;
-            }
-
-            if (Extract)
-                CoroutineService.Instance.StartCoroutine(ExtractPack());
+            if(UseOriginal)
+                StartCoroutine(AutoPlay());
             else
             {
-                CoroutineService.Instance.StartCoroutine(Test());
+                StartCoroutine(Test());
             }
         }
 
-        private IEnumerator PlayForSeconds(float seconds)
-        {
-            while (true)
-            {
-                Play();
-                yield return new WaitForSeconds(seconds);
-                Stop();
-
-                yield return new WaitForSeconds(3);
-            }
-        }
-
-        [ContextMenu("Play")]
-        public void Play()
-        {
-
-        }
-
-        private IEnumerator LoopPlay()
-        {
-            for (int i = 0; i < 20; i++)
-            {
-                if (!ExperienceAppPlayer.IsRunning)
-                    yield return StartCoroutine(PlayRoutine());
-
-                yield return new WaitForSeconds(8);
-
-                Stop();
-            }
-        }
-
-        [ContextMenu("Stop")]
-        public void Stop()
-        {
-            StartCoroutine((StopRoutine()));
-        }
-
-        private IEnumerator PlayRoutine()
-        {
-            Debug.Log("Play Routine");
-
-            SceneContainer.SetActive(false);
-
-            ResolvePlatformLimapp(out _limappData, out string fileName);
-
-            var experience = new Experience
-            {
-                Id = ExperienceAppUtils.AppIdFromName(fileName),
-                Bytes = _limappData,
-                CompressionType = GetCompressionType(fileName),
-            };
-
-            var loadOp = ExperienceAppPlayer.Load(experience);
-            LoadingBar.Load(loadOp);
-            EnsureEmulatorFlagIsFalse();
-            
-            
-            yield return loadOp.LoadScene();
-
-            experience.Bytes = null;
-            _limappData = null;
-
-            EnsureEmulatorFlagIsFalse();
-
-            LoadingBar.SetActiveState(false);
-
-            ExperienceAppPlayer.Begin();
-
-            // Try clear it all.
-            var experienceApp = GetExperienceApp();
-            var type = experienceApp.GetType();
-            var appDataField = type.GetField("m_AppData", BindingFlags.NonPublic | BindingFlags.Instance);
-            appDataField.SetValue(experienceApp, null); //We need this overload for .NET < 4.51
-
-            var assetLookUpField = type.GetField("m_AssetLookup", BindingFlags.NonPublic | BindingFlags.Instance);
-            assetLookUpField.SetValue(experienceApp, null); //We need this overload for .NET < 4.51
-
-            /*
-            var rootGO = type.GetField("m_RootGameObjects", BindingFlags.NonPublic | BindingFlags.Instance);
-            rootGO.SetValue(experienceApp, default); //We need this overload for .NET < 4.51
-            */
-            //_$AssetLookup
-            // reset state;
-
-            var assetLookUpObject = GameObject.Find("_$AssetLookup");
-            Destroy(assetLookUpObject);
-
-            ExperienceApp.OnComplete += OnExperienceComplete;
-            ExperienceApp.Initializing += SetScreenfaderActive;
-        }
-
-        private ECompressionType GetCompressionType(string fileName)
-        {
-            var compression = ECompressionType.LMZA;
-
-            if (string.IsNullOrEmpty(fileName) || string.IsNullOrWhiteSpace(fileName))
-                return compression;
-            
-            if (Path.GetExtension(fileName).Equals(".ulimapp")) 
-                compression = ECompressionType.Uncompressed;
-
-            return compression;
-        }
-
-        private void SetScreenfaderActive()
-        {
-            var avatar = (VRAvatar)FindObjectOfType(typeof(VRAvatar));
-            avatar.GetComponentInChildren<CompoundScreenFader>().enabled = true;
-        }
-
-        private void OnExperienceComplete(bool completed)
-        {
-            Stop();   
-        }
-
-        private IEnumerator StopRoutine()
-        {
-            yield return ExperienceAppPlayer.Unload();
-            Avatar.SetActive(true);
-            SceneContainer.SetActive(true);
-        }
-
-        private void ResolvePlatformLimapp(out byte[] data, out string fileName, bool forceAndroid = false)
-        {
-            if (Application.platform == RuntimePlatform.Android || forceAndroid)
-            {
-                data = BetterStreamingAssets.ReadAllBytes(PreviewConfig.AndroidAppFullName);
-                fileName = PreviewConfig.AndroidAppFullName;
-            }
-            else
-            {
-                var limappPath = PreviewConfig.EmulatorPath;
-                fileName = Path.GetFileName(limappPath);
-                data = File.ReadAllBytes(limappPath);
-            }
-        }
-
-        private string GetPath()
-        {
-            if (Application.platform == RuntimePlatform.Android )
-            {
-                return $"{Application.persistentDataPath}/bundle";
-            }
-            else
-            {
-                var limappPath = PreviewConfig.EmulatorPath;
-                return $"{Application.dataPath}/_Builds/assetBundle";
-            }
-        }
-
-        private void EnsureEmulatorFlagIsFalse()
-        {
-            var isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
-            isEmulator.SetValue(null, false);
-        }
-
-        /*public Coroutine InitializeApp()
-        {
-            // TODO Investigate if activating the pointer is necessary.
-            try
-            {
-                if (VRAvatar.Active.PrimaryHand != null && VRAvatar.Active.PrimaryHand.IsActive)
-                {
-                    VRDevice.Device.PrimaryInputDevice.Pointer.Activate();
-                }
-                else
-                {
-                    Debug.Log("Could not activate pointer");
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.Log($"Could not activate pointer {e}");
-            }
-
-            return StartCoroutine(_InitializeApp());
-        }*/
-
-        public HashSet<Object> StartObjects = new HashSet<Object>();
-
-        // TEST
         public IEnumerator Test()
         {
-            var count = 20;
-            for (int i = 0; i < count; i++)
-            {
-                yield return UnPack();
-                SceneManager.LoadScene(0);
-                break;
-            }
-        }
-
-        public IEnumerator ExtractPack()
-        {
-            ResolvePlatformLimapp(out var appBytes, out string fileName, ExtractForceAndroid);
-            var unpacker = new AppUnpacker();
-            unpacker.UnpackAsync(appBytes);
-
-            yield return new WaitUntil(() => unpacker.IsDone);
-
-            // write all assemblies on disk
-            var assmeblies = unpacker.Data.Assemblies;
-
-            var appFolder = $"{Application.persistentDataPath}/{unpacker.Data.ApplicationId}";
-            var assemblyFolder = $"{appFolder}/assemblyFolder";
-
-            if (!Directory.Exists(appFolder))
-                Directory.CreateDirectory(appFolder);
-
-            if (!Directory.Exists(assemblyFolder))
-                Directory.CreateDirectory(assemblyFolder);
-
-            // Wait, in theory, I can rewrite the assembly to match ah, but that's not it.
-
-            for (var i = 0; i < assmeblies.Count; i++)
-            {
-                var asmBytes = assmeblies[i];
-                var asm = Assembly.Load(asmBytes);
-                File.WriteAllBytes($"{assemblyFolder}/{asm.GetName()}", asmBytes);
-            }
-
-            File.WriteAllBytes($"{appFolder}/appBundle", unpacker.Data.SceneBundle);
-            Debug.Log("Done!");
-            yield break;
+            yield return UnPack();
+            SceneManager.LoadScene(0);
         }
 
         public List<int> AppIds;
-        public int _appIndex = 0;
+        public static int _appIndex = 0;
 
         public IEnumerator UnPack()
         {
-            /*// This creases memory issues.
-            BundleAsyncLoadOperation.LogMemory("[Before Extract]");
-            yield return ExtractPack();
-            BundleAsyncLoadOperation.LogMemory("[After Extract]");*/
-
-            BundleAsyncLoadOperation.LogMemory("[Loading]");
+            LogMemory("[Loading]");
             // read from directory
             var appId = AppIds[_appIndex];
 
@@ -318,12 +77,13 @@ namespace Liminal.Platform.Experimental.App
             if (_appIndex >= AppIds.Count - 1)
                 _appIndex = 0;
 
-            var appFolder = $"{Application.persistentDataPath}/{appId}";
+            var platformName = Application.isMobilePlatform ? "Android" : "WindowsStandalone";
+            var appFolder = $"{Application.persistentDataPath}/Limapps/{appId}/{platformName}";
             var assemblyFolder = $"{appFolder}/assemblyFolder";
 
             var asmPaths = Directory.GetFiles(assemblyFolder);
             var assemblies = new List<Assembly>();
-            
+
             //  When an asset bundle is set, it deserializes correctly using this data?
             //  ExperienceAppReflectionCache.AssetBundleField.SetValue(null, assetBundle);
 
@@ -377,7 +137,7 @@ namespace Liminal.Platform.Experimental.App
 
                 //yield return SceneManager.UnloadSceneAsync(sceneName);
                 //assetBundle.Unload(true);
-                
+
                 yield return PlatformUnload(assemblies, assetBundle, sceneName);
             }
 
@@ -391,7 +151,7 @@ namespace Liminal.Platform.Experimental.App
             void PlayApp(Scene scene, LoadSceneMode mode)
             {
                 SceneContainer.gameObject.SetActive(false);
-                
+
                 ExperienceApp = GetExperienceApp();
                 if (ExperienceApp == null)
                 {
@@ -410,7 +170,6 @@ namespace Liminal.Platform.Experimental.App
             }
         }
 
-
         public IEnumerator Unload()
         {
             SerializationUtils.ClearGlobalSerializableTypes();
@@ -419,7 +178,6 @@ namespace Liminal.Platform.Experimental.App
 
             yield return CacheUtils.Clean();
         }
-
 
         public ExperienceApp ExperienceApp;
 
@@ -446,84 +204,6 @@ namespace Liminal.Platform.Experimental.App
             CoroutineService.Instance.StartCoroutine((IEnumerator)method.Invoke(ExperienceApp, null));
         }
 
-        // Pass in a .limapp
-        public IEnumerator Unpack(byte[] bytes)
-        {
-            yield return CacheUtils.Clean();
-
-            BundleAsyncLoadOperation.LogMemory("[Loading]");
-
-            var unpacker = new AppUnpacker();
-            unpacker.UnpackAsync(bytes);
-            bytes = null;
-
-            yield return new WaitUntil(() => unpacker.IsDone);
-
-            var data = unpacker?.Data;
-            var assemblies = data.Assemblies;
-
-
-
-            var assetBundleRequest = AssetBundle.LoadFromMemoryAsync(data.SceneBundle);
-            //var assetBundleRequest = LoadBundleFromFile();
-
-            yield return assetBundleRequest;
-            
-            BundleAsyncLoadOperation.LogMemory("[Loaded]");
-
-            var assetBundle = assetBundleRequest.assetBundle;
-
-            // The scene part
-            var sceneName = assetBundle.GetAllScenePaths()[0];
-
-            // down this as a unity scene?
-            //var op = Addressables.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-            var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
-            yield return op;
-            yield return new WaitForSeconds(2);
-
-            assetBundleRequest.assetBundle.Unload(true);
-
-            yield return SceneManager.UnloadSceneAsync(sceneName);
-
-            // Load an empty scene? 
-
-            yield return CacheUtils.Clean();
-            //assetBundleRequest.assetBundle.Unload(true);
-            assetBundleRequest = null;
-            yield return CacheUtils.Clean();
-            BundleAsyncLoadOperation.LogMemory("[Unloaded]");
-        }
-
-        List<GameObject> FindSceneObjects(string sceneName)
-        {
-            List<GameObject> objs = new List<GameObject>();
-            foreach (GameObject obj in Object.FindObjectsOfType(typeof(GameObject)))
-            {
-                if (obj.scene.name.CompareTo(sceneName) == 0)
-                {
-                    objs.Add(obj);
-                }
-            }
-            return objs;
-        }
-
-        public static void Restart()
-        {
-            var scenes = SceneManager.GetAllScenes();
-            foreach(var s in scenes)
-                SceneManager.UnloadScene(s);
-
-            // Destroy all remaining textures.
-            // Unload dont destroy on load
-
-            Resources.UnloadUnusedAssets();
-
-            System.GC.Collect(4, System.GCCollectionMode.Forced);
-            CoroutineService.Instance.StopAllCoroutines();
-
-            SceneManager.LoadScene(0);
-        }
 
         /// <summary>
         /// Unloads the limapp and clean up to ensure the next app can be run without conflicts.
@@ -545,7 +225,7 @@ namespace Liminal.Platform.Experimental.App
 
             Debug.Log("Shutting down");
 
-            if(ExperienceApp == null)
+            if (ExperienceApp == null)
                 Debug.Log("Experience app is null");
 
             try
@@ -564,14 +244,6 @@ namespace Liminal.Platform.Experimental.App
 
             yield return Resources.UnloadUnusedAssets();
 
-            /*_avatarBefore.SetActive(true);
-
-            unpacker = null;
-            _appPack = null;
-            SceneLoadingOperation = null;
-            _loadProgress = 0f;
-            */
-
             GC.Collect();
 
             Debug.Log("Unloaded...");
@@ -585,8 +257,6 @@ namespace Liminal.Platform.Experimental.App
 
         public void ResetAllStaticsVariables(Type type)
         {
-            Debug.Log("Resetting Static Variables");
-
             var fields = type.GetFields(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Public);
             foreach (var fieldInfo in fields)
             {
@@ -622,7 +292,157 @@ namespace Liminal.Platform.Experimental.App
             return null;
         }
 
+
+
+
+
+
+
+
+
+
+
+        public static void LogMemory(string s)
+        {
+            var mem = System.GC.GetTotalMemory(true);
+            Debug.Log($"memory {s}: {mem / 1e+6}");
+        }
+
+        private IEnumerator AutoPlay()
+        {
+            for (var i = 0; i < 20; i++)
+            {
+                Playing = false;
+
+                LogMemory("[Loading - Play]");
+                Play();
+
+                yield return new WaitUntil(() => Playing);
+                yield return new WaitForSeconds(15);
+                Stop();
+
+                //  
+            }
+        }
+
+        public void Play()
+        {
+            if(!ExperienceAppPlayer.IsRunning)
+                StartCoroutine(PlayRoutine());
+        }
+
+        public void Stop()
+        {
+            StartCoroutine((StopRoutine()));
+        }
+
+        public bool Playing;
+
+        private IEnumerator PlayRoutine()
+        {
+            if (!UseOriginal)
+                yield break;
+
+            SceneContainer.SetActive(false);
+
+            ResolvePlatformLimapp(out _limappData, out string fileName);
+
+            var experience = new Experience
+            {
+                Id = ExperienceAppUtils.AppIdFromName(fileName),
+                Bytes = _limappData,
+                CompressionType = GetCompressionType(fileName),
+            };
+
+            var loadOp = ExperienceAppPlayer.Load(experience);
+            LoadingBar.Load(loadOp);
+            EnsureEmulatorFlagIsFalse();
+            yield return loadOp.LoadScene();
+            EnsureEmulatorFlagIsFalse();
+
+            LoadingBar.SetActiveState(false);
+
+            ExperienceAppPlayer.Begin();
+
+            ExperienceApp.OnComplete += OnExperienceComplete;
+            ExperienceApp.Initializing += SetScreenfaderActive;
+
+            Playing = true;
+        }
+
+        private ECompressionType GetCompressionType(string fileName)
+        {
+            var compression = ECompressionType.LMZA;
+
+            if (string.IsNullOrEmpty(fileName) || string.IsNullOrWhiteSpace(fileName))
+                return compression;
+            
+            if (Path.GetExtension(fileName).Equals(".ulimapp")) 
+                compression = ECompressionType.Uncompressed;
+
+            return compression;
+        }
+
+        private void SetScreenfaderActive()
+        {
+            var avatar = (VRAvatar)FindObjectOfType(typeof(VRAvatar));
+            avatar.GetComponentInChildren<CompoundScreenFader>().enabled = true;
+        }
+
+        private void OnExperienceComplete(bool completed)
+        {
+            Stop();   
+        }
+
+        private IEnumerator StopRoutine()
+        {
+            yield return ExperienceAppPlayer.Unload();
+            Avatar.SetActive(true);
+            SceneContainer.SetActive(true);
+        }
+
+        private void ResolvePlatformLimapp(out byte[] data, out string fileName, bool forceAndroid = false)
+        {
+            if (Application.platform == RuntimePlatform.Android || forceAndroid)
+            {
+                data = BetterStreamingAssets.ReadAllBytes(PreviewConfig.AndroidAppFullName);
+                fileName = PreviewConfig.AndroidAppFullName;
+            }
+            else
+            {
+                var limappPath = PreviewConfig.EmulatorPath;
+                fileName = Path.GetFileName(limappPath);
+                data = File.ReadAllBytes(limappPath);
+            }
+        }
+
+        private void EnsureEmulatorFlagIsFalse()
+        {
+            var isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
+            isEmulator.SetValue(null, false);
+        }
     }
 }
 
 
+namespace Limapp.Test
+{
+    public static class CacheUtils
+    {
+        public static Coroutine Clean(int iteration = 4)
+        {
+            return CoroutineService.Instance.StartCoroutine(Routine());
+
+            IEnumerator Routine()
+            {
+                for (int i = 0; i < iteration; i++)
+                {
+                    Caching.ClearCache();
+                    yield return Resources.UnloadUnusedAssets();
+                    GC.Collect();
+                    yield return new WaitForSeconds(0.2F);
+                }
+            }
+        }
+    }
+}

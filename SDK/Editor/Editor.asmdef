@@ -4,7 +4,7 @@
         "Platform",
         "LiminalSdk",
         "Oculus.VR.Editor",
-        "Unity.Addressables.Editor"
+        "Unity.EditorCoroutines.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

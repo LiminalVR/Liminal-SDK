@@ -127,9 +127,9 @@ namespace Liminal.Platform.Experimental.App
 
                 var assetBundle = request.assetBundle;
                 var sceneName = assetBundle.GetAllScenePaths()[0];
+
                 var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
                 SceneManager.sceneLoaded += PlayApp;
-
                 yield return op;
 
                 Debug.Log("App started, waiting...");

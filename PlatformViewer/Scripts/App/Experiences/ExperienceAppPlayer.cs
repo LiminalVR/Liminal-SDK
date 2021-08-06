@@ -253,26 +253,3 @@ namespace Liminal.Platform.Experimental.App.Experiences
         }
     }
 }
-
-
-namespace Limapp.Test
-{
-    public static class CacheUtils
-    {
-        public static Coroutine Clean(int iteration = 4)
-        {
-            return CoroutineService.Instance.StartCoroutine(Routine());
-
-            IEnumerator Routine()
-            {
-                for (int i = 0; i < iteration; i++)
-                {
-                    Caching.ClearCache();
-                    yield return Resources.UnloadUnusedAssets();
-                    GC.Collect();
-                    yield return new WaitForSeconds(0.2F);
-                }
-            }
-        }
-    }
-}

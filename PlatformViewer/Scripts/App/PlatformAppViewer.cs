@@ -300,7 +300,8 @@ namespace Liminal.Platform.Experimental.App
             yield break;
         }
 
-        public int AppId = 87;
+        public List<int> AppIds;
+        public int _appIndex = 0;
 
         public IEnumerator UnPack()
         {
@@ -311,7 +312,12 @@ namespace Liminal.Platform.Experimental.App
 
             BundleAsyncLoadOperation.LogMemory("[Loading]");
             // read from directory
-            var appId = AppId;
+            var appId = AppIds[_appIndex];
+
+            _appIndex++;
+            if (_appIndex >= AppIds.Count - 1)
+                _appIndex = 0;
+
             var appFolder = $"{Application.persistentDataPath}/{appId}";
             var assemblyFolder = $"{appFolder}/assemblyFolder";
 

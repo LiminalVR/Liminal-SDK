@@ -133,7 +133,7 @@ namespace Liminal.Platform.Experimental.App
                 yield return op;
 
                 Debug.Log("App started, waiting...");
-                yield return new WaitForSeconds(15);
+                yield return new WaitForSeconds(30);
 
                 //yield return SceneManager.UnloadSceneAsync(sceneName);
                 //assetBundle.Unload(true);

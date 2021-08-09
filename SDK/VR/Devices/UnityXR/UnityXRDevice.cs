@@ -121,7 +121,7 @@ namespace Liminal.SDK.XR
 			// Instantiate a new one
             var xrRig = avatar.Transform.GetComponentInChildren<XRRig>(true);
             if(xrRig == null)
-                GameObject.FindObjectOfType<XRRig>();
+                xrRig = GameObject.FindObjectOfType<XRRig>();
 			
             if (xrRig == null)
             {
@@ -130,9 +130,10 @@ namespace Liminal.SDK.XR
                 xrRig = rigObject.GetComponent<XRRig>();
             }
 
+			// unless you need to offset the difference...
             xrRig.transform.SetParent(avatar.Transform);
-			xrRig.transform.position = avatar.Head.Transform.position;
-			xrRig.transform.rotation = avatar.Head.Transform.rotation;
+			xrRig.transform.position = avatar.Transform.position;
+			xrRig.transform.rotation = avatar.Transform.rotation;
 
             return xrRig;
         }
@@ -178,17 +179,22 @@ namespace Liminal.SDK.XR
         private void SetupCameraRig(IVRAvatar avatar, XRRig xrRig)
         {
 			var centerEye = avatar.Head.CenterEyeCamera.gameObject;
-			xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
 			xrRig.cameraGameObject = centerEye.gameObject;
 
-			// Attach Eye Driver to the head.
 			var eyeDriver = avatar.Head.Transform.GetComponent<TrackedPoseDriver>();
-			if (eyeDriver == null)
-				eyeDriver = avatar.Head.Transform.gameObject.AddComponent<TrackedPoseDriver>();
 
-			eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
-			eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
-		}
+			// Only modify eye setting if you're making a new one.
+            if (eyeDriver == null)
+            {
+                xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+
+				eyeDriver = avatar.Head.Transform.gameObject.AddComponent<TrackedPoseDriver>();
+                eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
+                eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
+                eyeDriver.UseRelativeTransform = false;
+            }
+
+        }
 	}
 }
 

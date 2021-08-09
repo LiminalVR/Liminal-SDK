@@ -33,9 +33,9 @@ namespace Liminal.SDK.Build
             DrawDirectorySelection(ref OutputDirectory, "Output Directory");
             DrawDirectorySelection(ref InputDirectory, "Input Directory");
 
-            var input = "D:/Tests/descent";
+            var input = "C:/Users/ticoc/Documents/Liminal/Limapp-v2/89/Android/assemblyFolder/descent";
             //var input = "D:/Tests/descent_2019-4";
-            var output = "D:/Tests/descent-new";
+            var output = "C:/Users/ticoc/Documents/Liminal/Limapp-v2/89/Android/assemblyFolder/descent-new";
 
             if (GUILayout.Button("Read from Input"))
             {
@@ -79,7 +79,7 @@ namespace Liminal.SDK.Build
                     Replace(methodDef, inputTypeRef, newInputType);
                 }
 
-                Debug.Log(inputTypeRef.FullName);
+                //Debug.Log(inputTypeRef.FullName);
 
                 asmDef.Write(output);
             }

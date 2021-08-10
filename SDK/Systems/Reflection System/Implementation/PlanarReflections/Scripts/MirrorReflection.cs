@@ -112,6 +112,20 @@ namespace App
                 m_Renderer.material.SetFloat("_OffsetX", 1);
             }
 
+            if (model == EDeviceModelType.PicoNeo3)
+            {
+                m_Renderer.material.SetFloat("_Quest", 0);
+                m_Renderer.material.SetFloat(s_offsetEnabled, 1);
+                m_Renderer.material.SetFloat("_Debug", 1);
+
+                m_Renderer.material.SetFloat("_OffsetRX", 1.0143f);
+                m_Renderer.material.SetFloat("_OffsetRY", 1f);
+                m_Renderer.material.SetFloat("_OffsetRZ", -0.009f);
+                m_Renderer.material.SetFloat("_OffsetRW", 0f);
+
+                m_Renderer.material.SetFloat("_OffsetX", 1);
+            }
+
             void SetMaterial(ReflectionOffsetModel m)
             {
                 m_Renderer.material.SetFloat("_OffsetRX", m.RX);

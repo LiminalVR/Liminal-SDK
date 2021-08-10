@@ -36,6 +36,7 @@ namespace Liminal.Platform.Experimental.App
         private byte[] _limappData;
 
         public bool UseOriginal;
+        public bool AutoRun;
 
         private void OnValidate()
         {
@@ -49,6 +50,9 @@ namespace Liminal.Platform.Experimental.App
             VRDevice.Initialize(device);
             VRDevice.Device.SetupAvatar(Avatar);
             BetterStreamingAssets.Initialize();
+
+            if (!AutoRun)
+                return;
 
             if(UseOriginal)
                 StartCoroutine(AutoPlay());

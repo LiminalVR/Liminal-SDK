@@ -177,17 +177,25 @@ namespace Liminal.SDK.XR
                 return;
             }
 			
-			// Make one.
-            var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "Neo3_L" : "Neo3_R";
+            //var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "Neo3_L" : "Neo3_R";
+            var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "PicoNeo_Controller_Visual_L" : "PicoNeo_Controller_Visual_R";
+			
             var prefab = Resources.Load($"Prefabs/{controllerPrefabName}");
             var controllerInstance = GameObject.Instantiate(prefab, controllerComponent.transform) as GameObject;
             controllerInstance.transform.localPosition = Vector3.zero;
-			controllerInstance.transform.localScale = Vector3.one * 0.01f;
+            controllerInstance.transform.localEulerAngles = Vector3.zero;
 
-			var laserPointerPrefab = Resources.Load("LaserPointer");
-			var pointerVisualGO = (GameObject)GameObject.Instantiate(laserPointerPrefab, controllerComponent.transform);
-			var pointerVisual = pointerVisualGO.GetComponent<LaserPointerVisual>();
-			pointerVisual.Bind(hand.InputDevice.Pointer);
+			// if the controller instance has laser pointer, no pointer making one
+			var pointerVisual = controllerInstance.GetComponentInChildren<LaserPointerVisual>();
+
+            if (pointerVisual == null)
+            {
+                var laserPointerPrefab = Resources.Load("LaserPointer");
+                var pointerVisualGO = (GameObject) GameObject.Instantiate(laserPointerPrefab, controllerComponent.transform);
+                pointerVisual = pointerVisualGO.GetComponent<LaserPointerVisual>();
+            }
+
+            pointerVisual.Bind(hand.InputDevice.Pointer);
 
 			// Apparently it's binding to the wrong one.
 			var device = hand.InputDevice as UnityXRController;

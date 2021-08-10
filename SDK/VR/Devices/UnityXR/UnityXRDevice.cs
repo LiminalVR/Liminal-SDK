@@ -86,13 +86,23 @@ namespace Liminal.SDK.XR
 		}
 		#endregion
 
+        private IVRAvatar _currentAvatar;
+
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
 		/// </summary>
 		public void Update ()
 		{
-
+			// Turn on or off controller depending on avatar state? 
+            if (_currentAvatar != null)
+            {
+				//_currentAvatar.PrimaryHand.
+            }
 		}
+
+        private void UpdateHandVisibility()
+        {
+        }
 
 		public bool HasCapabilities(VRDeviceCapability capabilities)
 		{
@@ -111,6 +121,8 @@ namespace Liminal.SDK.XR
             SetupCameraRig(avatar, rig);
 
 			unityAvatar.Initialize(avatar, this);
+
+            _currentAvatar = avatar;
 
 			SetupControllers(avatar, rig);
 		}
@@ -147,18 +159,33 @@ namespace Liminal.SDK.XR
 			avatar.PrimaryHand.TrackedObject = new UnityXRTrackedControllerProxy(rightHand, avatar);
 			avatar.SecondaryHand.TrackedObject = new UnityXRTrackedControllerProxy(leftHand, avatar);
 
-			// Bind left
+			ActivatePointer(avatar.PrimaryHand, rightHand);
+			ActivatePointer(avatar.SecondaryHand, leftHand);
 
-			// Bind right
-
-			ActivatePointer(avatar.PrimaryHand);
-			ActivatePointer(avatar.SecondaryHand);
+			// Right, here we set the track object to be the XR hand. 
+			// We also bind the pointer. 
+			// We just need to put the pointer inside the Anchor?
 		}
 
-		public void ActivatePointer(IVRAvatarHand hand)
+		public void ActivatePointer(IVRAvatarHand hand, XRController xrController)
         {
+			// check if the hand even have a controller attached. // Do we include inactive ones?
+            var controllerComponent = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive:true);
+            if (controllerComponent == null)
+            {
+				Debug.Log("No avatar controller found");
+                return;
+            }
+			
+			// Make one.
+            var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "Neo3_L" : "Neo3_R";
+            var prefab = Resources.Load($"Prefabs/{controllerPrefabName}");
+            var controllerInstance = GameObject.Instantiate(prefab, controllerComponent.transform) as GameObject;
+            controllerInstance.transform.localPosition = Vector3.zero;
+			controllerInstance.transform.localScale = Vector3.one * 0.01f;
+
 			var laserPointerPrefab = Resources.Load("LaserPointer");
-			var pointerVisualGO = (GameObject)GameObject.Instantiate(laserPointerPrefab, hand.Transform);
+			var pointerVisualGO = (GameObject)GameObject.Instantiate(laserPointerPrefab, controllerComponent.transform);
 			var pointerVisual = pointerVisualGO.GetComponent<LaserPointerVisual>();
 			pointerVisual.Bind(hand.InputDevice.Pointer);
 

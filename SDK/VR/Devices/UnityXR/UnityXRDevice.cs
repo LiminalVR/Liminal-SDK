@@ -10,6 +10,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Object = UnityEngine.Object;
 using UnityEngine.Assertions;
 using System.Linq;
+using Liminal.SDK.VR.EventSystems;
 using Liminal.SDK.VR.Pointers;
 
 namespace Liminal.SDK.XR
@@ -38,8 +39,8 @@ namespace Liminal.SDK.XR
 		public string Name => "UnityXR";
 		public int InputDeviceCount => mInputDevicesList.Count;
 
-		public IVRHeadset Headset { get; }
-		public IEnumerable<IVRInputDevice> InputDevices { get; }
+		public IVRHeadset Headset { get; private set; }
+		public IEnumerable<IVRInputDevice> InputDevices { get; private set; }
 		private readonly List<IVRInputDevice> mInputDevicesList = new List<IVRInputDevice>();
 
 		public IVRInputDevice PrimaryInputDevice { get; private set;  }
@@ -70,34 +71,33 @@ namespace Liminal.SDK.XR
 
 #region Constructors
 		public UnityXRDevice()
-		{
-			Headset = new UnityXRHeadset();
-			PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right, XRNode.RightHand);
-			SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left, XRNode.LeftHand);
+        {
+            Setup();
+        }
 
-			InputDevices = new List<IVRInputDevice>
-			{
-				PrimaryInputDevice,
-				SecondaryInputDevice,
-			};
+        public void Setup()
+        {
+            Headset = new UnityXRHeadset();
+            PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right, XRNode.RightHand);
+            SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left, XRNode.LeftHand);
 
-			XRInputs.Add(mRightController);
-			XRInputs.Add(mLeftController);
-		}
-		#endregion
+            InputDevices = new List<IVRInputDevice>
+            {
+                PrimaryInputDevice,
+                SecondaryInputDevice,
+            };
 
-        private IVRAvatar _currentAvatar;
+            XRInputs.Add(mRightController);
+            XRInputs.Add(mLeftController);
+        }
+
+        #endregion
 
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
 		/// </summary>
 		public void Update ()
 		{
-			// Turn on or off controller depending on avatar state? 
-            if (_currentAvatar != null)
-            {
-				//_currentAvatar.PrimaryHand.
-            }
 		}
 
         private void UpdateHandVisibility()
@@ -111,18 +111,29 @@ namespace Liminal.SDK.XR
 
 		public void SetupAvatar(IVRAvatar avatar)
 		{
-			Assert.IsNotNull(avatar);
+            Assert.IsNotNull(avatar);
 
-            var unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+			// Clean up existing pointers.
+			if(VRDevice.Device?.PrimaryInputDevice?.Pointer != null)
+                VRPointerInputModule.RemovePointer(VRDevice.Device.PrimaryInputDevice.Pointer);
+
+            if (VRDevice.Device?.SecondaryInputDevice?.Pointer != null)
+				VRPointerInputModule.RemovePointer(VRDevice.Device.SecondaryInputDevice.Pointer);
+
+			var unityAvatar = avatar.Transform.gameObject.GetComponent<UnityXRAvatar>();
+
+			if(unityAvatar == null)
+                unityAvatar = avatar.Transform.gameObject.AddComponent<UnityXRAvatar>();
+
             unityAvatar.gameObject.SetActive(true);
 
+            SetupManager(avatar);
+
 			var rig = CreateXRRig(avatar);
-			SetupManager(avatar);
             SetupCameraRig(avatar, rig);
 
+			// Does this need to happen a second time? Probably not!
 			unityAvatar.Initialize(avatar, this);
-
-            _currentAvatar = avatar;
 
 			SetupControllers(avatar, rig);
 		}
@@ -202,13 +213,18 @@ namespace Liminal.SDK.XR
 			Debug.Log($"Binding: Input Device: {device.Node}, Hand: {device.Hand}, Avatar Device: {hand.Transform.name}");
 
 			hand.InputDevice.Pointer.Transform = pointerVisual.transform;
+
+			// Always add it back in into the list.
+            VRPointerInputModule.RemovePointer(hand.InputDevice.Pointer);
+            VRPointerInputModule.AddPointer(hand.InputDevice.Pointer);
+            hand.InputDevice.Pointer.Activate();
 		}
 
-        private void SetupManager(IVRAvatar avatar)
+		private void SetupManager(IVRAvatar avatar)
         {
-            var interactionManager = GameObject.FindObjectOfType<XRInteractionManager>();
+            var interactionManager = avatar.Transform.GetComponentInChildren<XRInteractionManager>();
             var manager = interactionManager ?? new GameObject("XRInteractionManager").AddComponent<XRInteractionManager>();
-			GameObject.DontDestroyOnLoad(manager.gameObject);
+            manager.transform.SetParent(avatar.Transform);
         }
 
         private void SetupCameraRig(IVRAvatar avatar, XRRig xrRig)

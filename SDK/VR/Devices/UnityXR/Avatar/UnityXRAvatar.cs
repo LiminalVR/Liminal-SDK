@@ -15,7 +15,7 @@ namespace Liminal.SDK.XR
     public class UnityXRAvatar : MonoBehaviour, IVRDeviceAvatar
     {
         public IVRAvatar Avatar { get; set; }
-        private UnityXRDevice Device { get; set; }
+        public UnityXRDevice Device { get; private set; }
 
         public VRControllerVisual InstantiateControllerVisual(IVRAvatarLimb limb)
         {

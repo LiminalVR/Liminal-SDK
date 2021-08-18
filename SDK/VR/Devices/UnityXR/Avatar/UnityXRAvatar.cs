@@ -36,8 +36,14 @@ namespace Liminal.SDK.XR
                 Debug.Log("No device found");
                 return;
             }
+
             foreach (var input in Device.XRInputs)
                 input.Update();
+        }
+
+        private void OnDisable()
+        {
+            Update();
         }
     }
 }

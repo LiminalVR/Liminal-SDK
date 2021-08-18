@@ -30,10 +30,10 @@ public class FadeExample : MonoBehaviour
             return;
 
         // What probably happened is UnityXRDevice is still listening!
-        if (VRDevice.Device.GetButtonUp(VRButton.Trigger))
+        if (VRDevice.Device.GetButtonUp(VRButton.Back))
         {
             Debug.Log("Trigger Pressed");
-            //ToggleAvatar();
+            ToggleAvatar();
         }
     }
 

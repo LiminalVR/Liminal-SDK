@@ -33,10 +33,9 @@ namespace Liminal.Platform.Experimental.App
         public BaseLoadingBar LoadingBar;
         public GameObject SceneContainer;
 
-        private byte[] _limappData;
-
-        public bool UseOriginal;
         public bool AutoRun;
+
+        public Limapp.v2.LimappLoader LimappLoader = new Limapp.v2.LimappLoader();
 
         private void OnValidate()
         {
@@ -54,108 +53,140 @@ namespace Liminal.Platform.Experimental.App
             if (!AutoRun)
                 return;
 
-            if(UseOriginal)
-                StartCoroutine(AutoPlay());
-            else
+            StartCoroutine(Test());
+        }
+
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.S))
             {
-                StartCoroutine(Test());
+                CoroutineService.Instance.StartCoroutine(LimappLoader.Unload());
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                CoroutineService.Instance.StartCoroutine(Test());
             }
         }
 
         public IEnumerator Test()
         {
-            yield return UnPack();
-            SceneManager.LoadScene(0);
+            for (var i = 0; i <= AppIds.Count; i++)
+            {
+                yield return LimappLoader.Load(AppIds[i]);
+                yield return new WaitForSeconds(10);
+                yield return LimappLoader.Unload();
+            }
         }
 
         public List<int> AppIds;
         public static int _appIndex = 0;
 
-        public IEnumerator UnPack()
+        public ExperienceApp ExperienceApp;
+
+        public static void LogMemory(string s)
         {
-            LogMemory("[Loading]");
-            // read from directory
-            var appId = AppIds[_appIndex];
+            var mem = System.GC.GetTotalMemory(true);
+            Debug.Log($"memory {s}: {mem / 1e+6}");
+        }
 
-            _appIndex++;
-            if (_appIndex >= AppIds.Count - 1)
-                _appIndex = 0;
+        public void Play()
+        {
+        }
 
-            var platformName = Application.isMobilePlatform ? "Android" : "WindowsStandalone";
-            var appFolder = $"{Application.persistentDataPath}/Limapps/{appId}/{platformName}";
-            var assemblyFolder = $"{appFolder}/assemblyFolder";
+        public void Stop()
+        {
+            StartCoroutine((StopRoutine()));
+        }
 
-            var asmPaths = Directory.GetFiles(assemblyFolder);
-            var assemblies = new List<Assembly>();
+        public bool Playing;
 
-            //  When an asset bundle is set, it deserializes correctly using this data?
-            //  ExperienceAppReflectionCache.AssetBundleField.SetValue(null, assetBundle);
+        private void OnExperienceComplete(bool completed)
+        {
+            Stop();   
+        }
 
-            // Geez, ensuring emulator flag is falsed actually start the deserializing process.
-            // App Deserializing doesn't cause GC (at least when there is errors)
-            EnsureEmulatorFlagIsFalse();
+        private IEnumerator StopRoutine()
+        {
+            yield return ExperienceAppPlayer.Unload();
+            Avatar.SetActive(true);
+            SceneContainer.SetActive(true);
+        }
+    }
+}
 
-            foreach (var path in asmPaths)
+
+namespace Limapp.Test
+{
+    public static class CacheUtils
+    {
+        public static Coroutine Clean(int iteration = 4)
+        {
+            return CoroutineService.Instance.StartCoroutine(Routine());
+
+            IEnumerator Routine()
             {
-                var asmBytes = File.ReadAllBytes(path);
-
-                if (asmBytes == null || asmBytes.Length == 0)
-                    Debug.LogError("Assembly has no bytes");
-
-                var asm = Assembly.Load(asmBytes);
-                assemblies.Add(asm);
-
-                // Note: This is required by the app to be able to correctly deserialize some types after being imported.
-                try
+                for (int i = 0; i < iteration; i++)
                 {
-                    SerializationUtils.AddGlobalSerializableTypes(asm);
-                    Debug.Log($"Assembly Loaded {asm}");
-                }
-                catch
-                {
-                    Debug.LogError("Unable to fully load assembly");
+                    Caching.ClearCache();
+                    yield return Resources.UnloadUnusedAssets();
+                    GC.Collect();
+                    yield return new WaitForSeconds(0.2F);
                 }
             }
+        }
+    }
+}
+
+namespace Liminal.Limapp.v2
+{
+    public partial class LimappLoader
+    {
+        public ExperienceApp ExperienceApp;
+
+        public AssetBundle CurrentBundle;
+        public string SceneName;
+        public List<Assembly> Assemblies;
+
+        public IEnumerator Load(int appId)
+        {
+            LogMemory("[Loading]");
+
+            var platformName = Application.isMobilePlatform ? "Android" : "WindowsStandalone";
+            var appFolder = $"/Limapps/{appId}/{platformName}";
+            var assemblyFolder = $"{appFolder}/assemblyFolder";
+            var asmPaths = BetterStreamingAssets.GetFiles(assemblyFolder, "*");
+            var assemblies = new List<Assembly>();
+            Assemblies = assemblies;
+
+            EnsureEmulatorFlagIsFalse();
+            LoadAssemblies();
 
             // See if this even causes memory leak, if yes, it's because of unpacker.
             //new MemoryStream(unpacker.Data.SceneBundle, true)
 
             var bundlePath = $"{appFolder}/appBundle";
+            // Run a preload function
 
-            SceneContainer.SetActive(false);
-
-            using (var fileStream = new FileStream(bundlePath, FileMode.Open, FileAccess.Read))
+            //using (var fileStream = new FileStream(bundlePath, FileMode.Open, FileAccess.Read))
             {
-                var request = AssetBundle.LoadFromStreamAsync(fileStream);
+                //var request = AssetBundle.LoadFromStreamAsync(fileStream);
+                var request = BetterStreamingAssets.LoadAssetBundleAsync(bundlePath);
+
                 yield return new WaitUntil(() => request.isDone);
 
                 var assetBundle = request.assetBundle;
                 var sceneName = assetBundle.GetAllScenePaths()[0];
+                CurrentBundle = assetBundle;
+                SceneName = sceneName;
 
                 var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
                 SceneManager.sceneLoaded += PlayApp;
                 yield return op;
-
-                Debug.Log("App started, waiting...");
-                yield return new WaitForSeconds(30);
-
-                //yield return SceneManager.UnloadSceneAsync(sceneName);
-                //assetBundle.Unload(true);
-
-                yield return PlatformUnload(assemblies, assetBundle, sceneName);
             }
 
-            //yield return CacheUtils.Clean();
-            //yield return Unload();
-
-            Avatar.SetActive(true);
-            SceneContainer.SetActive(true);
-
-            // OR this part! NOPE!
             void PlayApp(Scene scene, LoadSceneMode mode)
             {
-                SceneContainer.gameObject.SetActive(false);
-
                 ExperienceApp = GetExperienceApp();
                 if (ExperienceApp == null)
                 {
@@ -172,51 +203,40 @@ namespace Liminal.Platform.Experimental.App
 
                 SceneManager.sceneLoaded -= PlayApp;
             }
+
+            void LoadAssemblies()
+            {
+                foreach (var path in asmPaths)
+                {
+                    var asmBytes = BetterStreamingAssets.ReadAllBytes(path);
+
+                    if (asmBytes == null || asmBytes.Length == 0)
+                        Debug.LogError("Assembly has no bytes");
+
+                    var asm = Assembly.Load(asmBytes);
+                    assemblies.Add(asm);
+
+                    // Note: This is required by the app to be able to correctly deserialize some types after being imported.
+                    try
+                    {
+                        SerializationUtils.AddGlobalSerializableTypes(asm);
+                        Debug.Log($"Assembly Loaded {asm}");
+                    }
+                    catch
+                    {
+                        Debug.LogError("Unable to fully load assembly");
+                    }
+                }
+            }
         }
-
-        public IEnumerator Unload()
-        {
-            SerializationUtils.ClearGlobalSerializableTypes();
-            yield return Resources.UnloadUnusedAssets();
-            GC.Collect();
-
-            yield return CacheUtils.Clean();
-        }
-
-        public ExperienceApp ExperienceApp;
-
-        private ExperienceApp GetExperienceApp()
-        {
-            var apps = Resources.FindObjectsOfTypeAll<ExperienceApp>();
-            return apps.Length > 0 ? apps[0] : null;
-        }
-
-        private void InitializeApp()
-        {
-            Debug.Log("Initializes app");
-            ExperienceApp.GetComponentInChildren<CompoundScreenFader>(includeInactive: true).enabled = true;
-
-            SceneManager.SetActiveScene(ExperienceApp.gameObject.scene);
-            ExperienceApp.gameObject.SetActive(true);
-
-            //# SUPER IMPORTANT
-            var deviceInitializer = GetComponentInChildren<IVRDeviceInitializer>();
-            var device = deviceInitializer.CreateDevice();
-            VRDevice.Replace(device);
-
-            var method = ExperienceAppReflectionCache.InitializeMethod;
-            CoroutineService.Instance.StartCoroutine((IEnumerator)method.Invoke(ExperienceApp, null));
-        }
-
 
         /// <summary>
         /// Unloads the limapp and clean up to ensure the next app can be run without conflicts.
         /// This also reload the previous scenes before loading a limapp.
         /// </summary>
-        public IEnumerator PlatformUnload(List<Assembly> _assemblies, AssetBundle assetBundle, string sceneName)
+        public IEnumerator Unload()
         {
-            Debug.Log("Begin Unloading...");
-            foreach (var asm in _assemblies)
+            foreach (var asm in Assemblies)
             {
                 var types = asm.GetTypes();
 
@@ -224,10 +244,7 @@ namespace Liminal.Platform.Experimental.App
                     ResetAllStaticsVariables(type);
             }
 
-            Debug.Log("Clear seializable");
             SerializationUtils.ClearGlobalSerializableTypes();
-
-            Debug.Log("Shutting down");
 
             if (ExperienceApp == null)
                 Debug.Log("Experience app is null");
@@ -241,22 +258,34 @@ namespace Liminal.Platform.Experimental.App
                 Debug.LogException(ex);
             }
 
-            yield return SceneManager.UnloadSceneAsync(sceneName);
-            UnloadAssetBundle();
+            ExperienceApp = null;
+            Assemblies = null;
 
+            yield return SceneManager.UnloadSceneAsync(SceneName);
+
+            UnloadAssetBundle();
             ExperienceAppReflectionCache.IsEndingField.SetValue(null, false);
 
             yield return Resources.UnloadUnusedAssets();
-
             GC.Collect();
-
+            
             Debug.Log("Unloaded...");
 
             void UnloadAssetBundle()
             {
-                assetBundle.Unload(unloadAllLoadedObjects: true);
+                CurrentBundle.Unload(unloadAllLoadedObjects: true);
                 ExperienceAppReflectionCache.AssetBundleField.SetValue(null, null);
+                CurrentBundle = null;
             }
+        }
+    }
+
+    public partial class LimappLoader
+    {
+        private void EnsureEmulatorFlagIsFalse()
+        {
+            var isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
+            isEmulator.SetValue(null, false);
         }
 
         public void ResetAllStaticsVariables(Type type)
@@ -296,157 +325,33 @@ namespace Liminal.Platform.Experimental.App
             return null;
         }
 
+        private ExperienceApp GetExperienceApp()
+        {
+            var apps = Resources.FindObjectsOfTypeAll<ExperienceApp>();
+            return apps.Length > 0 ? apps[0] : null;
+        }
 
+        private void InitializeApp()
+        {
+            ExperienceApp.GetComponentInChildren<CompoundScreenFader>(includeInactive: true).enabled = true;
 
+            SceneManager.SetActiveScene(ExperienceApp.gameObject.scene);
+            ExperienceApp.gameObject.SetActive(true);
 
+            //# SUPER IMPORTANT // Oh this replaces the device.... Maybe this is why it worked.
+            // Temporarily commented out.
+            /*var deviceInitializer = GetComponentInChildren<IVRDeviceInitializer>();
+            var device = deviceInitializer.CreateDevice();
+            VRDevice.Replace(device);*/
 
-
-
-
-
-
+            var method = ExperienceAppReflectionCache.InitializeMethod;
+            CoroutineService.Instance.StartCoroutine((IEnumerator)method.Invoke(ExperienceApp, null));
+        }
 
         public static void LogMemory(string s)
         {
             var mem = System.GC.GetTotalMemory(true);
             Debug.Log($"memory {s}: {mem / 1e+6}");
-        }
-
-        private IEnumerator AutoPlay()
-        {
-            for (var i = 0; i < 20; i++)
-            {
-                Playing = false;
-
-                LogMemory("[Loading - Play]");
-                Play();
-
-                yield return new WaitUntil(() => Playing);
-                yield return new WaitForSeconds(15);
-                Stop();
-
-                //  
-            }
-        }
-
-        public void Play()
-        {
-            if(!ExperienceAppPlayer.IsRunning)
-                StartCoroutine(PlayRoutine());
-        }
-
-        public void Stop()
-        {
-            StartCoroutine((StopRoutine()));
-        }
-
-        public bool Playing;
-
-        private IEnumerator PlayRoutine()
-        {
-            if (!UseOriginal)
-                yield break;
-
-            SceneContainer.SetActive(false);
-
-            ResolvePlatformLimapp(out _limappData, out string fileName);
-
-            var experience = new Experience
-            {
-                Id = ExperienceAppUtils.AppIdFromName(fileName),
-                Bytes = _limappData,
-                CompressionType = GetCompressionType(fileName),
-            };
-
-            var loadOp = ExperienceAppPlayer.Load(experience);
-            LoadingBar.Load(loadOp);
-            EnsureEmulatorFlagIsFalse();
-            yield return loadOp.LoadScene();
-            EnsureEmulatorFlagIsFalse();
-
-            LoadingBar.SetActiveState(false);
-
-            ExperienceAppPlayer.Begin();
-
-            ExperienceApp.OnComplete += OnExperienceComplete;
-            ExperienceApp.Initializing += SetScreenfaderActive;
-
-            Playing = true;
-        }
-
-        private ECompressionType GetCompressionType(string fileName)
-        {
-            var compression = ECompressionType.LMZA;
-
-            if (string.IsNullOrEmpty(fileName) || string.IsNullOrWhiteSpace(fileName))
-                return compression;
-            
-            if (Path.GetExtension(fileName).Equals(".ulimapp")) 
-                compression = ECompressionType.Uncompressed;
-
-            return compression;
-        }
-
-        private void SetScreenfaderActive()
-        {
-            var avatar = (VRAvatar)FindObjectOfType(typeof(VRAvatar));
-            avatar.GetComponentInChildren<CompoundScreenFader>().enabled = true;
-        }
-
-        private void OnExperienceComplete(bool completed)
-        {
-            Stop();   
-        }
-
-        private IEnumerator StopRoutine()
-        {
-            yield return ExperienceAppPlayer.Unload();
-            Avatar.SetActive(true);
-            SceneContainer.SetActive(true);
-        }
-
-        private void ResolvePlatformLimapp(out byte[] data, out string fileName, bool forceAndroid = false)
-        {
-            if (Application.platform == RuntimePlatform.Android || forceAndroid)
-            {
-                data = BetterStreamingAssets.ReadAllBytes(PreviewConfig.AndroidAppFullName);
-                fileName = PreviewConfig.AndroidAppFullName;
-            }
-            else
-            {
-                var limappPath = PreviewConfig.EmulatorPath;
-                fileName = Path.GetFileName(limappPath);
-                data = File.ReadAllBytes(limappPath);
-            }
-        }
-
-        private void EnsureEmulatorFlagIsFalse()
-        {
-            var isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
-            isEmulator.SetValue(null, false);
-        }
-    }
-}
-
-
-namespace Limapp.Test
-{
-    public static class CacheUtils
-    {
-        public static Coroutine Clean(int iteration = 4)
-        {
-            return CoroutineService.Instance.StartCoroutine(Routine());
-
-            IEnumerator Routine()
-            {
-                for (int i = 0; i < iteration; i++)
-                {
-                    Caching.ClearCache();
-                    yield return Resources.UnloadUnusedAssets();
-                    GC.Collect();
-                    yield return new WaitForSeconds(0.2F);
-                }
-            }
         }
     }
 }

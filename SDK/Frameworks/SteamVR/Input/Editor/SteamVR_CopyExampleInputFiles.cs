@@ -14,7 +14,7 @@ namespace Valve.VR
         public const string exampleJSONFolderParent = "Input";
         public const string exampleJSONFolderName = "ExampleJSON";
 
-        [UnityEditor.Callbacks.DidReloadScripts]
+        //[UnityEditor.Callbacks.DidReloadScripts]
         private static void OnReloadScripts()
         {
             SteamVR_Input.CheckOldLocation();

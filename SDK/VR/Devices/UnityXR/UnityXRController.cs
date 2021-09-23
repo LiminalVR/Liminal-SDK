@@ -148,6 +148,9 @@ namespace Liminal.SDK.XR
 						case EPressState.Up:
 							PressState = EPressState.None;
 							break;
+						case EPressState.Down:
+                            PressState = EPressState.None;
+							break;
 						default:
 							break;
 					}
@@ -215,6 +218,9 @@ namespace Liminal.SDK.XR
 						case EPressState.Up:
 							PressState = EPressState.None;
 							break;
+                        case EPressState.Down:
+                            PressState = EPressState.None;
+                            break;
 						default:
 							break;
 					}

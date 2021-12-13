@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Reflection;
 using App;
 using Limapp.Test;
@@ -17,6 +18,8 @@ using Liminal.Core.Fader;
 using Liminal.Platform.Experimental.App.BundleLoader.Impl;
 using Liminal.Platform.Experimental.Services;
 using Liminal.SDK.Serialization;
+using SevenZip.Compression.LZMA;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
@@ -60,6 +63,7 @@ namespace Liminal.Platform.Experimental.App
 
         public IEnumerator Test()
         {
+            // Make sure you download
             yield return UnPack();
             SceneManager.LoadScene(0);
         }
@@ -76,6 +80,9 @@ namespace Liminal.Platform.Experimental.App
             _appIndex++;
             if (_appIndex >= AppIds.Count - 1)
                 _appIndex = 0;
+
+
+            yield return DownloadAndExtractExperience(appId);
 
             var platformName = Application.isMobilePlatform ? "Android" : "WindowsStandalone";
             var appFolder = $"{Application.persistentDataPath}/Limapps/{appId}/{platformName}";
@@ -292,16 +299,6 @@ namespace Liminal.Platform.Experimental.App
             return null;
         }
 
-
-
-
-
-
-
-
-
-
-
         public static void LogMemory(string s)
         {
             var mem = System.GC.GetTotalMemory(true);
@@ -421,6 +418,42 @@ namespace Liminal.Platform.Experimental.App
             var isEmulator = typeof(ExperienceApp).GetField("_isEmulator", BindingFlags.Static | BindingFlags.NonPublic);
             isEmulator.SetValue(null, false);
         }
+
+
+
+        public IEnumerator DownloadAndExtractExperience(int id)
+        {
+            var url = $"https://liminal-resources.s3.ap-southeast-2.amazonaws.com/app/Limapp/v2/{id}.zip";
+            yield return DownloadAndExtract(url, id);
+        }
+
+        public IEnumerator DownloadAndExtract(string url, int id)
+        {
+            Debug.Log($"[Downloading] {id}");
+
+            var name = id.ToString();
+            var downloadToPath = $"{Application.persistentDataPath}/Limapps/{name}.zip";
+            var extractToPath = $"{Application.persistentDataPath}/Limapps/{name}";
+            var versionExists = Directory.Exists(extractToPath);
+
+            var www = new UnityWebRequest(url) {method = UnityWebRequest.kHttpVerbGET};
+            var dh = new DownloadHandlerFile(downloadToPath) {removeFileOnAbort = true};
+            www.downloadHandler = dh;
+            yield return www.SendWebRequest();
+            if (www.isNetworkError || www.isHttpError)
+                Debug.Log(www.error);
+            else
+                Debug.Log("Download saved to: " + downloadToPath);
+
+            www.Dispose();
+
+            // Extracting.
+            if (Directory.Exists(extractToPath))
+                Directory.Delete(extractToPath, true);
+
+            ZipFile.ExtractToDirectory(downloadToPath, extractToPath);
+        }
+
     }
 }
 

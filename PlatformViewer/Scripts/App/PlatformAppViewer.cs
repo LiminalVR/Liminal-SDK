@@ -11,6 +11,7 @@ using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.Core.Fader;
+using Newtonsoft.Json;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
@@ -40,6 +41,9 @@ namespace Liminal.Platform.Experimental.App
             VRDevice.Initialize(device);
             VRDevice.Device.SetupAvatar(Avatar);
             BetterStreamingAssets.Initialize();
+
+            var p = JsonConvert.SerializeObject(PreviewConfig);
+            JsonConvert.DeserializeObject(p);
         }
 
         public void Play()
@@ -59,7 +63,7 @@ namespace Liminal.Platform.Experimental.App
 
             ResolvePlatformLimapp(out _limappData, out string fileName);
 
-            var experience = new Experience
+            var experience = new Experiences.Experience
             {
                 Id = ExperienceAppUtils.AppIdFromName(fileName),
                 Bytes = _limappData,

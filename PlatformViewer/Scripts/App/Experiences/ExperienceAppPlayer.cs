@@ -160,7 +160,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             VRDevice.Replace(device);
 
             var method = ExperienceAppReflectionCache.InitializeMethod;
-            yield return (IEnumerator)method.Invoke(CurrentApp, null);
+            yield return method.Invoke(CurrentApp, null);
         }
 
         private IEnumerator UnloadRoutine(bool completed)

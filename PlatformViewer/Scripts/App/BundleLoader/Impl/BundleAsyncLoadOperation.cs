@@ -16,7 +16,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 {
     public class BundleAsyncLoadOperation : BundleAsyncLoadOperationBase
     {
-        private Experience mExperience;
+        private Experiences.Experience mExperience;
         private bool mSceneLoadCompletedHandlerDone;
         private AppPack mAppPack;
         private bool faulted = false;
@@ -66,7 +66,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 
         public bool Faulted() { return faulted; }
 
-        public BundleAsyncLoadOperation(Experience experience) : base(experience)
+        public BundleAsyncLoadOperation(Experiences.Experience experience) : base(experience)
         {
             mExperience = experience ?? throw new ArgumentNullException("experience");
             CoroutineService.Instance.StartCoroutine(DoLoad(experience.Bytes, experience.CompressionType));
@@ -173,7 +173,8 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
             {
                 foreach (var asmBytes in mAppPack.Assemblies)
                 {
-                    yield return LoadAppAssembly(asmBytes);
+                    // IL2CPP doesn't support this.
+                    //yield return LoadAppAssembly(asmBytes);
                     yield return null;
                 }
             }
@@ -188,6 +189,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
                 Debug.Log("[BundleLoader] No assembly included in app.");
                 yield break;
             }
+
 
             // Load the assembly into the current application domain
             var asm = Assembly.Load(bytes);

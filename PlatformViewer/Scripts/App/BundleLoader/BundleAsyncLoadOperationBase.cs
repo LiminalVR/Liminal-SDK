@@ -58,9 +58,9 @@ namespace Liminal.Platform.Experimental.App.BundleLoader
         public abstract float Progress { get; protected set; }
 
         /// <summary>
-        /// Gets the <see cref="Data.Models.Experience"/> data model.
+        /// Gets the <see cref="Experiences.Experience"/> data model.
         /// </summary>
-        public Experience Experience { get; private set; }
+        public Experiences.Experience Experience { get; private set; }
 
         /// <summary>
         /// Contains the <see cref="SDK.Core.ExperienceApp"/> for the loaded app, once the load operation has completed.
@@ -80,7 +80,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader
         /// The scene will not be activated and the operation will not complete
         /// until after ActivateScene() is called.
         /// </summary>
-        public BundleAsyncLoadOperationBase(Experience experience)
+        public BundleAsyncLoadOperationBase(Experiences.Experience experience)
         {
             Experience = experience;
         }

@@ -9,7 +9,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 {
     public class BundleLoader : IBundleLoader
     {
-        public BundleAsyncLoadOperationBase Load(Experience experience)
+        public BundleAsyncLoadOperationBase Load(Experiences.Experience experience)
         {
             return new BundleAsyncLoadOperation(experience);
         }

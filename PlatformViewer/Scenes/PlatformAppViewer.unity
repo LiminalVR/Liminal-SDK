@@ -716,6 +716,10 @@ MonoBehaviour:
   PreviewConfig: {fileID: 11400000, guid: 3a4df585a93abb54287991a55599773e, type: 2}
   LoadingBar: {fileID: 2038825751}
   SceneContainer: {fileID: 7260775234727785935}
+  UseOriginal: 0
+  AppIds: 03000000590000005700000076000000
+  ExperienceApp: {fileID: 0}
+  Playing: 0
 --- !u!1 &3473043119503296452
 GameObject:
   m_ObjectHideFlags: 0

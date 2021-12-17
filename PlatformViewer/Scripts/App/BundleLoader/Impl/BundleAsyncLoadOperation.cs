@@ -168,6 +168,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
         {
             SetState(State.LoadingAssemblies);
 
+            Debug.Log("Trying to load assemblies.");
             // Load assemblies
             if (mAppPack.Assemblies != null)
             {

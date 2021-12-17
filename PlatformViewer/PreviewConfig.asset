@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4a3c01ccdeb50541b24baa71f9ecfbd, type: 3}
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
-  EmulatorPath: D:/Unity/LiminalSdk-2019.1-Develop/Liminal-SDK-Unity-Package/Assets
+  EmulatorPath: D:/Unity/LiminalSdk-2019.1-Develop/Liminal-SDK-Unity-Package/Assets/_Builds/Ion-Emulator.limapp
   AndroidPath: D:/Unity/LiminalSdk-2019.1-Develop/Liminal-SDK-Unity-Package/Assets/StreamingAssets/Ion-GearVr.limapp
   AndroidAppFullName: Ion-GearVr.limapp

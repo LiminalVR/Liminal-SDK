@@ -59,10 +59,14 @@ namespace Liminal.Platform.Experimental.App.Experiences
             if (_loadOperation.IsDone)
             {
                 CurrentApp = _loadOperation.ExperienceApp;
+                Debug.Log($"[Experience App Player] - CurrentApp: {CurrentApp != null}");
 
                 try
                 {
+                    Debug.Log("[Experience App Player] - Initializing");
                     InitializeApp();
+                    Debug.Log("[Experience App Player] - Initialized");
+
                 }
                 catch (Exception ex)
                 {
@@ -142,25 +146,36 @@ namespace Liminal.Platform.Experimental.App.Experiences
                 Debug.Log($"Could not activate pointer {e}");
             }
 
+
             return StartCoroutine(_InitializeApp());
         }
 
         private IEnumerator _InitializeApp()
         {
+            Debug.Log("[_IntializeApp] - GC");
             yield return Resources.UnloadUnusedAssets();
             GC.Collect();
 
             yield return null;
 
+            Debug.Log($"[_IntializeApp] - Current App is: {CurrentApp != null}");
+            yield return new WaitUntil(() => CurrentApp != null);
+
             SceneManager.SetActiveScene(CurrentApp.gameObject.scene);
+
+            Debug.Log("[_IntializeApp] - Turn on App");
             CurrentApp.gameObject.SetActive(true);
 
+            Debug.Log("[_IntializeApp] - Create Device");
             //# SUPER IMPORTANT
             var device = DeviceUtils.CreateDevice(CurrentApp);
             VRDevice.Replace(device);
 
-            var method = ExperienceAppReflectionCache.InitializeMethod;
-            yield return method.Invoke(CurrentApp, null);
+            Debug.Log("[_IntializeApp] - Call Initialize");
+            yield return CurrentApp.InitializePublic();
+
+            //var method = ExperienceAppReflectionCache.InitializeMethod;
+            //yield return (IEnumerator)method.Invoke(CurrentApp, null);
         }
 
         private IEnumerator UnloadRoutine(bool completed)

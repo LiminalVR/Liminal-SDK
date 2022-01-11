@@ -717,7 +717,8 @@ MonoBehaviour:
   LoadingBar: {fileID: 2038825751}
   SceneContainer: {fileID: 7260775234727785935}
   UseOriginal: 0
-  AppIds: 03000000590000005700000076000000
+  AppIds: 02000000
+  PerformDownload: 0
   ExperienceApp: {fileID: 0}
   Playing: 0
 --- !u!1 &3473043119503296452
@@ -732,6 +733,7 @@ GameObject:
   - component: {fileID: 3473043119503296451}
   - component: {fileID: 3473043119503296449}
   - component: {fileID: 3473043119503296453}
+  - component: {fileID: 3473043119503296454}
   m_Layer: 0
   m_Name: '[PlatformAppViewer]'
   m_TagString: Untagged
@@ -753,6 +755,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BuildType: 2
   EditorType: 1
+--- !u!114 &3473043119503296454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3473043119503296452}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 837620836, guid: 194c71307c0c31d4db3aa8493394d6c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &3934831371284879100
 RectTransform:
   m_ObjectHideFlags: 0

@@ -53,6 +53,8 @@ namespace Liminal.Platform.Experimental.App
             VRDevice.Device.SetupAvatar(Avatar);
             BetterStreamingAssets.Initialize();
 
+            //return;
+
             if(UseOriginal)
                 StartCoroutine(AutoPlay());
             else
@@ -71,6 +73,8 @@ namespace Liminal.Platform.Experimental.App
         public List<int> AppIds;
         public static int _appIndex = 0;
 
+        public bool PerformDownload;
+
         public IEnumerator UnPack()
         {
             LogMemory("[Loading]");
@@ -81,8 +85,8 @@ namespace Liminal.Platform.Experimental.App
             if (_appIndex >= AppIds.Count - 1)
                 _appIndex = 0;
 
-
-            yield return DownloadAndExtractExperience(appId);
+            if(PerformDownload)
+                yield return DownloadAndExtractExperience(appId);
 
             var platformName = Application.isMobilePlatform ? "Android" : "WindowsStandalone";
             var appFolder = $"{Application.persistentDataPath}/Limapps/{appId}/{platformName}";
@@ -98,7 +102,7 @@ namespace Liminal.Platform.Experimental.App
             // App Deserializing doesn't cause GC (at least when there is errors)
             EnsureEmulatorFlagIsFalse();
 
-            foreach (var path in asmPaths)
+            /*foreach (var path in asmPaths)
             {
                 var asmBytes = File.ReadAllBytes(path);
 
@@ -111,14 +115,15 @@ namespace Liminal.Platform.Experimental.App
                 // Note: This is required by the app to be able to correctly deserialize some types after being imported.
                 try
                 {
-                    SerializationUtils.AddGlobalSerializableTypes(asm);
+                    SerializationUtils.+
+            36.2(asm);
                     Debug.Log($"Assembly Loaded {asm}");
                 }
                 catch
                 {
                     Debug.LogError("Unable to fully load assembly");
                 }
-            }
+            }*/
 
             // See if this even causes memory leak, if yes, it's because of unpacker.
             //new MemoryStream(unpacker.Data.SceneBundle, true)

@@ -12,8 +12,8 @@ namespace Liminal.SDK.VR
     [AddComponentMenu("VR/Emulator Setup")]
     public class VREmulator : MonoBehaviour, IVRDeviceInitializer
     {
-        public ESDKType BuildType;
-        public ESDKType EditorType;
+        public ESDKType BuildType = ESDKType.OVR;
+        public ESDKType EditorType = ESDKType.Emulator;
 
         /// <summary>
         /// Creates a new <see cref="IVRDevice"/> and returns it.

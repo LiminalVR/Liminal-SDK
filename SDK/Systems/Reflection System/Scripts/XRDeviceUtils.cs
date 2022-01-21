@@ -64,7 +64,14 @@ namespace Liminal.Systems
 
         public static bool SupportsPlanarReflection()
         {
-            return PlanarReflectionSupported.Contains(GetDeviceModelType());
+            var model = GetDeviceModelType();
+
+#if UNITY_STANDALONE
+            if (model == EDeviceModelType.Quest || model == EDeviceModelType.Quest2)
+                return false;
+#endif
+
+            return PlanarReflectionSupported.Contains(model);
         }
     }
 }

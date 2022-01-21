@@ -243,7 +243,9 @@
                     // Fade reflection over distance
                     fixed2 delta = _WorldSpaceCameraPos.xz - i.worldPos.xz;
                     fixed dist = length(fixed2(delta.x * _FadeScaleX, delta.y));
-                    refl *= saturate(pow(dist / _FadeDistance, 4));
+                    
+                    //refl *= saturate(pow(dist / _FadeDistance, 4));
+                    
                     refl = saturate(refl - Luminance(main) / 6);
 
                     fixed4 col = saturate(main + refl);

@@ -17,7 +17,13 @@ namespace App
 #if UNITY_XR
             return CreateDevice(ESDKType.UnityXR);
 #else
-            return CreateDevice(Application.platform == RuntimePlatform.Android ? ESDKType.OVR : ESDKType.OpenVR);
+            var sdkType = Application.platform == RuntimePlatform.Android ? ESDKType.OVR : ESDKType.OpenVR;
+            if (Application.isEditor)
+                sdkType = ESDKType.Emulator;
+            else
+                sdkType = ESDKType.OVR;
+
+            return CreateDevice(sdkType);
 #endif
         }
 

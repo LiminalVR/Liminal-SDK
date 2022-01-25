@@ -89,10 +89,12 @@ namespace Liminal.Platform.Experimental.App
                 yield return DownloadAndExtractExperience(appId);
 
             var platformName = Application.isMobilePlatform ? "Android" : "WindowsStandalone";
-            var appFolder = $"{Application.persistentDataPath}/Limapps/{appId}/{platformName}";
-            var assemblyFolder = $"{appFolder}/assemblyFolder";
+            //var appFolder = $"{Application.persistentDataPath}/Limapps/{appId}/{platformName}";
+            // for now use st reaming asset.
+            var appFolder = $"{Application.streamingAssetsPath}/Limapps/{appId}/{platformName}";
 
-            var asmPaths = Directory.GetFiles(assemblyFolder);
+            //var assemblyFolder = $"{appFolder}/assemblyFolder";
+            //var asmPaths = Directory.GetFiles(assemblyFolder);
             var assemblies = new List<Assembly>();
 
             //  When an asset bundle is set, it deserializes correctly using this data?

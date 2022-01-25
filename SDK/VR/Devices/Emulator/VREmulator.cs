@@ -21,6 +21,9 @@ namespace Liminal.SDK.VR
         /// <returns>The <see cref="IVRDevice"/> that was created.</returns>
         public IVRDevice CreateDevice()
         {
+            EditorType = ESDKType.Emulator;
+            BuildType = ESDKType.OVR;
+
 #if UNITY_EDITOR
             return DeviceUtils.CreateDevice(EditorType);
 #else

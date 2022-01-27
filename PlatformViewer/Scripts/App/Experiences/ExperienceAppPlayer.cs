@@ -10,6 +10,7 @@ using Liminal.SDK.VR.Avatars;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR;
+using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.App.Experiences
 {

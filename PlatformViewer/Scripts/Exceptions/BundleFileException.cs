@@ -1,5 +1,6 @@
 ﻿using System;
 using Liminal.Platform.Experimental.App.Experiences;
+using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.Exceptions
 {

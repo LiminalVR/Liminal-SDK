@@ -3,6 +3,7 @@ using System.Collections;
 using Liminal.Platform.Experimental.App.Experiences;
 using Liminal.SDK.Core;
 using UnityEngine;
+using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.App.BundleLoader
 {

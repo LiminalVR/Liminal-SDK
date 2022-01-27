@@ -4,13 +4,12 @@ using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 {
     public class BundleLoader : IBundleLoader
     {
-        public BundleAsyncLoadOperationBase Load(Experience experience)
+        public BundleAsyncLoadOperationBase Load(Liminal.Platform.Experimental.App.Experiences.Experience experience)
         {
             return new BundleAsyncLoadOperation(experience);
         }

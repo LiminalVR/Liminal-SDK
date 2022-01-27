@@ -10,7 +10,6 @@ using Liminal.SDK.VR.Avatars;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.XR;
-using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.App.Experiences
 {
@@ -19,7 +18,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
     /// </summary>
     public class ExperienceAppPlayer : MonoBehaviour
     {
-        public event Action<Experience, ExperienceApp> ExperienceAppLoaded;
+        public event Action<Liminal.Platform.Experimental.App.Experiences.Experience, ExperienceApp> ExperienceAppLoaded;
         public event Action<bool> ExperienceAppUnloaded;
         public event Action<bool> ExperienceAppEnded;
 
@@ -41,7 +40,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
         /// </summary>
         /// <param name="experience"></param>
         /// <returns></returns>
-        public BundleAsyncLoadOperationBase Load(Experience experience)
+        public BundleAsyncLoadOperationBase Load(Liminal.Platform.Experimental.App.Experiences.Experience experience)
         {
             Setup();
 

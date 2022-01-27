@@ -11,13 +11,12 @@ using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 {
     public class BundleAsyncLoadOperation : BundleAsyncLoadOperationBase
     {
-        private Experience mExperience;
+        private Liminal.Platform.Experimental.App.Experiences.Experience mExperience;
         private bool mSceneLoadCompletedHandlerDone;
         private AppPack mAppPack;
         private bool faulted = false;
@@ -67,7 +66,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 
         public bool Faulted() { return faulted; }
 
-        public BundleAsyncLoadOperation(Experience experience) : base(experience)
+        public BundleAsyncLoadOperation(Liminal.Platform.Experimental.App.Experiences.Experience experience) : base(experience)
         {
             mExperience = experience ?? throw new ArgumentNullException("experience");
             CoroutineService.Instance.StartCoroutine(DoLoad(experience.Bytes, experience.CompressionType));

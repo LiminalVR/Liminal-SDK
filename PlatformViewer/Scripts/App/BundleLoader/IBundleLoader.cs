@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using Liminal.Platform.Experimental.App.Experiences;
 using Liminal.SDK.Core;
-using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.App.BundleLoader
 {
@@ -12,7 +11,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader
         /// </summary>
         /// <param name="experience">The <see cref="Experience"/> to load.</param>
         /// <returns>An <see cref="BundleAsyncLoadOperationBase"/>.</returns>
-        BundleAsyncLoadOperationBase Load(Experience experience);
+        BundleAsyncLoadOperationBase Load(Liminal.Platform.Experimental.App.Experiences.Experience experience);
 
         /// <summary>
         /// Unloads an <see cref="ExperienceApp"/>.

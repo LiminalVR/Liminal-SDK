@@ -11,6 +11,7 @@ using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.Core.Fader;
+using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App

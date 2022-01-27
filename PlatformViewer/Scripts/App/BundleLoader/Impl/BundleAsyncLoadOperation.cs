@@ -11,13 +11,12 @@ using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 {
     public class BundleAsyncLoadOperation : BundleAsyncLoadOperationBase
     {
-        private Experiences.Experience mExperience;
+        private Liminal.Platform.Experimental.App.Experiences.Experience mExperience;
         private bool mSceneLoadCompletedHandlerDone;
         private AppPack mAppPack;
         private bool faulted = false;
@@ -67,7 +66,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
 
         public bool Faulted() { return faulted; }
 
-        public BundleAsyncLoadOperation(Experiences.Experience experience) : base(experience)
+        public BundleAsyncLoadOperation(Liminal.Platform.Experimental.App.Experiences.Experience experience) : base(experience)
         {
             mExperience = experience ?? throw new ArgumentNullException("experience");
             CoroutineService.Instance.StartCoroutine(DoLoad(experience.Bytes, experience.CompressionType));
@@ -169,14 +168,12 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
         {
             SetState(State.LoadingAssemblies);
 
-            Debug.Log("Trying to load assemblies.");
             // Load assemblies
             if (mAppPack.Assemblies != null)
             {
                 foreach (var asmBytes in mAppPack.Assemblies)
                 {
-                    // IL2CPP doesn't support this.
-                    //yield return LoadAppAssembly(asmBytes);
+                    yield return LoadAppAssembly(asmBytes);
                     yield return null;
                 }
             }
@@ -191,7 +188,6 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
                 Debug.Log("[BundleLoader] No assembly included in app.");
                 yield break;
             }
-
 
             // Load the assembly into the current application domain
             var asm = Assembly.Load(bytes);

@@ -11,7 +11,6 @@ using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.Core.Fader;
-using Experience = Liminal.Platform.Experimental.App.Experiences.Experience;
 
 // TODO Rename the namespace and class name. The world Platform shouldn't be in either.
 namespace Liminal.Platform.Experimental.App
@@ -60,7 +59,7 @@ namespace Liminal.Platform.Experimental.App
 
             ResolvePlatformLimapp(out _limappData, out string fileName);
 
-            var experience = new Experience
+            var experience = new Liminal.Platform.Experimental.App.Experiences.Experience
             {
                 Id = ExperienceAppUtils.AppIdFromName(fileName),
                 Bytes = _limappData,

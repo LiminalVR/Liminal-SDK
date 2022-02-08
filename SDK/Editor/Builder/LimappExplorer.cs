@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using Experimental;
 using Liminal.SDK.Serialization;
 using Newtonsoft.Json;
@@ -39,6 +40,26 @@ namespace Liminal.SDK.Build
             if (GUILayout.Button("Download All"))
             {
                 EditorCoroutineUtility.StartCoroutineOwnerless(DownloadAll());
+            }
+
+            if (GUILayout.Button("Move Dll and Rename"))
+            {
+                var path = "C:\\Users\\ticoc\\Documents\\Liminal\\Server-v2\\Android\\Android";
+                var newPath = "C:\\Users\\ticoc\\Documents\\Liminal\\Server-v2\\Android\\Assemblies";
+                path = newPath;
+
+                var stringBuilder = new StringBuilder();
+
+                var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+                foreach (var file in files)
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(file);
+                    if (file.Contains("App000"))
+                    {
+                        stringBuilder.AppendLine($"<assembly fullname=\"{fileName}\" preserve=\"all\"/>");
+                    }
+                }
+                Debug.Log(stringBuilder.ToString());
             }
 
             IEnumerator DownloadAll()

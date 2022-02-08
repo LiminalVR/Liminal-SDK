@@ -59,7 +59,7 @@ namespace Liminal.Platform.Experimental.App
 
             ResolvePlatformLimapp(out _limappData, out string fileName);
 
-            var experience = new Experience
+            var experience = new Liminal.Platform.Experimental.App.Experiences.Experience
             {
                 Id = ExperienceAppUtils.AppIdFromName(fileName),
                 Bytes = _limappData,

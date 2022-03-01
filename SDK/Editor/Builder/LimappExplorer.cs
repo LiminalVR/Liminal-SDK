@@ -46,11 +46,22 @@ namespace Liminal.SDK.Build
             {
                 var path = "C:\\Users\\ticoc\\Documents\\Liminal\\Server-v2\\Android\\Android";
                 var newPath = "C:\\Users\\ticoc\\Documents\\Liminal\\Server-v2\\Android\\Assemblies";
-                path = newPath;
+                //path = newPath;
 
                 var stringBuilder = new StringBuilder();
-
                 var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+
+                foreach (var file in files)
+                {
+                    var fileName = Path.GetFileNameWithoutExtension(file);
+                    if (file.Contains("App000"))
+                    {
+                        var splitFileNames = fileName.Split(',');
+                        var newFileName = $"{newPath}/{splitFileNames[0]}.dll";
+                        File.Copy(file, newFileName);
+                    }
+                }
+
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileNameWithoutExtension(file);

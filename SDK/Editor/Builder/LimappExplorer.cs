@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,24 +13,56 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Networking;
+using Debug = UnityEngine.Debug;
 
 namespace Liminal.SDK.Build
 {
     public class LimappExplorer : BaseWindowDrawer
     {
-        public static string OutputDirectory = "C:/Users/ticoc/Documents/Liminal/Limapps-new-output/Standalone";
         public static string InputDirectory = "C:/Users/ticoc/Documents/Liminal/Limapps/Standalone";
+        public static string OutputDirectory = "C:/Users/ticoc/Documents/Liminal/Limapps-new-output/Standalone";
 
         public static HashSet<int> ProcessedFile = new HashSet<int>();
         public static bool IsAndroid = false;
         public static string PlatformName => IsAndroid ? "Android" : "Standalone";
 
+        public override void OnEnabled()
+        {
+            if(EditorPrefs.HasKey("limappInputDirectory"))
+                InputDirectory = EditorPrefs.GetString("limappInputDirectory");
+
+            if (EditorPrefs.HasKey("limappOutputDdirectory"))
+                OutputDirectory = EditorPrefs.GetString("limappOutputDdirectory");
+
+            base.OnEnabled();
+        }
+
         public override void Draw(BuildWindowConfig config)
         {
-            DrawDirectorySelection(ref OutputDirectory, "Output Directory");
-            DrawDirectorySelection(ref InputDirectory, "Input Directory");
+            EditorGUIHelper.DrawTitle("Migration Window");
 
-            if (GUILayout.Button("Extract"))
+            EditorGUILayout.LabelField("The migration window lets you convert limapp v1 to limapp v2. This is only necessary for Quest.");
+            EditorGUILayout.LabelField("This process will extract .limapp into raw data and put it into a folder and then zip it.");
+            EditorGUILayout.LabelField("The DLL need to be copied into the Platform project and added to the link.xml");
+
+            GUILayout.Space(20);
+
+            EditorGUILayout.LabelField("Select limapp folder");
+            DrawDirectorySelection(ref InputDirectory, "Input Directory");
+            DrawDirectorySelection(ref OutputDirectory, "Output Directory");
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Save Paths", GUILayout.Width(110)))
+            {
+                EditorPrefs.SetString("limappInputDirectory", InputDirectory);
+                EditorPrefs.SetString("limappOutputDdirectory", OutputDirectory);
+            }
+            GUILayout.Space(20);
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("Convert"))
             {
                 ProcessedFile.Clear();
 
@@ -37,29 +70,38 @@ namespace Liminal.SDK.Build
                 EditorCoroutineUtility.StartCoroutineOwnerless(ExtractAll(limapps));
             }
 
-            if (GUILayout.Button("Download All"))
-            {
-                EditorCoroutineUtility.StartCoroutineOwnerless(DownloadAll());
-            }
 
-            if (GUILayout.Button("Move Dll and Rename"))
+            //  path = Android folder?
+            void RenameDLL(string path)
             {
-                var path = "C:\\Users\\ticoc\\Documents\\Liminal\\Server-v2\\Android\\Android";
-                var newPath = "C:\\Users\\ticoc\\Documents\\Liminal\\Server-v2\\Android\\Assemblies";
-                path = newPath;
-
                 var stringBuilder = new StringBuilder();
 
                 var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
                 foreach (var file in files)
                 {
                     var fileName = Path.GetFileNameWithoutExtension(file);
-                    if (file.Contains("App000"))
+                    if (file.Contains("App000") && file.Contains(","))
                     {
                         stringBuilder.AppendLine($"<assembly fullname=\"{fileName}\" preserve=\"all\"/>");
+
+                        var fileNames = file.Split(',');
+                        var fileNameWithoutAssembly = fileNames[0];
+                        var newFileName = Path.GetFileName(fileNameWithoutAssembly);
+                        var newFullPath = $"{path}/{newFileName}.dll";
+
+                        if (File.Exists(newFullPath))
+                        {
+                            Debug.Log($"{newFullPath} exists so it has been deleted.");
+                            File.Delete(newFullPath);
+                        }
+
+                        File.Copy(file, newFullPath);
+
+                        Debug.Log($"Success! Add to link.xml: \n {stringBuilder.ToString()}");
+
+                        Process.Start(OutputDirectory);
                     }
                 }
-                Debug.Log(stringBuilder.ToString());
             }
 
             IEnumerator DownloadAll()
@@ -118,6 +160,9 @@ namespace Liminal.SDK.Build
                     var bytes = File.ReadAllBytes(limappPath);
                     yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExtractPack(bytes, limappPath));
                 }
+
+                yield return new EditorWaitForSeconds(1);
+                RenameDLL(OutputDirectory);
 
                 EditorUtility.ClearProgressBar();
             }

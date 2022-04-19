@@ -6,7 +6,7 @@
     Issues,
     Preview,
     Settings,
-    Explorer
+    Migration
 }
 
 

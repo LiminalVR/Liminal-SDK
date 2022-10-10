@@ -39,30 +39,6 @@ namespace Liminal.SDK.Build
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Liminal/Use Legacy SDK")]
-        public static void UseLegacy()
-        {
-            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithoutXR);
-            AssetDatabase.Refresh();
-
-            PlayerSettings.virtualRealitySupported = true;
-            PlayerSettings.SetVirtualRealitySDKs(BuildTargetGroup.Android, new string[] { "Oculus" });
-
-            var currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
-            currentSymbols = currentSymbols.Replace("UNITY_XR", "");
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, $"{currentSymbols}");
-        }
-
-        [MenuItem("Liminal/Use Unity XR")]
-        public static void UseUnityXR()
-        {
-            PlayerSettings.virtualRealitySupported = false;
-            
-            File.WriteAllText(UnityPackageManagerUtils.ManifestPath, UnityPackageManagerUtils.ManifestWithXR);
-            AssetDatabase.Refresh();
-            var currentSymbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android);
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, $"{currentSymbols};UNITY_XR");
-        }
 
         private void OnEnable()
         {

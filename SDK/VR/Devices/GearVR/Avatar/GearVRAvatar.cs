@@ -260,7 +260,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
             // Assign the correct controller based on the limb type the controller is attached to
             OVRInput.Controller controllerType = GetControllerTypeForLimb(limb);
             trackedRemote.m_controller = controllerType;
-            trackedRemote.m_modelGearVrController.SetActive(true);
+            //trackedRemote.m_modelGearVrController.SetActive(true);
 
             // Activate the controller
             // TODO Do we need to set active here? 
@@ -303,7 +303,7 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
 
             var ovrController = instance.GetComponent<OVRControllerHelper>();
             ovrController.m_controller = GetControllerTypeForLimb(limb);
-            ovrController.m_modelGearVrController.SetActive(true);
+            //ovrController.m_modelGearVrController.SetActive(true);
             ovrController.enabled = false;
 
             instance.gameObject.SetActive(true);
@@ -382,12 +382,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             if (mAvatar != null)
             {
-                if (OVRUtils.IsGearVRHeadset())
-                {
-                    if (OVRInput.GetActiveController() == OVRInput.Controller.Touchpad)
-                        active = false;
-                }
-
                 mAvatar.SetHandsActive(active);
             }
         }
@@ -408,12 +402,6 @@ namespace Liminal.SDK.VR.Devices.GearVR.Avatar
         {
             if (mSettings != null && mSettings.HmdRecenterPolicy != HmdRecenterPolicy.OnControllerRecenter)
                 return;
-
-            if (OVRInput.GetControllerWasRecentered())
-            {
-                // Recenter the camera when the user recenters the controller
-                UnityEngine.XR.InputTracking.Recenter();
-            }
         }
 
         private OVRInput.Controller GetControllerTypeForLimb(IVRAvatarLimb limb)

@@ -169,30 +169,6 @@ namespace Liminal.SDK.VR.Devices.GearVR
             }
             #endregion            
 
-            #region Headset (Swipe-pad)
-
-            if (Headset is GearVRHeadset)
-            {
-                var gearVRHeadset = Headset as GearVRHeadset;
-
-                if ((ctrlMask & OVRInput.Controller.Touchpad) != 0)
-                {
-                    if (!mHeadsetInputConnected)
-                    {
-                        connectedList.Add(gearVRHeadset);
-                        mHeadsetInputConnected = true;
-                    }
-
-                    allControllers.Add(gearVRHeadset);
-                }
-                else if (Headset != null)
-                {
-                    disconnectedList.Add(gearVRHeadset);
-                    mHeadsetInputConnected = false;
-                }
-            }
-            #endregion
-
             // Update internal state
             mInputDevices = allControllers.ToArray();
             mConnectedControllerMask = ctrlMask;
@@ -293,16 +269,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
             // TODO Introduce ActiveInputDevice, presently PrimaryInputDevice is treated as Active and it should be Left or Right, not Primary or Secondary.
             if (hasController)
             {
-                if (OVRUtils.IsOculusQuest)
-                {
-                    PrimaryInputDevice = mPrimaryController;
-                    SecondaryInputDevice = mSecondaryController;
-                }
-                else
-                {
-                    PrimaryInputDevice = OVRInput.GetActiveController() == OVRInput.Controller.RTrackedRemote ? mPrimaryController : mSecondaryController;
-                    SecondaryInputDevice = Headset as GearVRInputDevice;
-                }
+                PrimaryInputDevice = mPrimaryController;
+                SecondaryInputDevice = mSecondaryController;
             }
             else
             {

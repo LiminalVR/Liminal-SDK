@@ -10,7 +10,7 @@
 
         private void Awake()
         {
-            Debug.Log($"Known Device Name: {XRDeviceUtils.GetDeviceModelType()} - Actual Device Model: {XRDevice.model}");
+            Debug.Log($"Known Device Name: {XRDeviceUtils.GetDeviceModelType()} - Actual Device Model: {SystemInfo.deviceModel}");
 
             if (XRDeviceUtils.SupportsPlanarReflection())
             {

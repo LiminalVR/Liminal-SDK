@@ -1,4 +1,5 @@
-﻿using Liminal.SDK.VR.Avatars;
+﻿using System;
+using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
 
 /// <summary>
@@ -7,7 +8,9 @@ using Liminal.SDK.VR.Input;
 public static class OVRUtils
 {
     public static bool IsOculusQuest => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Quest;
-    public static bool IsOculusGo => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.Oculus_Go;
+
+    [Obsolete("Oculus go no longer supported by OVR")]
+    public static bool IsOculusGo => OVRPlugin.GetSystemHeadsetType() == OVRPlugin.SystemHeadset.None;
 
     /// <summary>
     /// When both controllers are connected, Controller.Touch is used.
@@ -18,21 +21,10 @@ public static class OVRUtils
            OVRInput.IsControllerConnected(OVRInput.Controller.RTouch) ||
            OVRInput.IsControllerConnected(OVRInput.Controller.LTouch);
 
+    [Obsolete("Oculus go no longer supported by OVR")]
     public static bool IsGearVRHeadset()
     {
-        OVRPlugin.SystemHeadset headsetType = OVRPlugin.GetSystemHeadsetType();
-        switch (headsetType)
-        {
-            case OVRPlugin.SystemHeadset.GearVR_R320:
-            case OVRPlugin.SystemHeadset.GearVR_R321:
-            case OVRPlugin.SystemHeadset.GearVR_R322:
-            case OVRPlugin.SystemHeadset.GearVR_R323:
-            case OVRPlugin.SystemHeadset.GearVR_R324:
-            case OVRPlugin.SystemHeadset.GearVR_R325:
-                return true;
-            default:
-                return false;
-        }
+        return false; 
     }
 
     public static bool IsRift()
@@ -67,9 +59,9 @@ public static class OVRUtils
         switch (limbType)
         {
             case VRAvatarLimbType.LeftHand:
-                return IsOculusQuest ? OVRInput.Controller.LTouch : OVRInput.Controller.LTrackedRemote;
+                return OVRInput.Controller.LTouch;
             case VRAvatarLimbType.RightHand:
-                return IsOculusQuest ? OVRInput.Controller.RTouch : OVRInput.Controller.RTrackedRemote;
+                return OVRInput.Controller.RTouch;
             default:
                 return OVRInput.Controller.None;
         }
@@ -85,9 +77,9 @@ public static class OVRUtils
         switch (hand)
         {
             case VRInputDeviceHand.Left:
-                return IsOculusQuest ? OVRInput.Controller.LTouch : OVRInput.Controller.LTrackedRemote;
+                return OVRInput.Controller.LTouch;
             case VRInputDeviceHand.Right:
-                return IsOculusQuest ? OVRInput.Controller.RTouch : OVRInput.Controller.RTrackedRemote;
+                return OVRInput.Controller.RTouch;
             default:
                 return OVRInput.Controller.None;
         }

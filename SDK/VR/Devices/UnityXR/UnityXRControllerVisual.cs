@@ -57,9 +57,9 @@ namespace Liminal.SDK.XR
 			OVRPlugin.SystemHeadset headset = OVRPlugin.GetSystemHeadsetType();
 			switch (headset)
 			{
-				case OVRPlugin.SystemHeadset.Oculus_Go:
+				/*case OVRPlugin.SystemHeadset.Oculus_Go:
 					activeControllerType = ControllerType.Go;
-					break;
+					break;*/
 				case OVRPlugin.SystemHeadset.Oculus_Quest:
 					activeControllerType = ControllerType.QuestAndRiftS;
 					break;
@@ -69,14 +69,14 @@ namespace Liminal.SDK.XR
 				case OVRPlugin.SystemHeadset.Rift_S:
 					activeControllerType = ControllerType.QuestAndRiftS;
 					break;
-				case OVRPlugin.SystemHeadset.GearVR_R320:
+				/*case OVRPlugin.SystemHeadset.GearVR_R320:
 				case OVRPlugin.SystemHeadset.GearVR_R321:
 				case OVRPlugin.SystemHeadset.GearVR_R322:
 				case OVRPlugin.SystemHeadset.GearVR_R323:
 				case OVRPlugin.SystemHeadset.GearVR_R324:
 				case OVRPlugin.SystemHeadset.GearVR_R325:
 					activeControllerType = ControllerType.GearVR;
-					break;
+					break;*/
 				default:
 #if UNITY_EDITOR || !UNITY_ANDROID
 					activeControllerType = ControllerType.Rift;
@@ -87,28 +87,15 @@ namespace Liminal.SDK.XR
 			}
 
 			Debug.LogFormat("OVRControllerHelp: Active controller type: {0} for product {1}", activeControllerType, OVRPlugin.productName);
-			if ((activeControllerType != ControllerType.GearVR) && (activeControllerType != ControllerType.Go))
-			{
-				if (m_controller == OVRInput.Controller.LTrackedRemote)
-				{
-					m_controller = OVRInput.Controller.LTouch;
-				}
-				else if (m_controller == OVRInput.Controller.RTrackedRemote)
-				{
-					m_controller = OVRInput.Controller.RTouch;
-				}
-			}
-			else
-			{
-				if (m_controller == OVRInput.Controller.LTouch)
-				{
-					m_controller = OVRInput.Controller.LTrackedRemote;
-				}
-				else if (m_controller == OVRInput.Controller.RTouch)
-				{
-					m_controller = OVRInput.Controller.RTrackedRemote;
-				}
-			}
+
+            if (m_controller == OVRInput.Controller.LTouch)
+            {
+                m_controller = OVRInput.Controller.LTouch;
+            }
+            else if (m_controller == OVRInput.Controller.RTouch)
+            {
+                m_controller = OVRInput.Controller.RTouch;
+            }
 		}
 
 		void Update()

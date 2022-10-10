@@ -40,7 +40,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
         #endregion
 
-        public GearVRHeadset() : base(OVRInput.Controller.Touchpad)
+        public GearVRHeadset() : base(OVRInput.Controller.Touch)
         {
         }
 

@@ -21,7 +21,8 @@ namespace Liminal.Systems
 
         public static EDeviceModelType GetDeviceModelType()
         {
-            var model = XRDevice.model;
+            var model = SystemInfo.deviceModel;
+            Debug.Log($"[XRDeviceUtils] - We've changed XRDdevice.model to SystemInfo.deviceModel, let's make sure this works. The model is {model}");
             var type = EDeviceModelType.Unknown;
             model = model.ToLower();
 

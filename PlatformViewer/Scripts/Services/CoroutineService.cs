@@ -34,6 +34,7 @@ namespace Liminal.Platform.Experimental.Services
                 if (_instance == null)
                 {
                     _instance = new GameObject("[CoroutineService]").AddComponent<CoroutineService>();
+                    GameObject.DontDestroyOnLoad(_instance.gameObject);
                 }
 
                 return _instance;

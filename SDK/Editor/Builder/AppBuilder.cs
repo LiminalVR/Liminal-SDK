@@ -31,6 +31,37 @@ namespace Liminal.SDK.Editor.Build
 
         #region Public Interface
 
+        [MenuItem("AssemblyBuilder Example/Build Assembly Sync")]
+        public static void BuildAssemblySync()
+        {
+            var buildInfo = new AppBuildInfo()
+            {
+                Scene = SceneManager.GetActiveScene(),
+                BuildTarget = BuildTarget.StandaloneWindows,
+                BuildTargetDevice = AppBuildInfo.BuildTargetDevices.None,
+                CompressionType = ECompressionType.LMZA,
+            };
+
+            var app = UnityEngine.Object.FindObjectOfType<ExperienceApp>();
+            VerifyAppSceneSetup(app);
+            ClearAppData(app);
+
+            var appManifest = ReadAppManifest();
+            var asmName = "App" + appManifest.Id.ToString().PadLeft(AppManifest.MaxIdLength, '0');
+            var buildTargetGroup = BuildPipeline.GetBuildTargetGroup(buildInfo.BuildTarget);
+
+            var asmPath = GetAppAssemblyPath() + ".bytes";
+            var asmBuilder = new AppAssemblyBuilder();
+            var asmBuildInfo = new AppAssemblyBuilder.AssemblyBuildInfo()
+            {
+                Name = asmName,
+                BuildTarget = buildInfo.BuildTarget,
+                BuildTargetGroup = buildTargetGroup,
+                Version = appManifest.Version
+            };
+            asmBuilder.Build(asmBuildInfo, asmPath);
+        }
+
         /// <summary>
         /// Builds a Liminal Experience Application from the current scene and build target.
         /// </summary>
@@ -160,14 +191,29 @@ namespace Liminal.SDK.Editor.Build
                 // Build asset bundles
                 UpdateProgressBar("Building Limapp", "Building scene AssetBundle", 0.4F);
                 Debug.Log("[Liminal.Build] Building scene AssetBundle...");
-                BuildPipeline.BuildAssetBundles(outputPath,
-                    BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.ForceRebuildAssetBundle,
-                    buildInfo.BuildTarget);
 
+                // Try ChunckBase instead.
+                BuildPipeline.BuildAssetBundles(outputPath, BuildAssetBundleOptions.UncompressedAssetBundle | BuildAssetBundleOptions.ForceRebuildAssetBundle, buildInfo.BuildTarget);
+
+                // Replace all Assembly-CSHarp dll with asmName.dll
                 // Run post-processor on the asset bundle
                 var sceneBundlePath = Path.Combine(outputPath, "appscene");
                 var sceneBundleProc = new SceneBundleProcessor(BuildConsts.ProjectAssemblyName, asmName);
                 sceneBundleProc.Process(sceneBundlePath);
+
+
+
+                // We need to replace it with addressable
+                //var settings = AddressableAssetSettingsDefaultObject.Settings;
+                //if (settings == null)
+                //    return;
+
+                //var context = new AddressablesDataBuilderInput(settings);
+                //settings.ActivePlayerDataBuilder.BuildData<AddressablesPlayerBuildResult>(context);
+
+
+
+                // Scene Processor, replaces Assembly-Csharp with new AssemblyName.
 
                 // Pack to AppPack (.limapp)
                 // This will also compress the app (using LZMA)
@@ -176,8 +222,7 @@ namespace Liminal.SDK.Editor.Build
 
                 var platformName = GetAppPlatformOutputName(buildInfo);
                 var extension = GetFileExtension(buildInfo.CompressionType);
-                var appFilename = string.Format("app_{0}_{1}_v{2}.{3}", appManifest.Id, platformName,
-                    appManifest.Version, extension);
+                var appFilename = string.Format("app_{0}_{1}_v{2}.{3}", appManifest.Id, platformName, appManifest.Version, extension);
                 var appPackPath = Path.Combine(outputPath, appFilename);
                 var appPack = new AppPack()
                 {
@@ -187,6 +232,7 @@ namespace Liminal.SDK.Editor.Build
                     SceneBundle = File.ReadAllBytes(Path.Combine(outputPath, "appscene")),
                     CompressionType = buildInfo.CompressionType,
                 };
+
 
                 // Pack the AppPack into a compressed file
                 UpdateProgressBar("Building Limapp", "Compressing App", 0.8F);

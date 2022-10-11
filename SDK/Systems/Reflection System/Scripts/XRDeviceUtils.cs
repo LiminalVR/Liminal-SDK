@@ -16,13 +16,26 @@ namespace Liminal.Systems
             EDeviceModelType.Rift,
             EDeviceModelType.RiftS,
             EDeviceModelType.HtcVivePro,
-            EDeviceModelType.Quest2
+            EDeviceModelType.Quest2,
+            EDeviceModelType.Pico,
+            EDeviceModelType.PicoNeo3
         };
 
         public static EDeviceModelType GetDeviceModelType()
         {
-            var model = SystemInfo.deviceModel;
-            Debug.Log($"[XRDeviceUtils] - We've changed XRDdevice.model to SystemInfo.deviceModel, let's make sure this works. The model is {model}");
+            //SystemInfo.deviceName = Pico Neo 3
+            Debug.Log("XR Model: " + XRDevice.model);
+            Debug.Log("Device Name: " + SystemInfo.deviceName);
+            Debug.Log("Device Model " + SystemInfo.deviceModel);
+
+            var deviceName = SystemInfo.deviceName;
+            if (deviceName.Contains("Neo 3"))
+                return EDeviceModelType.PicoNeo3;
+
+            // Not sure what the value is but this port is strictly just Pico so it's OK.
+            return EDeviceModelType.Pico;
+
+            var model = XRDevice.model;
             var type = EDeviceModelType.Unknown;
             model = model.ToLower();
 

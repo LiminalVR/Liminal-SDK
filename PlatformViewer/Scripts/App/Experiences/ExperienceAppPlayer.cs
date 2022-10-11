@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Reflection;
 using App;
+using Limapp.Test;
 using Liminal.Platform.Experimental.App.BundleLoader;
+using Liminal.Platform.Experimental.App.BundleLoader.Impl;
+using Liminal.Platform.Experimental.Services;
 using Liminal.SDK.Core;
 using Liminal.SDK.Serialization;
 using Liminal.SDK.VR;
@@ -22,13 +25,15 @@ namespace Liminal.Platform.Experimental.App.Experiences
         public event Action<bool> ExperienceAppUnloaded;
         public event Action<bool> ExperienceAppEnded;
 
-        public ExperienceApp CurrentApp { get; private set; }
+        public ExperienceApp CurrentApp { get; set; }
 
         private FieldInfo _isEmulator;
 
         private BundleLoader.Impl.BundleLoader _bundleLoader = new BundleLoader.Impl.BundleLoader();
         private BundleAsyncLoadOperationBase _loadOperation;
         private ExperienceStateModel _stateModel = new ExperienceStateModel();
+
+        public VREmulator Emulator;
 
         public bool IsRunning
         {
@@ -123,7 +128,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             ExperienceAppLoaded?.Invoke(operationBase.Experience, operationBase.ExperienceApp);
         }
 
-        private Coroutine InitializeApp()
+        public Coroutine InitializeApp()
         {
             _stateModel.SetState(AppState.Running);
             _stateModel.SetStartTime(Time.realtimeSinceStartup);
@@ -168,7 +173,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
 
             Debug.Log("[_IntializeApp] - Create Device");
             //# SUPER IMPORTANT
-            var device = DeviceUtils.CreateDevice(CurrentApp);
+            var device = Emulator.CreateDevice();
             VRDevice.Replace(device);
 
             Debug.Log("[_IntializeApp] - Call Initialize");
@@ -187,6 +192,8 @@ namespace Liminal.Platform.Experimental.App.Experiences
 
             Cancel();
             yield return ShutDownAppRoutine();
+
+            yield return CacheUtils.Clean();
 
             UnloadAssetBundle();
 
@@ -235,6 +242,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             {
                 ExperienceApp.AssetBundle.Unload(unloadAllLoadedObjects: true);
                 ExperienceAppReflectionCache.AssetBundleField.SetValue(null, null);
+                
             }
         }
 
@@ -245,6 +253,12 @@ namespace Liminal.Platform.Experimental.App.Experiences
             yield return Resources.UnloadUnusedAssets();
             GC.Collect();
             Time.timeScale = 1f;
+
+            yield return CacheUtils.Clean();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         private void EnsureEmulatorFlagIsFalse()

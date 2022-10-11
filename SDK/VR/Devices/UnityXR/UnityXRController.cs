@@ -87,10 +87,13 @@ namespace Liminal.SDK.XR
 
 			public override string Name => BaseFeature.name;
 
-			public InputFeature(InputFeatureUsage<T> aBaseFeature) : base()
+            public string MyName;
+
+			public InputFeature(InputFeatureUsage<T> aBaseFeature, string name) : base()
 			{
 				BaseFeature = aBaseFeature;
-			}
+                MyName = name;
+            }
 		}
 
 		public class ButtonInputFeature : InputFeature<bool>
@@ -105,13 +108,18 @@ namespace Liminal.SDK.XR
 				}
 			}
 
-			public ButtonInputFeature(InputFeatureUsage<bool> aBaseFeature) : base(aBaseFeature)
+			public ButtonInputFeature(InputFeatureUsage<bool> aBaseFeature, string name) : base(aBaseFeature, name)
 			{
 			}
 
 			public override void UpdateState()
 			{
-				if (!Device.HasValue) return;
+				if (!Device.HasValue) 
+                    return;
+
+				// Button Touch is being called repetitively. As Pico doesn't need it, this is filtered out.
+                if (MyName == "ButtonTouch")
+                    return;
 
 				if (!Device.Value.TryGetFeatureValue(BaseFeature, out bool isPressed))
 				{
@@ -148,7 +156,12 @@ namespace Liminal.SDK.XR
 						case EPressState.Up:
 							PressState = EPressState.None;
 							break;
+						case EPressState.Down:
+                            PressState = EPressState.None;
+							break;
 						default:
+							// Added this here.
+                            PressState = EPressState.None;
 							break;
 					}
 				}
@@ -171,7 +184,7 @@ namespace Liminal.SDK.XR
 				}
 			}
 
-			public Axis1DInputFeature(InputFeatureUsage<float> aBaseFeature) : base(aBaseFeature)
+			public Axis1DInputFeature(InputFeatureUsage<float> aBaseFeature, string name) : base(aBaseFeature, name)
 			{
 			}
 
@@ -215,6 +228,9 @@ namespace Liminal.SDK.XR
 						case EPressState.Up:
 							PressState = EPressState.None;
 							break;
+                        case EPressState.Down:
+                            PressState = EPressState.None;
+                            break;
 						default:
 							break;
 					}
@@ -240,7 +256,7 @@ namespace Liminal.SDK.XR
 				}
 			}
 
-			public Axis2DInputFeature(InputFeatureUsage<Vector2> aBaseFeature) : base(aBaseFeature)
+			public Axis2DInputFeature(InputFeatureUsage<Vector2> aBaseFeature, string name) : base(aBaseFeature, name)
 			{
 			}
 
@@ -315,27 +331,29 @@ namespace Liminal.SDK.XR
 		private Dictionary<string, InputFeature> _inputFeatures = new Dictionary<string, InputFeature>
 		{
             // buttons
-            { VRButton.Back, new ButtonInputFeature(CommonUsages.secondaryButton) },
-			{ VRButton.Touch, new ButtonInputFeature(CommonUsages.primaryTouch) },
-			{ VRButton.Trigger, new ButtonInputFeature(CommonUsages.triggerButton) },
+            { VRButton.Back, new ButtonInputFeature(CommonUsages.secondaryButton, VRButton.Back)},
+			{ VRButton.Touch, new ButtonInputFeature(CommonUsages.primaryTouch, VRButton.Touch) },
+			{ VRButton.Trigger, new ButtonInputFeature(CommonUsages.triggerButton, VRButton.Trigger) },
             // TODO: Map VRButton.Primary to CommonUsages.triggerButton, and create a new mapping option for CommonUsages.primaryButton
-            { VRButton.Primary, new ButtonInputFeature(CommonUsages.triggerButton) },
-			{ VRButton.Seconday, new ButtonInputFeature(CommonUsages.gripButton) },
-			{ VRButton.Three, new ButtonInputFeature(CommonUsages.primary2DAxisTouch) },
-			{ VRButton.Four, new ButtonInputFeature(CommonUsages.primary2DAxisClick) },
+            { VRButton.Primary, new ButtonInputFeature(CommonUsages.triggerButton, VRButton.Primary) },
+			{ VRButton.Seconday, new ButtonInputFeature(CommonUsages.gripButton, VRButton.Seconday) },
+			{ VRButton.Three, new ButtonInputFeature(CommonUsages.primary2DAxisTouch, VRButton.Three) },
+			{ VRButton.Four, new ButtonInputFeature(CommonUsages.primary2DAxisClick, VRButton.Four) },
 
             // axis 2D
-            { VRAxis.One, new Axis2DInputFeature(CommonUsages.primary2DAxis) },
+            { VRAxis.One, new Axis2DInputFeature(CommonUsages.primary2DAxis, VRAxis.One) },
 
             // axis 1D
-            { VRAxis.Two, new Axis1DInputFeature(CommonUsages.trigger) },
-			{ VRAxis.Three, new Axis1DInputFeature(CommonUsages.grip) },
+            { VRAxis.Two, new Axis1DInputFeature(CommonUsages.trigger, VRAxis.Two) },
+			{ VRAxis.Three, new Axis1DInputFeature(CommonUsages.grip, VRAxis.Three) },
 		};
 
-		public UnityXRController(VRInputDeviceHand hand) : base(OVRUtils.GetControllerType(hand))
-		{
-			mHand = hand;
+		public XRNode Node;
 
+		public UnityXRController(VRInputDeviceHand hand, XRNode node) : base(OVRUtils.GetControllerType(hand))
+		{
+			Node = node;
+			mHand = hand;
 			Pointer?.Activate();
 
 			foreach (var pairs in _inputFeatures.ToArray())
@@ -368,7 +386,7 @@ namespace Liminal.SDK.XR
 			return new InputDevicePointer(this);
 		}
 
-		public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Hand == VRInputDeviceHand.Right ? XRNode.RightHand : XRNode.LeftHand);
+		public InputDevice InputDevice => InputDevices.GetDeviceAtXRNode(Node);
 
 		public override bool HasCapabilities(VRInputDeviceCapability capabilities)
 		{

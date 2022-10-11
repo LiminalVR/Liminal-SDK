@@ -56,6 +56,7 @@ namespace Liminal.SDK.VR.Devices.GearVR
             if (OVRUtils.IsOculusQuest)
             {
                 // TODO: Add HandTrigger support and IndexTrigger support since Oculus Quest can provide an Axis.
+                //
             }
 
             // No 1D axes on the GearVR controller.

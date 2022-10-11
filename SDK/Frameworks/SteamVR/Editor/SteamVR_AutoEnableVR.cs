@@ -45,8 +45,7 @@ namespace Valve.VR
 
         public static void Update()
         {
-
-            /*
+            return;
             if (SteamVR_Settings.instance.autoEnableVR)
             {
                 bool enabledVR = false;
@@ -96,7 +95,6 @@ namespace Valve.VR
 #if UNITY_2018_2_OR_NEWER
                 //2018+ requires us to manually add the OpenVR package
 
-                /*
                 switch (packageState)
                 {
                     case PackageStates.None:
@@ -224,11 +222,11 @@ namespace Valve.VR
                         UnityEditor.EditorUtility.DisplayDialog("SteamVR", failtext, "Ok");
                         Debug.Log("<b>[SteamVR Setup]</b> " + failtext);
                     }
-                }#1#
+                }
 #else
                 UnityEditor.EditorApplication.update -= Update;
 #endif
-            }*/
+            }
         }
     }
 }

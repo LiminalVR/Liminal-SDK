@@ -10,7 +10,7 @@ using System.IO;
 
 namespace Valve.VR
 {
-    [InitializeOnLoad]
+    //[InitializeOnLoad]
     public class SteamVR_UnitySettingsWindow : EditorWindow
     {
         const bool forceShow = false; // Set to true to get the dialog to show back up in the case you clicked Ignore All.
@@ -65,11 +65,13 @@ namespace Valve.VR
 
         static SteamVR_UnitySettingsWindow()
         {
+            return;
             EditorApplication.update += Update;
         }
 
         static void Update()
         {
+            return;
             bool show =
                 (!EditorPrefs.HasKey(ignore + buildTarget) &&
                     EditorUserBuildSettings.activeBuildTarget != recommended_BuildTarget) ||

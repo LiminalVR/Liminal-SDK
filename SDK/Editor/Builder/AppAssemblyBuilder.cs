@@ -154,6 +154,7 @@ namespace Liminal.SDK.Editor.Build
 
             // CJS: This `should` be the same as the block above?!?
             asmDef.Write(outputPath, new WriterParameters(){WriteSymbols = true});
+
             //asmDef.Write(outputPath + ".foo", new WriterParameters(){WriteSymbols = true});
         }
         
@@ -313,6 +314,9 @@ namespace Liminal.SDK.Editor.Build
                     continue;
 
                 if (relativePath.IndexOf("Frameworks/SteamVR", StringComparison.OrdinalIgnoreCase) > -1)
+                    continue;
+
+                if (relativePath.IndexOf("Frameworks/PicoMobileSDK", StringComparison.OrdinalIgnoreCase) > -1)
                     continue;
 
                 var path = "Assets" + relativePath;

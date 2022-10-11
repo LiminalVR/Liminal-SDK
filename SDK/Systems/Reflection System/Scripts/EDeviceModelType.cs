@@ -12,5 +12,7 @@
         Rift,
         Unknown,
         Quest2,
+        Pico,
+        PicoNeo3
     }
 }

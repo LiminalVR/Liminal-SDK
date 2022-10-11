@@ -1,4 +1,5 @@
-﻿using Liminal.SDK.Core;
+﻿using System.Linq;
+using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Input;
 using System.Text;
@@ -23,6 +24,8 @@ public class ControllerInputExample : MonoBehaviour
             InputText.text = inputStringBuilder.ToString();
 
         }
+
+        
     }
 
     public void AppendDeviceInput(StringBuilder builder, IVRInputDevice inputDevice, string deviceName)
@@ -38,6 +41,9 @@ public class ControllerInputExample : MonoBehaviour
         builder.AppendLine($"{deviceName} Three: {inputDevice.GetButton(VRButton.Three)}");
         builder.AppendLine($"{deviceName} Four: {inputDevice.GetButton(VRButton.Four)}");
 
+        inputDevice.GetButtonDown(VRButton.One);
+
+        /*
         builder.AppendLine($"{deviceName} Axis One: {inputDevice.GetAxis2D(VRAxis.One)}");
         builder.AppendLine($"{deviceName} Axis One Raw: {inputDevice.GetAxis2D(VRAxis.OneRaw)}");
 
@@ -46,14 +52,10 @@ public class ControllerInputExample : MonoBehaviour
 
         builder.AppendLine($"{deviceName} Axis Three: {inputDevice.GetAxis1D(VRAxis.Three)}");
         builder.AppendLine($"{deviceName} Axis Three Raw: {inputDevice.GetAxis1D(VRAxis.ThreeRaw):0.00}");
+        */
 
-        if (inputDevice.GetButtonUp(VRButton.Trigger))
-        {
-            Debug.Log("Button up");
-        }
-
-        //builder.AppendLine($"{deviceName} Axis2D-One: {inputDevice.GetAxis2D(VRAxis.One)}");
-        //builder.AppendLine($"{deviceName} Axis2D-OneRaw: {inputDevice.GetAxis2D(VRAxis.OneRaw)}");
+        builder.AppendLine($"{deviceName} Axis2D-One: {inputDevice.GetAxis2D(VRAxis.One)}");
+        builder.AppendLine($"{deviceName} Axis2D-OneRaw: {inputDevice.GetAxis2D(VRAxis.OneRaw)}");
     }
 
     public void End() 

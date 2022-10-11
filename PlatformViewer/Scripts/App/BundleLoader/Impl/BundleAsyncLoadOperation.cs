@@ -179,6 +179,7 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
             }
 
             yield return LoadAppScene(mAppPack.SceneBundle);
+            
         }
 
         private IEnumerator LoadAppAssembly(byte[] bytes)
@@ -200,12 +201,22 @@ namespace Liminal.Platform.Experimental.App.BundleLoader.Impl
             yield return null;
         }
 
+        public static void LogMemory(string s)
+        {
+            var mem = System.GC.GetTotalMemory(true);
+            Debug.Log($"memory {s}: {mem/1e+6}");
+        }
+
         private IEnumerator LoadAppScene(byte[] bytes)
         {
+            LogMemory("Before Asset Bundle");
+
             SetState(State.LoadingAssetBundle);
 
             var request = AssetBundle.LoadFromMemoryAsync(bytes);
             yield return request;
+
+            LogMemory("After Asset Bundle");
 
             var assetBundle = request.assetBundle;
             ExperienceAppReflectionCache.AssetBundleField.SetValue(null, assetBundle);

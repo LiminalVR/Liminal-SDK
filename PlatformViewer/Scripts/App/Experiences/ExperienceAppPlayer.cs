@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Reflection;
 using App;
-using Limapp.Test;
 using Liminal.Platform.Experimental.App.BundleLoader;
 using Liminal.Platform.Experimental.App.BundleLoader.Impl;
 using Liminal.Platform.Experimental.Services;
@@ -193,7 +192,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             Cancel();
             yield return ShutDownAppRoutine();
 
-            yield return CacheUtils.Clean();
+            //yield return CacheUtils.Clean();
 
             UnloadAssetBundle();
 
@@ -254,7 +253,7 @@ namespace Liminal.Platform.Experimental.App.Experiences
             GC.Collect();
             Time.timeScale = 1f;
 
-            yield return CacheUtils.Clean();
+            //yield return CacheUtils.Clean();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();

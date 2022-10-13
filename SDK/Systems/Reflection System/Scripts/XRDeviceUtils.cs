@@ -24,18 +24,11 @@ namespace Liminal.Systems
         public static EDeviceModelType GetDeviceModelType()
         {
             //SystemInfo.deviceName = Pico Neo 3
-            Debug.Log("XR Model: " + XRDevice.model);
+            Debug.Log("XR Model: " + SystemInfo.deviceModel);
             Debug.Log("Device Name: " + SystemInfo.deviceName);
             Debug.Log("Device Model " + SystemInfo.deviceModel);
 
-            var deviceName = SystemInfo.deviceName;
-            if (deviceName.Contains("Neo 3"))
-                return EDeviceModelType.PicoNeo3;
-
-            // Not sure what the value is but this port is strictly just Pico so it's OK.
-            return EDeviceModelType.Pico;
-
-            var model = XRDevice.model;
+            var model = SystemInfo.deviceModel;
             var type = EDeviceModelType.Unknown;
             model = model.ToLower();
 

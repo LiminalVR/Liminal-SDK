@@ -1,11 +1,13 @@
 {
     "name": "LiminalSdk",
+    "rootNamespace": "",
     "references": [
         "Oculus.VR",
         "SteamVR",
         "UnityEngine.SpatialTracking",
         "UnityEngine.UI",
-        "Unity.XR.Interaction.Toolkit"
+        "Unity.XR.Interaction.Toolkit",
+        "Unity.XR.CoreUtils"
     ],
     "includePlatforms": [
         "Android",

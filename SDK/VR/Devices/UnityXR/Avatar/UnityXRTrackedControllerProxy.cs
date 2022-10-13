@@ -17,9 +17,9 @@ namespace Liminal.SDK.XR
         public Vector3 Position => Controller.transform.position;
         public Quaternion Rotation => Controller.transform.rotation;
 
-        public XRController Controller;
+        public ActionBasedController Controller;
 
-        public UnityXRTrackedControllerProxy(XRController controller, IVRAvatar avatar)
+        public UnityXRTrackedControllerProxy(ActionBasedController controller, IVRAvatar avatar)
         {
             Controller = controller;
         }

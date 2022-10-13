@@ -12,6 +12,7 @@ using UnityEngine.Assertions;
 using System.Linq;
 using Liminal.SDK.VR.EventSystems;
 using Liminal.SDK.VR.Pointers;
+using Unity.XR.CoreUtils;
 
 namespace Liminal.SDK.XR
 {
@@ -138,17 +139,17 @@ namespace Liminal.SDK.XR
 			SetupControllers(avatar, rig);
 		}
 
-        private XRRig CreateXRRig(IVRAvatar avatar)
+        private XROrigin CreateXRRig(IVRAvatar avatar)
         {
 			// Maybe a way to pass in one?
 			// Instantiate a new one
-            var xrRig = avatar.Transform.GetComponentInChildren<XRRig>(true);
+            var xrRig = avatar.Transform.GetComponentInChildren<XROrigin>(true);
             if(xrRig == null)
-                xrRig = GameObject.FindObjectOfType<XRRig>();
+                xrRig = GameObject.FindObjectOfType<XROrigin>();
 			
             if (xrRig == null)
             {
-                var xrRigPrefab = Resources.Load("XR Rig");
+                var xrRigPrefab = Resources.Load("Complete XR Origin Set Up Variant");
                 var rigObject = GameObject.Instantiate(xrRigPrefab) as GameObject;
                 xrRig = rigObject.GetComponent<XRRig>();
             }
@@ -161,11 +162,11 @@ namespace Liminal.SDK.XR
             return xrRig;
         }
 
-		private void SetupControllers(IVRAvatar avatar, XRRig rig)
+		private void SetupControllers(IVRAvatar avatar, XROrigin rig)
         {
-			var controllers = rig.GetComponentsInChildren<XRController>().ToList();
-			var leftHand = controllers.FirstOrDefault(x => x.controllerNode == XRNode.LeftHand);
-			var rightHand = controllers.FirstOrDefault(x => x.controllerNode == XRNode.RightHand);
+			var controllers = rig.GetComponentsInChildren<ActionBasedController>().ToList();
+			var leftHand = controllers.FirstOrDefault(x => x.transform.name.Contains("LeftHand"));
+			var rightHand = controllers.FirstOrDefault(x => x.transform.name.Contains("RightHand"));
 
 			avatar.PrimaryHand.TrackedObject = new UnityXRTrackedControllerProxy(rightHand, avatar);
 			avatar.SecondaryHand.TrackedObject = new UnityXRTrackedControllerProxy(leftHand, avatar);
@@ -178,7 +179,7 @@ namespace Liminal.SDK.XR
 			// We just need to put the pointer inside the Anchor?
 		}
 
-		public void ActivatePointer(IVRAvatarHand hand, XRController xrController)
+		public void ActivatePointer(IVRAvatarHand hand, ActionBasedController xrController)
         {
 			// check if the hand even have a controller attached. // Do we include inactive ones?
             var controllerComponent = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive:true);
@@ -189,7 +190,7 @@ namespace Liminal.SDK.XR
             }
 			
             //var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "Neo3_L" : "Neo3_R";
-            var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "PicoNeo_Controller_Visual_L" : "PicoNeo_Controller_Visual_R";
+            var controllerPrefabName = xrController.transform.name.Contains("LeftHand") ? "PicoNeo_Controller_Visual_L" : "PicoNeo_Controller_Visual_R";
 			
             var prefab = Resources.Load($"Prefabs/{controllerPrefabName}");
             var controllerInstance = GameObject.Instantiate(prefab, controllerComponent.transform) as GameObject;
@@ -227,17 +228,16 @@ namespace Liminal.SDK.XR
             manager.transform.SetParent(avatar.Transform);
         }
 
-        private void SetupCameraRig(IVRAvatar avatar, XRRig xrRig)
+        private void SetupCameraRig(IVRAvatar avatar, XROrigin xrRig)
         {
 			var centerEye = avatar.Head.CenterEyeCamera.gameObject;
-			xrRig.cameraGameObject = centerEye.gameObject;
-
+            xrRig.Camera = centerEye.GetComponent<Camera>();
 			var eyeDriver = avatar.Head.Transform.GetComponent<TrackedPoseDriver>();
 
 			// Only modify eye setting if you're making a new one.
             if (eyeDriver == null)
             {
-                xrRig.TrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+                //xrRig.RequestedTrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
 
 				eyeDriver = avatar.Head.Transform.gameObject.AddComponent<TrackedPoseDriver>();
                 eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;

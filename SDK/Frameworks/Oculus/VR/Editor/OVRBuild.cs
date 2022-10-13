@@ -229,13 +229,13 @@ partial class OculusBuildApp : EditorWindow
                 "Builds uploaded to the Oculus storefront are required to have incrementing version numbers.\nThis value is exposed to players."),
                 PlayerSettings.Android.bundleVersionCode, GUILayout.Width(220));
 
-            EditorGUI.BeginChangeCheck();
+            /*EditorGUI.BeginChangeCheck();
             bool isAutoIncrement = PlayerPrefs.GetInt(OVRGradleGeneration.prefName, 0) != 0;
             isAutoIncrement = EditorGUILayout.ToggleLeft(new GUIContent("Auto-Increment?",
                 "If true, version number will be automatically incremented after every successful build."),
                 isAutoIncrement, EditorStyles.miniLabel, GUILayout.Width(120));
             if (EditorGUI.EndChangeCheck())
-                OVRGradleGeneration.ToggleUtilities();
+                OVRGradleGeneration.ToggleUtilities();*/
             EditorGUILayout.EndHorizontal();
 
             EditorGUILayout.Space(15f);

@@ -103,10 +103,9 @@ namespace Liminal.SDK.XR
         }
 
 		public override Vector2 GetAxis2D(string axis)
-		{
-			if (!HasAxis2D(axis)) return Vector2.zero;
-
-            return Vector2.zero;
+        {
+            var action = GetInputAction(axis);
+            return action.ReadValue<Vector2>();
 		}
 
 		public override bool GetButton(string button) 

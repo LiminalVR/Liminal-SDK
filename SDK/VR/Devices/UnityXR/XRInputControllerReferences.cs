@@ -8,6 +8,7 @@ namespace Liminal.SDK.XR
     public class XRInputControllerReferences
     {
         public InputActionReference Trigger;
+        public InputActionReference Joystick;
 
         public InputAction GetInputAction(string name)
         {
@@ -16,6 +17,9 @@ namespace Liminal.SDK.XR
                 case VRButton.Trigger:
                 case VRButton.One:
                     return Trigger.action;
+                case VRAxis.One:
+                case VRAxis.OneRaw:
+                    return Joystick;
             }
 
             return new InputAction("");

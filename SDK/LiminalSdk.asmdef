@@ -7,7 +7,8 @@
         "UnityEngine.SpatialTracking",
         "UnityEngine.UI",
         "Unity.XR.Interaction.Toolkit",
-        "Unity.XR.CoreUtils"
+        "Unity.XR.CoreUtils",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Android",

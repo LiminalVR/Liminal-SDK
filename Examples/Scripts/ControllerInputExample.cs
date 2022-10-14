@@ -1,14 +1,19 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Liminal.SDK.Core;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Input;
 using System.Text;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 public class ControllerInputExample : MonoBehaviour
 {
     public Text InputText;
+
+    public  InputActionReference TriggerReference;
 
     private void Update()
     {
@@ -25,7 +30,27 @@ public class ControllerInputExample : MonoBehaviour
 
         }
 
-        
+        LogControllerInput();
+    }
+
+    private void LogControllerInput()
+    {
+        var leftHandedControllers = new List<UnityEngine.XR.InputDevice>();
+        var desiredCharacteristics = UnityEngine.XR.InputDeviceCharacteristics.HeldInHand | UnityEngine.XR.InputDeviceCharacteristics.Left | UnityEngine.XR.InputDeviceCharacteristics.Controller;
+        UnityEngine.XR.InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, leftHandedControllers);
+
+        foreach (var device in leftHandedControllers)
+        {
+            if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.triggerButton, out var triggerValue) && triggerValue)
+            {
+                Debug.Log("Trigger button is pressed.");
+            }
+        }
+
+        if (TriggerReference.action.IsPressed())
+        {
+            Debug.Log("Trigger ref is pressed.");
+        }
     }
 
     public void AppendDeviceInput(StringBuilder builder, IVRInputDevice inputDevice, string deviceName)

@@ -13,6 +13,7 @@ using System.Linq;
 using Liminal.SDK.VR.EventSystems;
 using Liminal.SDK.VR.Pointers;
 using Unity.XR.CoreUtils;
+using UnityEngine.Events;
 
 namespace Liminal.SDK.XR
 {
@@ -79,8 +80,8 @@ namespace Liminal.SDK.XR
         public void Setup()
         {
             Headset = new UnityXRHeadset();
-            PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right, XRNode.RightHand);
-            SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left, XRNode.LeftHand);
+            PrimaryInputDevice = mRightController = new UnityXRController(VRInputDeviceHand.Right);
+            SecondaryInputDevice = mLeftController = new UnityXRController(VRInputDeviceHand.Left);
 
             InputDevices = new List<IVRInputDevice>
             {
@@ -211,7 +212,7 @@ namespace Liminal.SDK.XR
 
 			// Apparently it's binding to the wrong one.
 			var device = hand.InputDevice as UnityXRController;
-			Debug.Log($"Binding: Input Device: {device.Node}, Hand: {device.Hand}, Avatar Device: {hand.Transform.name}");
+			Debug.Log($"Binding: Input Device: , Hand: {device.Hand}, Avatar Device: {hand.Transform.name}");
 
 			hand.InputDevice.Pointer.Transform = pointerVisual.transform;
 
@@ -250,3 +251,5 @@ namespace Liminal.SDK.XR
 }
 
 #endif
+
+

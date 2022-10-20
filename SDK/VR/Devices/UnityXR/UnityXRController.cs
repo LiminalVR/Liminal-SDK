@@ -115,11 +115,10 @@ namespace Liminal.SDK.XR
 		public override bool GetButtonUp(string button) 
             => GetInputAction(button).WasReleasedThisFrame();
 
-		public XRInputControllerReferences InputRefs => XRInputReferences.Instance.RightControllerReferences;
+		public XRInputControllerReferences InputRefs => XRInputReferences.Instance.GetHandInputReferences(Hand);
 
 		public override void Update()
 		{
-
 		}
 
 		/// <summary>

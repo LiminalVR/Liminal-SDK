@@ -13,8 +13,6 @@ public class ControllerInputExample : MonoBehaviour
 {
     public Text InputText;
 
-    public  InputActionReference TriggerReference;
-
     private void Update()
     {
         var device = VRDevice.Device;
@@ -29,28 +27,6 @@ public class ControllerInputExample : MonoBehaviour
             InputText.text = inputStringBuilder.ToString();
 
         }
-
-        LogControllerInput();
-    }
-
-    private void LogControllerInput()
-    {
-        var leftHandedControllers = new List<UnityEngine.XR.InputDevice>();
-        var desiredCharacteristics = UnityEngine.XR.InputDeviceCharacteristics.HeldInHand | UnityEngine.XR.InputDeviceCharacteristics.Left | UnityEngine.XR.InputDeviceCharacteristics.Controller;
-        UnityEngine.XR.InputDevices.GetDevicesWithCharacteristics(desiredCharacteristics, leftHandedControllers);
-
-        foreach (var device in leftHandedControllers)
-        {
-            if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.triggerButton, out var triggerValue) && triggerValue)
-            {
-                Debug.Log("Trigger button is pressed.");
-            }
-        }
-
-        if (TriggerReference.action.IsPressed())
-        {
-            Debug.Log("Trigger ref is pressed.");
-        }
     }
 
     public void AppendDeviceInput(StringBuilder builder, IVRInputDevice inputDevice, string deviceName)
@@ -62,7 +38,7 @@ public class ControllerInputExample : MonoBehaviour
         builder.AppendLine($"{deviceName} Touch Pad Touching: {inputDevice.IsTouching}");
         builder.AppendLine($"{deviceName} Trigger: {inputDevice.GetButton(VRButton.Trigger)}");
         builder.AppendLine($"{deviceName} Primary: {inputDevice.GetButton(VRButton.Primary)}");
-        builder.AppendLine($"{deviceName} Seconday: {inputDevice.GetButton(VRButton.Seconday)}");
+        builder.AppendLine($"{deviceName} Secondary: {inputDevice.GetButton(VRButton.Seconday)}");
         builder.AppendLine($"{deviceName} Three: {inputDevice.GetButton(VRButton.Three)}");
         builder.AppendLine($"{deviceName} Four: {inputDevice.GetButton(VRButton.Four)}");
 

@@ -144,23 +144,23 @@ namespace Liminal.SDK.XR
         {
 			// Maybe a way to pass in one?
 			// Instantiate a new one
-            var xrRig = avatar.Transform.GetComponentInChildren<XROrigin>(true);
-            if(xrRig == null)
-                xrRig = GameObject.FindObjectOfType<XROrigin>();
+            var xrReferences = avatar.Transform.GetComponentInChildren<XRInputReferences>(true);
+            if(xrReferences == null)
+                xrReferences = GameObject.FindObjectOfType<XRInputReferences>();
 			
-            if (xrRig == null)
+            if (xrReferences == null)
             {
                 var xrRigPrefab = Resources.Load("Complete XR Origin Set Up Variant");
                 var rigObject = GameObject.Instantiate(xrRigPrefab) as GameObject;
-                xrRig = rigObject.GetComponent<XRRig>();
+                xrReferences = rigObject.GetComponent<XRInputReferences>();
             }
 
 			// unless you need to offset the difference...
-            xrRig.transform.SetParent(avatar.Transform);
-			xrRig.transform.position = avatar.Transform.position;
-			xrRig.transform.rotation = avatar.Transform.rotation;
+            xrReferences.transform.SetParent(avatar.Transform);
+			xrReferences.transform.position = avatar.Transform.position;
+			xrReferences.transform.rotation = avatar.Transform.rotation;
 
-            return xrRig;
+            return xrReferences.XROrigin;
         }
 
 		private void SetupControllers(IVRAvatar avatar, XROrigin rig)
@@ -193,13 +193,13 @@ namespace Liminal.SDK.XR
             //var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "Neo3_L" : "Neo3_R";
             var controllerPrefabName = xrController.transform.name.Contains("LeftHand") ? "PicoNeo_Controller_Visual_L" : "PicoNeo_Controller_Visual_R";
 			
-            var prefab = Resources.Load($"Prefabs/{controllerPrefabName}");
-            var controllerInstance = GameObject.Instantiate(prefab, controllerComponent.transform) as GameObject;
-            controllerInstance.transform.localPosition = Vector3.zero;
-            controllerInstance.transform.localEulerAngles = Vector3.zero;
+            //var prefab = Resources.Load($"Prefabs/{controllerPrefabName}");
+            //var controllerInstance = GameObject.Instantiate(prefab, controllerComponent.transform) as GameObject;
+            //controllerInstance.transform.localPosition = Vector3.zero;
+            //controllerInstance.transform.localEulerAngles = Vector3.zero;
 
 			// if the controller instance has laser pointer, no pointer making one
-			var pointerVisual = controllerInstance.GetComponentInChildren<LaserPointerVisual>();
+			var pointerVisual = xrController.GetComponentInChildren<LaserPointerVisual>();
 
             if (pointerVisual == null)
             {

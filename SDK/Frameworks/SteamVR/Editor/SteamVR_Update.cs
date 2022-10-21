@@ -31,7 +31,7 @@ namespace Valve.VR
 
         static SteamVR_Update()
         {
-            EditorApplication.update += Update;
+            //EditorApplication.update += Update;
         }
 
         static void Update()

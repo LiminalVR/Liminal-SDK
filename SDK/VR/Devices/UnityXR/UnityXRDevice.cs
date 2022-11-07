@@ -264,8 +264,12 @@ namespace Liminal.SDK.XR
 			avatar.Head.CenterEyeCamera.transform.Identity();
 
             _cameraDriver = _tracker.AddComponent<TrackedPoseDriver>();
-            //_offset.transform.localPosition = new Vector3(0, -1.1f, 0); // Need to accomondate for real life height.
+			RecenterHeight();
+
+            _startTime = Time.time;
         }
+
+        private float _startTime;
 
 		/// <summary>
 		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
@@ -281,9 +285,19 @@ namespace Liminal.SDK.XR
             var xrRig = CreateXRRig(avatar);
             xrRig.CameraFloorOffsetObject.transform.position = _offset.transform.position;
 
-            var realWorldHeight = _tracker.transform.localPosition.y;
+            var elapsed = Time.time - _startTime;
+			if(elapsed < 3)
+			    RecenterHeight();
+        }
+
+		public void RecenterHeight()
+        {
+			var realWorldHeight = _tracker.transform.localPosition.y;
 			var targetLocalPosition = new Vector3(0, -realWorldHeight, 0);
-            _offset.transform.localPosition = Vector3.Slerp(_offset.transform.localPosition, targetLocalPosition, 10 * Time.deltaTime);
+            _offset.transform.localPosition = targetLocalPosition;
+
+			// You could also store the realWorldHeight and re-use this as the offset
+			// Or do what is being done now.
         }
 	}
 }

@@ -20,22 +20,13 @@ namespace Liminal.SDK.Build
         public static string InputDirectory;
         public static HashSet<int> ProcessedFile = new HashSet<int>();
 
-
-        static string path = @"D:/Tests/descent";
-        static string newPath = @"D:/Tests/descent-new";
-
-        static string ipp = "UnityEngine.InputModule";
-        static string version = "UnityEngine.InputLegacyModule";
-
-
         public override void Draw(BuildWindowConfig config)
         {
             DrawDirectorySelection(ref OutputDirectory, "Output Directory");
             DrawDirectorySelection(ref InputDirectory, "Input Directory");
 
-            var input = "C:/Users/ticoc/Documents/Liminal/Limapp-v2/89/Android/assemblyFolder/descent";
-            //var input = "D:/Tests/descent_2019-4";
-            var output = "C:/Users/ticoc/Documents/Liminal/Limapp-v2/89/Android/assemblyFolder/descent-new";
+            var input = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Assets\TestApp\DLLs\App000000000017.dll";
+            var output = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\DLLFixes\App000000000017.dll";
 
             if (GUILayout.Button("Read from Input"))
             {
@@ -67,16 +58,13 @@ namespace Liminal.SDK.Build
                 //asmDef.Name.Name = asmDef.Name.Name.Replace(ipp, version);
                 var reference = AssemblyNameReference.Parse("UnityEngine.InputLegacyModule, Version=0.0.0.0");
                 asmDef.MainModule.AssemblyReferences.Add(reference);
-                
-                asmDef.MainModule.TryGetTypeReference("UnityEngine.Input", out var inputTypeRef);
                 var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Input));
-                //var newInputType = asmDef.MainModule.ImportReference(typeof(TempInput));
 
                 var methods = GetAllMethodDefinitions(asmDef);
                 foreach (var methodDef in methods)
                 {
                     //ReplaceInstantiateCallsInMethod(methodDef, unityObjectTypeRef, liminalObjectTypeRef);
-                    Replace(methodDef, inputTypeRef, newInputType);
+                    Replace(methodDef, newInputType, typeof(UnityEngine.Input));
                 }
 
                 //Debug.Log(inputTypeRef.FullName);
@@ -84,28 +72,25 @@ namespace Liminal.SDK.Build
                 asmDef.Write(output);
             }
 
-            void Replace(MethodDefinition targetMethod, TypeReference unityTypeRef, TypeReference replacementTypeRef)
+            void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, Type type)
             {
                 if (!targetMethod.HasBody)
                     return;
 
-                // Find all calls within the method body
                 var methodCalls = targetMethod.Body.Instructions
                     .Where(x => x.OpCode == OpCodes.Call)
                     .ToArray();
 
                 foreach (var instruction in methodCalls)
                 {
-                    var mRef = instruction.Operand as MethodReference;
-                    if (mRef == null)
+                    if (instruction.Operand is not MethodReference mRef)
                         continue;
 
-                    var methodNameToPatch = "GetKeyDown";
+                    if (!mRef.DeclaringType.Name.Equals(type.Name)) 
+                        continue;
 
-                    if (mRef.Name == methodNameToPatch && mRef.DeclaringType == unityTypeRef)
-                    {
-                        instruction.Operand = CloneMethodWithDeclaringType(mRef, replacementTypeRef);
-                    }
+                    Debug.Log($"{mRef.Name}, Declare Type {mRef.DeclaringType}");
+                    instruction.Operand = CloneMethodWithDeclaringType(mRef, replacementTypeRef);
                 }
             }
 

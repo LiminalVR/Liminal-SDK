@@ -10,6 +10,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using Object = UnityEngine.Object;
 using UnityEngine.Assertions;
 using System.Linq;
+using Liminal.SDK.Extensions;
 using Liminal.SDK.VR.EventSystems;
 using Liminal.SDK.VR.Pointers;
 using Unity.XR.CoreUtils;
@@ -95,13 +96,6 @@ namespace Liminal.SDK.XR
 
         #endregion
 
-		/// <summary>
-		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
-		/// </summary>
-		public void Update ()
-		{
-		}
-
         private void UpdateHandVisibility()
         {
         }
@@ -113,6 +107,7 @@ namespace Liminal.SDK.XR
 
 		public void SetupAvatar(IVRAvatar avatar)
 		{
+			Debug.Log("[UnityXRDevice] Setting up avatar");
             Assert.IsNotNull(avatar);
 
 			// Clean up existing pointers.
@@ -129,14 +124,20 @@ namespace Liminal.SDK.XR
 
             unityAvatar.gameObject.SetActive(true);
 
-            SetupManager(avatar);
+            Debug.Log("[UnityXRDevice] Setting up managers");
+			SetupManager(avatar);
 
+            Debug.Log("[UnityXRDevice] Creating XR Rig");
 			var rig = CreateXRRig(avatar);
-            SetupCameraRig(avatar, rig);
 
+            Debug.Log("[UnityXRDevice] Setup Camera Rig");
+			SetupCameraRig(avatar, rig);
+
+            Debug.Log("[UnityXRDevice] Initialize Avatar");
 			// Does this need to happen a second time? Probably not!
 			unityAvatar.Initialize(avatar, this);
 
+            Debug.Log("[UnityXRDevice] Setup Controllers");
 			SetupControllers(avatar, rig);
 		}
 
@@ -172,22 +173,21 @@ namespace Liminal.SDK.XR
 			avatar.PrimaryHand.TrackedObject = new UnityXRTrackedControllerProxy(rightHand, avatar);
 			avatar.SecondaryHand.TrackedObject = new UnityXRTrackedControllerProxy(leftHand, avatar);
 
-			ActivatePointer(avatar.PrimaryHand, rightHand);
-			ActivatePointer(avatar.SecondaryHand, leftHand);
+			var rightPointer = ActivatePointer(avatar.PrimaryHand, rightHand);
+			var leftPointer = ActivatePointer(avatar.SecondaryHand, leftHand);
 
-			// Right, here we set the track object to be the XR hand. 
-			// We also bind the pointer. 
-			// We just need to put the pointer inside the Anchor?
+            mRightController.Bind(leftHand, avatar.PrimaryHand, rightPointer);
+			mLeftController.Bind(rightHand, avatar.SecondaryHand, leftPointer);
 		}
 
-		public void ActivatePointer(IVRAvatarHand hand, ActionBasedController xrController)
+		public LaserPointerVisual ActivatePointer(IVRAvatarHand hand, ActionBasedController xrController)
         {
 			// check if the hand even have a controller attached. // Do we include inactive ones?
             var controllerComponent = hand.Transform.GetComponentInChildren<VRAvatarController>(includeInactive:true);
             if (controllerComponent == null)
             {
 				Debug.Log("No avatar controller found");
-                return;
+                return null;
             }
 			
             //var controllerPrefabName = xrController.controllerNode == XRNode.LeftHand ? "Neo3_L" : "Neo3_R";
@@ -220,7 +220,8 @@ namespace Liminal.SDK.XR
             VRPointerInputModule.RemovePointer(hand.InputDevice.Pointer);
             VRPointerInputModule.AddPointer(hand.InputDevice.Pointer);
             hand.InputDevice.Pointer.Activate();
-		}
+            return pointerVisual;
+        }
 
 		private void SetupManager(IVRAvatar avatar)
         {
@@ -229,23 +230,60 @@ namespace Liminal.SDK.XR
             manager.transform.SetParent(avatar.Transform);
         }
 
-        private void SetupCameraRig(IVRAvatar avatar, XROrigin xrRig)
+        private GameObject _tracker;
+        private GameObject _offset;
+        private TrackedPoseDriver _cameraDriver;
+
+
+		private void SetupCameraRig(IVRAvatar avatar, XROrigin xrRig)
         {
-			var centerEye = avatar.Head.CenterEyeCamera.gameObject;
-            xrRig.Camera = centerEye.GetComponent<Camera>();
-			var eyeDriver = avatar.Head.Transform.GetComponent<TrackedPoseDriver>();
+			//avatar.Head.Transform.SetParent(xrRig.Camera.transform);
+            xrRig.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+            xrRig.Camera.enabled = false;
 
-			// Only modify eye setting if you're making a new one.
-            if (eyeDriver == null)
-            {
-                //xrRig.RequestedTrackingOriginMode = TrackingOriginModeFlags.TrackingReference;
+			// Deduct Default Device Tracking Height from the avatar head as these experiences originally built for Oculus Go
+			// The head is placed at least 1.7 up. TBH this needs more investigation.
+            //var defaultDeviceTrackingHeight = 1.7f;
+			//Ripple Effect 1.5f. But that doesn't mean other experiences do that?
+			// Some may be 1.7?
+            //avatar.Head.Transform.position -= Vector3.up * defaultDeviceTrackingHeight;
 
-				eyeDriver = avatar.Head.Transform.gameObject.AddComponent<TrackedPoseDriver>();
-                eyeDriver.trackingType = TrackedPoseDriver.TrackingType.RotationAndPosition;
-                eyeDriver.SetPoseSource(TrackedPoseDriver.DeviceType.GenericXRDevice, TrackedPoseDriver.TrackedPose.Center);
-                eyeDriver.UseRelativeTransform = false;
-            }
+			// Create a tracker, this tracker will be driven by the real life camera as local position from floor.
+			// The head is used as an offset. This is because existing limapps use case move the head up and around etc.
+			// Note, they also use VRAvatar or maybe nesting of the avatar. 
+            _tracker = new GameObject("Tracker");
+            _offset = new GameObject("Offset");
 
+            _offset.transform.SetParent(avatar.Head.Transform);
+            _offset.transform.Identity();
+
+			_tracker.transform.SetParent(_offset.transform);
+            _tracker.transform.Identity();
+
+			avatar.Head.CenterEyeCamera.transform.SetParent(_tracker.transform);
+			avatar.Head.CenterEyeCamera.transform.Identity();
+
+            _cameraDriver = _tracker.AddComponent<TrackedPoseDriver>();
+            //_offset.transform.localPosition = new Vector3(0, -1.1f, 0); // Need to accomondate for real life height.
+        }
+
+		/// <summary>
+		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
+		/// </summary>
+		public void Update()
+        {
+            if (_tracker == null)
+                return;
+
+			// The camera floor offset object is necessary to match the head position to make sure the controllers are in place.
+			// Do note a problem that will exist is if you bend up and down, that would kind of add an offset?
+            var avatar = VRAvatar.Active;
+            var xrRig = CreateXRRig(avatar);
+            xrRig.CameraFloorOffsetObject.transform.position = _offset.transform.position;
+
+            var realWorldHeight = _tracker.transform.localPosition.y;
+			var targetLocalPosition = new Vector3(0, -realWorldHeight, 0);
+            _offset.transform.localPosition = Vector3.Slerp(_offset.transform.localPosition, targetLocalPosition, 10 * Time.deltaTime);
         }
 	}
 }

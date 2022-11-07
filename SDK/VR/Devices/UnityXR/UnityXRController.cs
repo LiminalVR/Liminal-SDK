@@ -57,14 +57,17 @@ namespace Liminal.SDK.XR
 		private VRInputDeviceHand mHand;
 		public override VRInputDeviceHand Hand => mHand;
 
-        private ActionBasedController Controller;
+        private ActionBasedController _controller;
+        private IVRAvatarHand _avatarHand;
+        private LaserPointerVisual _pointer;
+
 
 		public UnityXRController(VRInputDeviceHand hand) : base(OVRUtils.GetControllerType(hand))
 		{
 			mHand = hand;
 			Pointer?.Activate();
 			Debug.Log($"[{GetType().Name}] UnityXRController({hand}) created.");
-		}
+        }
 
 		public UnityXRController()
 		{
@@ -117,8 +120,39 @@ namespace Liminal.SDK.XR
 
 		public XRInputControllerReferences InputRefs => XRInputReferences.Instance.GetHandInputReferences(Hand);
 
+        public void Bind(ActionBasedController controller, IVRAvatarHand avatarHand, LaserPointerVisual pointer)
+        {
+            _controller = controller;
+            _avatarHand = avatarHand;
+            _pointer = pointer;
+
+			SyncControllers();
+        }
+
 		public override void Update()
-		{
+        {
+        }
+
+        private void SyncControllers()
+        {
+            var controllerVisual = _avatarHand.Transform.GetComponentInChildren<VRAvatarController>();
+            var hasControllerVisual = controllerVisual != null;
+
+			if (hasControllerVisual)
+            {
+				Debug.Log("Has controller visual, so move it over!");
+                _controller.hideControllerModel = false;
+
+				_controller.modelParent = _avatarHand.Anchor;
+                _controller.model.localPosition = Vector3.zero;
+            }
+            else
+            {
+                _controller.hideControllerModel = true;
+            }
+
+            _pointer.transform.SetParent(_controller.model);
+            _pointer.transform.localPosition = Vector3.zero;
 		}
 
 		/// <summary>
@@ -126,7 +160,7 @@ namespace Liminal.SDK.XR
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-        public InputAction GetInputAction(string name)
+		public InputAction GetInputAction(string name)
         {
             return InputRefs.GetInputAction(name);
         }

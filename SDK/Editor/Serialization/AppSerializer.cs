@@ -32,7 +32,7 @@ namespace Liminal.SDK.Editor.Serialization
             mSerializableTypes = SerializationUtils.BuildSerializableTypeSet("Assembly-CSharp");
             mJsonSettings = new JsonSerializerSettings()
             {
-                //ContractResolver = new UnityJsonContractResolver(assemblyDataProvider, mAssetLookup)
+                ContractResolver = new UnityJsonContractResolver(assemblyDataProvider, mAssetLookup)
             };
         }
 

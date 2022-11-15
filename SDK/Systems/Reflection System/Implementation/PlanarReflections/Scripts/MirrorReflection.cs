@@ -52,6 +52,8 @@ namespace App
 
             if (OVRPlugin.ipd >= 0.067f)
                 IpdModel = Ipd68OffsetModel;
+
+            IpdModel = Ipd63OffsetModel;
         }
 
         private void Start()

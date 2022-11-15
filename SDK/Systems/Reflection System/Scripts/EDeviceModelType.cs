@@ -12,5 +12,6 @@
         Rift,
         Unknown,
         Quest2,
+        QuestPro
     }
 }

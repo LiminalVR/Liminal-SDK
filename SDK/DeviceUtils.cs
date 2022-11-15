@@ -20,6 +20,8 @@ namespace App
             var sdkType = Application.platform == RuntimePlatform.Android ? ESDKType.OVR : ESDKType.OpenVR;
             if (Application.isEditor)
                 sdkType = ESDKType.Emulator;
+            else
+                sdkType = ESDKType.OVR;
 
             return CreateDevice(sdkType);
 #endif

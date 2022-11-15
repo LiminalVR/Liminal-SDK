@@ -82,8 +82,8 @@ namespace Liminal.SDK.Build
         [UnityEditor.Callbacks.DidReloadScripts]
         private static void ScriptsCompiled()
         {
-            _currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
-            IssuesUtility.CheckForForbiddenCalls("Library/ScriptAssemblies/Assembly-CSharp.dll", ref _forbiddenCallsAndScripts);
+            //_currentAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+            //IssuesUtility.CheckForForbiddenCalls("Library/ScriptAssemblies/Assembly-CSharp.dll", ref _forbiddenCallsAndScripts);
         }
 
         private void DisplayUnityEditorTab()

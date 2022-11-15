@@ -36,6 +36,7 @@ namespace App
         public ReflectionOffsetModel Ipd58OffsetModel = new ReflectionOffsetModel(1.194927f, -0.186721f, 0.8499745f);
         public ReflectionOffsetModel Ipd63OffsetModel = new ReflectionOffsetModel(1.077431f, -0.07495025f, 0.9323733f);
         public ReflectionOffsetModel Ipd68OffsetModel = new ReflectionOffsetModel(1.044061f, -0.006401608f, 1.038761f, -0.03448246f);
+        public ReflectionOffsetModel IpdQuestProOffsetModel = new ReflectionOffsetModel(1.230723f, -0.2374479f, 0.8047135f);
 
         public static ReflectionOffsetModel IpdModel = null;
 
@@ -52,6 +53,11 @@ namespace App
 
             if (OVRPlugin.ipd >= 0.067f)
                 IpdModel = Ipd68OffsetModel;
+
+
+            var model = XRDeviceUtils.GetDeviceModelType();
+            if (model == EDeviceModelType.QuestPro)
+                IpdModel = IpdQuestProOffsetModel;
 
             IpdModel = Ipd63OffsetModel;
         }
@@ -95,7 +101,7 @@ namespace App
             }
 #endif
 
-            if (model == EDeviceModelType.Quest2)
+            if (model == EDeviceModelType.Quest2 || model == EDeviceModelType.QuestPro)
             {
                 m_Renderer.material.SetFloat("_Quest", 0);
                 m_Renderer.material.SetFloat(s_offsetEnabled, 1);

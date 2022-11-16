@@ -54,12 +54,9 @@ namespace App
             if (OVRPlugin.ipd >= 0.067f)
                 IpdModel = Ipd68OffsetModel;
 
-
             var model = XRDeviceUtils.GetDeviceModelType();
             if (model == EDeviceModelType.QuestPro)
                 IpdModel = IpdQuestProOffsetModel;
-
-            IpdModel = Ipd63OffsetModel;
         }
 
         private void Start()

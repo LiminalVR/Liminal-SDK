@@ -157,8 +157,7 @@ namespace Liminal.SDK.Build
                     EditorUtility.DisplayProgressBar("Extracting...", limappPath, i / (float)limappPath.Length);
 
                     Debug.Log($"Processing: {limappPath}");
-                    var bytes = File.ReadAllBytes(limappPath);
-                    yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExtractPack(bytes, limappPath));
+                    yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExtractPack(limappPath, PlatformName));
                 }
 
                 yield return new EditorWaitForSeconds(1);
@@ -166,64 +165,66 @@ namespace Liminal.SDK.Build
 
                 EditorUtility.ClearProgressBar();
             }
+        }
 
+        public static IEnumerator ExtractPack(string limappPath, string platformName)
+        {
+            var appBytes = File.ReadAllBytes(limappPath);
 
-            IEnumerator ExtractPack(byte[] appBytes, string limappPath)
-            {
-                Debug.Log("Unpacking...");
-                var unpacker = new AppUnpacker();
-                unpacker.UnpackAsync(appBytes);
+            Debug.Log("Unpacking...");
+            var unpacker = new AppUnpacker();
+            unpacker.UnpackAsync(appBytes);
 
-                yield return new WaitUntil(() => unpacker.IsDone);
+            yield return new WaitUntil(() => unpacker.IsDone);
 
-                var fileName = Path.GetFileNameWithoutExtension(limappPath);
+            var fileName = Path.GetFileNameWithoutExtension(limappPath);
 
-                // write all assemblies on disk
-                var assmeblies = unpacker.Data.Assemblies;
-                //Application.persistentDataPath
-                // ../Android/3
-                var appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}";
+            // write all assemblies on disk
+            var assmeblies = unpacker.Data.Assemblies;
+            var p = Path.Combine(Application.dataPath, @"..\Limapp-output");
+            OutputDirectory = $"{p}/{platformName}";
 
-                if (ProcessedFile.Contains(unpacker.Data.ApplicationId))
-                    appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}-{fileName}/{unpacker.Data.TargetPlatform}";
+            //Application.persistentDataPathS
+            // ../Android/3
+            var appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}";
 
-                var assemblyFolder = $"{appFolder}/assemblyFolder";
+            if (ProcessedFile.Contains(unpacker.Data.ApplicationId))
+                appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}-{fileName}/{unpacker.Data.TargetPlatform}";
+
+            var assemblyFolder = $"{appFolder}/assemblyFolder";
                 
-                if (!Directory.Exists(appFolder))
-                    Directory.CreateDirectory(appFolder);
+            if (!Directory.Exists(appFolder))
+                Directory.CreateDirectory(appFolder);
 
-                if (!Directory.Exists(assemblyFolder))
-                    Directory.CreateDirectory(assemblyFolder);
+            if (!Directory.Exists(assemblyFolder))
+                Directory.CreateDirectory(assemblyFolder);
 
-                // Wait, in theory, I can rewrite the assembly to match ah, but that's not it.
+            // Wait, in theory, I can rewrite the assembly to match ah, but that's not it.
 
-                for (var i = 0; i < assmeblies.Count; i++)
-                {
-                    var asmBytes = assmeblies[i];
-                    var asm = Assembly.Load(asmBytes);
-                    File.WriteAllBytes($"{assemblyFolder}/{asm.GetName()}", asmBytes);
-                }
-
-                File.WriteAllBytes($"{appFolder}/appBundle", unpacker.Data.SceneBundle);
-
-                var manifest = new AppManifest
-                {
-                    ExtractedFrom = Path.GetFileName(limappPath),
-                    CreatedDate = DateTime.UtcNow.ToString()
-                };
-
-                var manifestJson = JsonConvert.SerializeObject(manifest);
-
-                File.WriteAllText($"{appFolder}/manifest.json", manifestJson);
-
-                ProcessedFile.Add(unpacker.Data.ApplicationId);
-                Debug.Log("Done!");
-
-                var output = $"{OutputDirectory}/{unpacker.Data.ApplicationId}.zip";
-                UnzipTest.ZipFolder(appFolder, $"{output}");
-
-                yield break;
+            for (var i = 0; i < assmeblies.Count; i++)
+            {
+                var asmBytes = assmeblies[i];
+                var asm = Assembly.Load(asmBytes);
+                File.WriteAllBytes($"{assemblyFolder}/{asm.GetName()}", asmBytes);
             }
+
+            File.WriteAllBytes($"{appFolder}/appBundle", unpacker.Data.SceneBundle);
+
+            var manifest = new AppManifest
+            {
+                ExtractedFrom = Path.GetFileName(limappPath),
+                CreatedDate = DateTime.UtcNow.ToString()
+            };
+
+            var manifestJson = JsonConvert.SerializeObject(manifest);
+
+            File.WriteAllText($"{appFolder}/manifest.json", manifestJson);
+
+            ProcessedFile.Add(unpacker.Data.ApplicationId);
+            Debug.Log("Done!");
+
+            var output = $"{OutputDirectory}/{unpacker.Data.ApplicationId}.zip";
+            UnzipTest.ZipFolder(appFolder, $"{output}");
         }
 
         public class AppManifest

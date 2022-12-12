@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Experimental;
+using Liminal.SDK.Editor.Build;
 using Liminal.SDK.Serialization;
 using Newtonsoft.Json;
 using Unity.EditorCoroutines.Editor;
@@ -21,18 +22,27 @@ namespace Liminal.SDK.Build
     {
         public static string InputDirectory = "C:/Users/ticoc/Documents/Liminal/Limapps/Standalone";
         public static string OutputDirectory = "C:/Users/ticoc/Documents/Liminal/Limapps-new-output/Standalone";
+        public static string PlatformAppDirectory;
+
 
         public static HashSet<int> ProcessedFile = new HashSet<int>();
         public static bool IsAndroid = false;
         public static string PlatformName => IsAndroid ? "Android" : "Standalone";
 
+        public const string LimappInputPathKey = "limappInputDirectory";
+        public const string LimappOutputPathKey = "limappOutputDirectory";
+        public const string PlatformAppPathKey = "PlatformAppDirectory";
+
         public override void OnEnabled()
         {
-            if(EditorPrefs.HasKey("limappInputDirectory"))
-                InputDirectory = EditorPrefs.GetString("limappInputDirectory");
+            if(EditorPrefs.HasKey(LimappInputPathKey))
+                InputDirectory = EditorPrefs.GetString(LimappInputPathKey);
 
-            if (EditorPrefs.HasKey("limappOutputDdirectory"))
-                OutputDirectory = EditorPrefs.GetString("limappOutputDdirectory");
+            if (EditorPrefs.HasKey(LimappOutputPathKey))
+                OutputDirectory = EditorPrefs.GetString(LimappOutputPathKey);
+
+            if (EditorPrefs.HasKey(PlatformAppPathKey))
+                PlatformAppDirectory = EditorPrefs.GetString(PlatformAppPathKey);
 
             base.OnEnabled();
         }
@@ -50,13 +60,15 @@ namespace Liminal.SDK.Build
             EditorGUILayout.LabelField("Select limapp folder");
             DrawDirectorySelection(ref InputDirectory, "Input Directory");
             DrawDirectorySelection(ref OutputDirectory, "Output Directory");
+            DrawDirectorySelection(ref PlatformAppDirectory, "Platform Assets Folder");
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("Save Paths", GUILayout.Width(110)))
             {
-                EditorPrefs.SetString("limappInputDirectory", InputDirectory);
-                EditorPrefs.SetString("limappOutputDdirectory", OutputDirectory);
+                EditorPrefs.SetString(LimappInputPathKey, InputDirectory);
+                EditorPrefs.SetString(LimappOutputPathKey, OutputDirectory);
+                EditorPrefs.SetString(PlatformAppPathKey, PlatformAppDirectory);
             }
             GUILayout.Space(20);
             EditorGUILayout.EndHorizontal();
@@ -70,6 +82,10 @@ namespace Liminal.SDK.Build
                 EditorCoroutineUtility.StartCoroutineOwnerless(ExtractAll(limapps));
             }
 
+            if (GUILayout.Button("Sync with Platform"))
+            {
+                SyncWithPlatform();
+            }
 
             //  path = Android folder?
             void RenameDLL(string path)
@@ -167,6 +183,61 @@ namespace Liminal.SDK.Build
             }
         }
 
+        public static string GetOutputPath => Path.Combine(Application.dataPath, @"..\Limapp-output");
+
+        public static void SyncWithPlatform()
+        {
+            // Copy the dll over
+            var appManifest = AppBuilder.ReadAppManifest();
+            var asmFolder = $"{GetOutputPath}/Android/{appManifest.Id}/assemblyFolder/";
+            var dllPaths = Directory.GetFiles(asmFolder);
+            var platformDllFolder = $"{PlatformAppDirectory}/App/Limapps";
+
+            var dllName = "";
+            foreach (var dllPath in dllPaths)
+            {
+                var fileName = Path.GetFileName(dllPath);
+                dllName = fileName.Split(',')[0];
+                fileName = dllName;
+
+                if (fileName.Contains("App"))
+                {
+                    var dest = $"{platformDllFolder}/{fileName}.dll";
+                    File.Copy(dllPath, dest, true);
+                }
+            }
+
+            var linkerPath = $"{PlatformAppDirectory}/link.xml";
+            var linkerText = File.ReadAllText(linkerPath);
+
+            if (linkerText.Contains(dllName))
+            {
+                Debug.Log($"{dllName} already exist in linker file, no need to edit.");
+            }
+            else
+            {
+                var linkerLine = File.ReadAllLines(linkerPath).ToList();
+                var newLinkerLine = $"<assembly fullname=\"{dllName}\" preserve=\"all\"/>";
+                linkerLine.Insert(linkerLine.Count - 1, newLinkerLine);
+
+                File.WriteAllLines(linkerPath, linkerLine);
+            }
+
+            var scriptPath = $"{PlatformAppDirectory}/App/Scripts/Server/AppServerController/AppServerExperiencesController.cs";
+            var scriptLines = File.ReadAllLines(scriptPath);
+            var scriptTexts = File.ReadAllText(scriptPath);
+
+            if (!scriptTexts.Contains($",{appManifest.Id}"))
+            {
+                scriptLines[77] += $",{appManifest.Id}";
+                File.WriteAllLines(scriptPath, scriptLines);
+            }
+            else
+            {
+                Debug.Log($"{appManifest.Id} already exist in script AppServerExperiencesController, no need to edit.");
+            }
+        }
+
         public static IEnumerator ExtractPack(string limappPath, string platformName)
         {
             var appBytes = File.ReadAllBytes(limappPath);
@@ -181,8 +252,7 @@ namespace Liminal.SDK.Build
 
             // write all assemblies on disk
             var assmeblies = unpacker.Data.Assemblies;
-            var p = Path.Combine(Application.dataPath, @"..\Limapp-output");
-            OutputDirectory = $"{p}/{platformName}";
+            OutputDirectory = $"{GetOutputPath}/{platformName}";
 
             //Application.persistentDataPathS
             // ../Android/3
@@ -263,7 +333,7 @@ namespace Liminal.SDK.Build
 
                 if (GUILayout.Button("...", GUILayout.Width(Size.x * 0.1F)))
                 {
-                    directoryPath = EditorUtility.OpenFolderPanel("Select Limapp Folder", "", "");
+                    directoryPath = EditorUtility.OpenFolderPanel("Select a Folder", "", "");
                     directoryPath = DirectoryUtils.ReplaceBackWithForwardSlashes(directoryPath);
                 }
             }

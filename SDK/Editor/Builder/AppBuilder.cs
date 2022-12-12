@@ -363,7 +363,7 @@ namespace Liminal.SDK.Editor.Build
             return list;
         }
 
-        private static AppManifest ReadAppManifest()
+        public static AppManifest ReadAppManifest()
         {
             var appManifestAsset = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Liminal/liminalapp.json");
             if (appManifestAsset == null)

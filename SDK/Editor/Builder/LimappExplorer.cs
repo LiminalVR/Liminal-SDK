@@ -173,7 +173,7 @@ namespace Liminal.SDK.Build
                     EditorUtility.DisplayProgressBar("Extracting...", limappPath, i / (float)limappPath.Length);
 
                     Debug.Log($"Processing: {limappPath}");
-                    yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExtractPack(limappPath, PlatformName));
+                    yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExtractPack(limappPath, PlatformName, true));
                 }
 
                 yield return new EditorWaitForSeconds(1);
@@ -183,13 +183,13 @@ namespace Liminal.SDK.Build
             }
         }
 
-        public static string GetOutputPath => Path.Combine(Application.dataPath, @"..\Limapp-output");
+        public static string GetDefaultOutputPath => Path.Combine(Application.dataPath, @"..\Limapp-output");
 
         public static void SyncWithPlatform()
         {
             // Copy the dll over
             var appManifest = AppBuilder.ReadAppManifest();
-            var asmFolder = $"{GetOutputPath}/Android/{appManifest.Id}/assemblyFolder/";
+            var asmFolder = $"{GetDefaultOutputPath}/Android/{appManifest.Id}/assemblyFolder/";
             var dllPaths = Directory.GetFiles(asmFolder);
             var platformDllFolder = $"{PlatformAppDirectory}/App/Limapps";
 
@@ -237,7 +237,7 @@ namespace Liminal.SDK.Build
             }
         }
 
-        public static IEnumerator ExtractPack(string limappPath, string platformName)
+        public static IEnumerator ExtractPack(string limappPath, string platformName, bool useSelectedOutputPath = false)
         {
             var appBytes = File.ReadAllBytes(limappPath);
 
@@ -251,14 +251,11 @@ namespace Liminal.SDK.Build
 
             // write all assemblies on disk
             var assmeblies = unpacker.Data.Assemblies;
-            OutputDirectory = $"{GetOutputPath}/{platformName}";
-
-            //Application.persistentDataPathS
-            // ../Android/3
-            var appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}";
+            var outputPath = useSelectedOutputPath ? OutputDirectory : $"{GetDefaultOutputPath}/{platformName}";
+            var appFolder = $"{outputPath}/{unpacker.Data.ApplicationId}";
 
             if (ProcessedFile.Contains(unpacker.Data.ApplicationId))
-                appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}-{fileName}";
+                appFolder = $"{outputPath}/{unpacker.Data.ApplicationId}-{fileName}";
 
             var assemblyFolder = $"{appFolder}/assemblyFolder";
                 

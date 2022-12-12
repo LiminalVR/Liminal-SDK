@@ -197,11 +197,10 @@ namespace Liminal.SDK.Build
             foreach (var dllPath in dllPaths)
             {
                 var fileName = Path.GetFileName(dllPath);
-                dllName = fileName.Split(',')[0];
-                fileName = dllName;
-
                 if (fileName.Contains("App"))
                 {
+                    dllName = fileName.Split(',')[0];
+                    fileName = dllName;
                     var dest = $"{platformDllFolder}/{fileName}.dll";
                     File.Copy(dllPath, dest, true);
                 }
@@ -259,7 +258,7 @@ namespace Liminal.SDK.Build
             var appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}";
 
             if (ProcessedFile.Contains(unpacker.Data.ApplicationId))
-                appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}-{fileName}/{unpacker.Data.TargetPlatform}";
+                appFolder = $"{OutputDirectory}/{unpacker.Data.ApplicationId}-{fileName}";
 
             var assemblyFolder = $"{appFolder}/assemblyFolder";
                 

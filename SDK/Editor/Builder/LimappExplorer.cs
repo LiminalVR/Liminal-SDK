@@ -35,11 +35,8 @@ namespace Liminal.SDK.Build
 
         public override void OnEnabled()
         {
-            if(EditorPrefs.HasKey(LimappInputPathKey))
-                InputDirectory = EditorPrefs.GetString(LimappInputPathKey);
-
-            if (EditorPrefs.HasKey(LimappOutputPathKey))
-                OutputDirectory = EditorPrefs.GetString(LimappOutputPathKey);
+            InputDirectory = EditorPrefs.HasKey(LimappInputPathKey) ? EditorPrefs.GetString(LimappInputPathKey) : GetDefaultOutputPath;
+            OutputDirectory = EditorPrefs.HasKey(LimappOutputPathKey) ? EditorPrefs.GetString(LimappOutputPathKey) : GetDefaultOutputPath;
 
             if (EditorPrefs.HasKey(PlatformAppPathKey))
                 PlatformAppDirectory = EditorPrefs.GetString(PlatformAppPathKey);

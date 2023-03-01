@@ -84,38 +84,6 @@ namespace Liminal.SDK.Build
                 SyncWithPlatform();
             }
 
-            //  path = Android folder?
-            void RenameDLL(string path)
-            {
-                var stringBuilder = new StringBuilder();
-
-                var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
-                foreach (var file in files)
-                {
-                    var fileName = Path.GetFileNameWithoutExtension(file);
-                    if (file.Contains("App000") && file.Contains(","))
-                    {
-                        stringBuilder.AppendLine($"<assembly fullname=\"{fileName}\" preserve=\"all\"/>");
-
-                        var fileNames = file.Split(',');
-                        var fileNameWithoutAssembly = fileNames[0];
-                        var newFileName = Path.GetFileName(fileNameWithoutAssembly);
-                        var newFullPath = $"{path}/{newFileName}.dll";
-
-                        if (File.Exists(newFullPath))
-                        {
-                            Debug.Log($"{newFullPath} exists so it has been deleted.");
-                            File.Delete(newFullPath);
-                        }
-
-                        File.Copy(file, newFullPath);
-
-                        Debug.Log($"Success! Add to link.xml: \n {stringBuilder.ToString()}");
-
-                        Process.Start(OutputDirectory);
-                    }
-                }
-            }
 
             IEnumerator DownloadAll()
             {
@@ -178,6 +146,45 @@ namespace Liminal.SDK.Build
 
                 EditorUtility.ClearProgressBar();
             }
+        }
+
+
+        //  path = Android folder?
+        void RenameDLL(string path)
+        {
+            var stringBuilder = new StringBuilder();
+
+            var files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var fileName = Path.GetFileNameWithoutExtension(file);
+                if (file.Contains("App000") && file.Contains(","))
+                {
+                    stringBuilder.AppendLine($"<assembly fullname=\"{fileName}\" preserve=\"all\"/>");
+
+                    var newFullPath = $"{path}/{GetDllNameWithoutAssembly(file)}.dll";
+
+                    if (File.Exists(newFullPath))
+                    {
+                        Debug.Log($"{newFullPath} exists so it has been deleted.");
+                        File.Delete(newFullPath);
+                    }
+
+                    File.Copy(file, newFullPath);
+
+                    Debug.Log($"Success! Add to link.xml: \n {stringBuilder.ToString()}");
+
+                    Process.Start(OutputDirectory);
+                }
+            }
+        }
+
+        string GetDllNameWithoutAssembly(string file)
+        {
+            var fileNames = file.Split(',');
+            var fileNameWithoutAssembly = fileNames[0];
+            var newFileName = Path.GetFileName(fileNameWithoutAssembly);
+            return newFileName;
         }
 
         public static string GetDefaultOutputPath => Path.Combine(Application.dataPath, @"..\Limapp-output");
@@ -252,10 +259,16 @@ namespace Liminal.SDK.Build
             var appFolder = $"{outputPath}/{unpacker.Data.ApplicationId}";
 
             if (ProcessedFile.Contains(unpacker.Data.ApplicationId))
-                appFolder = $"{outputPath}/{unpacker.Data.ApplicationId}-{fileName}";
+            {
+                appFolder = $"{outputPath}/{unpacker.Data.ApplicationId}-{ProcessedFile.Count}";
+                Debug.Log($"Multiple limapps of this id exist. {unpacker.Data.ApplicationId}");
+            }
 
             var assemblyFolder = $"{appFolder}/assemblyFolder";
-                
+
+            if (Directory.Exists(appFolder))
+                Directory.Delete(appFolder, true);
+
             if (!Directory.Exists(appFolder))
                 Directory.CreateDirectory(appFolder);
 
@@ -268,7 +281,8 @@ namespace Liminal.SDK.Build
             {
                 var asmBytes = assmeblies[i];
                 var asm = Assembly.Load(asmBytes);
-                File.WriteAllBytes($"{assemblyFolder}/{asm.GetName()}", asmBytes);
+              
+                File.WriteAllBytes($"{assemblyFolder}/{asm.GetName().Name}.dll", asmBytes);
             }
 
             File.WriteAllBytes($"{appFolder}/appBundle", unpacker.Data.SceneBundle);
@@ -283,11 +297,12 @@ namespace Liminal.SDK.Build
 
             File.WriteAllText($"{appFolder}/manifest.json", manifestJson);
 
+            // We are adding this to the procesesed file so that when we do this in batches, if there are multiple limapps, we'll get a message about it.
             ProcessedFile.Add(unpacker.Data.ApplicationId);
+
             Debug.Log("Done!");
 
-            var output = $"{OutputDirectory}/{unpacker.Data.ApplicationId}.zip";
-            UnzipTest.ZipFolder(appFolder, $"{output}");
+            UnzipTest.ZipFolder(appFolder, $"{GetDefaultOutputPath}/{platformName}/{unpacker.Data.ApplicationId}.zip");
         }
 
         public class AppManifest

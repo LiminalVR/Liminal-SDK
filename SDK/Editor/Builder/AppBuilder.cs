@@ -243,6 +243,7 @@ namespace Liminal.SDK.Editor.Build
 
         private static void CreateLimappV2(string appPath, string platformName)
         {
+            LimappExplorer.ProcessedFile.Clear();
             EditorCoroutineUtility.StartCoroutineOwnerless(LimappExplorer.ExtractPack(appPath, platformName));
         }
 

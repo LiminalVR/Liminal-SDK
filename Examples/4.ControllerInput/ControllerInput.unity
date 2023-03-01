@@ -1231,7 +1231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe605048765ec114dacdac8ed2eddda4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DownloadPath: https://liminal-resources.s3.ap-southeast-2.amazonaws.com/app/Limapp/v2/3.zip
+  Zip: 0
 --- !u!1 &1057454605
 GameObject:
   m_ObjectHideFlags: 0
@@ -2230,6 +2230,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Type
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1260162970260054300, guid: 22276a8657744e04cba8ad0a2caf4195,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22276a8657744e04cba8ad0a2caf4195, type: 3}

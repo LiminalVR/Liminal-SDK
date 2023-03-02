@@ -51,7 +51,7 @@ namespace Liminal.SDK.Build
 
                 _selectedPlatform = config.SelectedPlatform;
                 _selectedBuildTarget = (int)config.SelectedPlatform;
-                _selectedBuildTarget = EditorGUILayout.IntPopup("Resize Scale: ", _selectedBuildTarget, buildTargetNames, sizes);
+                _selectedBuildTarget = EditorGUILayout.IntPopup("Build Target: ", _selectedBuildTarget, buildTargetNames, sizes);
                 _selectedPlatform = (BuildPlatform)_selectedBuildTarget;
 
                 config.SelectedPlatform = _selectedPlatform;

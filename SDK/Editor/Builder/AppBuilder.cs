@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -217,6 +218,11 @@ namespace Liminal.SDK.Editor.Build
                 EditorUtility.ClearProgressBar();
                 sw.Stop();
                 Debug.LogFormat("[Liminal.Build] Build completed successfully in {0:0.00}s. Size: {1:0.00}mb, Output: {2}", sw.Elapsed.TotalSeconds, BytesToMb(appFile.Length), appPath);
+
+                // Create limapp v2.
+                var resolvedPlatformName = appPlatform == AppPackPlatform.Android ? "Android" : "Standalone";
+                CreateLimappV2(appPath, resolvedPlatformName);
+
             }
             catch (Exception ex)
             {
@@ -233,6 +239,12 @@ namespace Liminal.SDK.Editor.Build
 
                 GUIUtility.ExitGUI();
             }
+        }
+
+        private static void CreateLimappV2(string appPath, string platformName)
+        {
+            LimappExplorer.ProcessedFile.Clear();
+            EditorCoroutineUtility.StartCoroutineOwnerless(LimappExplorer.ExtractPack(appPath, platformName));
         }
 
         private static string GetFileExtension(ECompressionType compressionType = ECompressionType.LMZA)
@@ -352,7 +364,7 @@ namespace Liminal.SDK.Editor.Build
             return list;
         }
 
-        private static AppManifest ReadAppManifest()
+        public static AppManifest ReadAppManifest()
         {
             var appManifestAsset = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Liminal/liminalapp.json");
             if (appManifestAsset == null)

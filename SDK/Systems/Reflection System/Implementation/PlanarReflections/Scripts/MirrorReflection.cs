@@ -35,7 +35,7 @@ namespace App
 
         public ReflectionOffsetModel Ipd58OffsetModel = new ReflectionOffsetModel(1.194927f, -0.186721f, 0.8499745f);
         public ReflectionOffsetModel Ipd63OffsetModel = new ReflectionOffsetModel(1.077431f, -0.07495025f, 0.9323733f);
-        public ReflectionOffsetModel Ipd68OffsetModel = new ReflectionOffsetModel(1.044061f, -0.006401608f, 1.043458f, -0.03977372f);
+        public ReflectionOffsetModel Ipd68OffsetModel = new ReflectionOffsetModel(1.044061f, -0.006401608f, 1.038761f, -0.03448246f);
 
         public static ReflectionOffsetModel IpdModel = null;
 
@@ -44,14 +44,30 @@ namespace App
             if (IpdModel != null)
                 return;
 
-            if (OVRPlugin.ipd >= 0.055f && OVRPlugin.ipd < 0.062f)
-                IpdModel = Ipd58OffsetModel;
+            var deviceModel = XRDeviceUtils.GetDeviceModelType();
 
-            if (OVRPlugin.ipd >= 0.062f && OVRPlugin.ipd < 0.067f)
-                IpdModel = Ipd63OffsetModel;
+            if (deviceModel == EDeviceModelType.QuestPro)
+            {
+                if (OVRPlugin.ipd >= 0.055f && OVRPlugin.ipd < 0.061f)
+                    IpdModel = Ipd58OffsetModel;
 
-            if (OVRPlugin.ipd >= 0.067f)
-                IpdModel = Ipd68OffsetModel;
+                if (OVRPlugin.ipd >= 0.061f && OVRPlugin.ipd < 0.0655f)
+                    IpdModel = Ipd63OffsetModel;
+
+                if (OVRPlugin.ipd >= 0.0655f)
+                    IpdModel = Ipd68OffsetModel;
+            }
+            else
+            {
+                if (OVRPlugin.ipd >= 0.055f && OVRPlugin.ipd < 0.062f)
+                    IpdModel = Ipd58OffsetModel;
+
+                if (OVRPlugin.ipd >= 0.062f && OVRPlugin.ipd < 0.067f)
+                    IpdModel = Ipd63OffsetModel;
+
+                if (OVRPlugin.ipd >= 0.067f)
+                    IpdModel = Ipd68OffsetModel;
+            }
         }
 
         private void Start()
@@ -93,7 +109,7 @@ namespace App
             }
 #endif
 
-            if (model == EDeviceModelType.Quest2)
+            if (model == EDeviceModelType.Quest2 || model == EDeviceModelType.QuestPro)
             {
                 m_Renderer.material.SetFloat("_Quest", 0);
                 m_Renderer.material.SetFloat(s_offsetEnabled, 1);

@@ -1,4 +1,5 @@
-﻿using Liminal.SDK.Editor.Build;
+﻿using System;
+using Liminal.SDK.Editor.Build;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
@@ -13,6 +14,7 @@ namespace Liminal.SDK.Build
     public class BuildWindow : BaseWindowDrawer
     {
         private string _referenceInput;
+        private int _selectedBuildTarget;
 
         public override void Draw(BuildWindowConfig config)
         {
@@ -28,8 +30,30 @@ namespace Liminal.SDK.Build
                 config.TargetScene = _scenePath;
                 EditorGUILayout.Space();
 
+                var target = string.Empty;
+
+                switch (EditorUserBuildSettings.activeBuildTarget)
+                {
+                    case BuildTarget.Android:
+                        target = "Android";
+                        break;
+                    case BuildTarget.StandaloneWindows:
+                        target = "Windows Standalone | Emulator | Editor";
+                        break;
+                    default:
+                        target = "UNSUPPORTED PLATFORM";
+                        break;
+                }
+
+                var buildTargetNames = new[] { $"Current ({target})", "Standalone Windows", "Android" };
+                var sizes = new[] { 0, 1, 2 };
+
+
                 _selectedPlatform = config.SelectedPlatform;
-                _selectedPlatform = (BuildPlatform)EditorGUILayout.EnumPopup("Select Platform", _selectedPlatform);
+                _selectedBuildTarget = (int)config.SelectedPlatform;
+                _selectedBuildTarget = EditorGUILayout.IntPopup("Build Target: ", _selectedBuildTarget, buildTargetNames, sizes);
+                _selectedPlatform = (BuildPlatform)_selectedBuildTarget;
+
                 config.SelectedPlatform = _selectedPlatform;
 
                 _compressionType = config.CompressionType;
@@ -105,20 +129,47 @@ namespace Liminal.SDK.Build
                 {
                     //run checks here.
 
+                    var buildTargetOkay = true;
+
+                    switch (_selectedPlatform)
+                    {
+                        case BuildPlatform.GearVR when EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android:
+                        case BuildPlatform.Standalone when EditorUserBuildSettings.activeBuildTarget != BuildTarget.StandaloneWindows:
+                            buildTargetOkay = false;
+                            break;
+                    }
+
+                    if (!buildTargetOkay)
+                    {
+                        if (EditorUtility.DisplayDialog("Platform Issue Detected", "Outstanding platform issues have been detected in your project. " +
+                                "To reduce build time, ensure your current build target matches your selected platform", "Build Anyway", "Cancel Build"))
+                        {
+                            buildTargetOkay = true;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+
                     IssuesUtility.CheckForAllIssues();
 
                     var hasBuildIssues = EditorPrefs.GetBool("HasBuildIssues");
 
                     if (hasBuildIssues)
                     {
-                        if(EditorUtility.DisplayDialog("Build Issues Detected", "Outstanding issues have been detected in your project. " +
-                        "Navigate to Build Settings->Issues for help resolving them", "Build Anyway", "Cancel Build"))
+                        if (EditorUtility.DisplayDialog("Build Issues Detected", "Outstanding issues have been detected in your project. " +
+                                "Navigate to Build Settings->Issues for help resolving them", "Build Anyway", "Cancel Build"))
                         {
-                            Build();
+                            hasBuildIssues = false;
                         }
                     }
-                    else
+
+                    if (buildTargetOkay && !hasBuildIssues)
+                    {
+
                         Build();
+                    }
                 }
 
                 EditorGUILayout.EndVertical();

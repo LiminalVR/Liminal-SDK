@@ -26,8 +26,8 @@ namespace Liminal.SDK.Build
 
 
         public static HashSet<int> ProcessedFile = new HashSet<int>();
-        public static bool IsAndroid = false;
-        public static string PlatformName => IsAndroid ? "Android" : "Standalone";
+        public static BuildTarget Target;
+        public static string PlatformName => Target.ToString();
 
         public const string LimappInputPathKey = "limappInputDirectory";
         public const string LimappOutputPathKey = "limappOutputDirectory";
@@ -54,21 +54,37 @@ namespace Liminal.SDK.Build
 
             GUILayout.Space(20);
 
+            EditorGUILayout.LabelField("Select Build Type");
+            Target = (BuildTarget)EditorGUILayout.EnumPopup("Build Target: ", Target);
+
+            GUILayout.Space(10);
+
             EditorGUILayout.LabelField("Select limapp folder");
+
+            EditorGUI.BeginChangeCheck();
+
             DrawDirectorySelection(ref InputDirectory, "Input Directory");
             DrawDirectorySelection(ref OutputDirectory, "Output Directory");
             DrawDirectorySelection(ref PlatformAppDirectory, "Platform Assets Folder");
 
-            EditorGUILayout.BeginHorizontal();
-            GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Save Paths", GUILayout.Width(110)))
-            {
+            //! Replace save paths with a change check?
+            if(EditorGUI.EndChangeCheck()) {
                 EditorPrefs.SetString(LimappInputPathKey, InputDirectory);
                 EditorPrefs.SetString(LimappOutputPathKey, OutputDirectory);
                 EditorPrefs.SetString(PlatformAppPathKey, PlatformAppDirectory);
             }
-            GUILayout.Space(20);
-            EditorGUILayout.EndHorizontal();
+
+            //
+            // EditorGUILayout.BeginHorizontal();
+            // GUILayout.FlexibleSpace();
+            // if (GUILayout.Button("Save Paths", GUILayout.Width(110)))
+            // {
+            //     EditorPrefs.SetString(LimappInputPathKey, InputDirectory);
+            //     EditorPrefs.SetString(LimappOutputPathKey, OutputDirectory);
+            //     EditorPrefs.SetString(PlatformAppPathKey, PlatformAppDirectory);
+            // }
+            // GUILayout.Space(20);
+            // EditorGUILayout.EndHorizontal();
 
             GUILayout.FlexibleSpace();
             if (GUILayout.Button("Convert"))
@@ -79,9 +95,14 @@ namespace Liminal.SDK.Build
                 EditorCoroutineUtility.StartCoroutineOwnerless(ExtractAll(limapps));
             }
 
-            if (GUILayout.Button("Sync with Platform"))
-            {
-                SyncWithPlatform();
+            if (GUILayout.Button("Sync with Platform")) {
+            
+                if(IsValidLocation(PlatformAppDirectory)) {
+                    SyncWithPlatform(EditorPrefs.HasKey(LimappOutputPathKey));
+                }
+                else {
+                    EditorUtility.DisplayDialog("Sync Error", "Platform Assets Directory is not valid. Please add a valid location in order to Sync with the platform", "Okay");
+                }
             }
 
 
@@ -102,7 +123,7 @@ namespace Liminal.SDK.Build
                         if (!experience.Approved || !experience.Enabled)
                             continue;
 
-                        var experienceGuid = IsAndroid ? experience.LimappGearVrGuid : experience.LimappEmulatorGuid;
+                        var experienceGuid = Target==BuildTarget.Android ? experience.LimappGearVrGuid : experience.LimappEmulatorGuid;
                         var getResource = $"https://api.liminalvr.com/api/resource/guid/{experienceGuid}";
                         using (var resourceWww = UnityWebRequest.Get(getResource))
                         {
@@ -138,7 +159,10 @@ namespace Liminal.SDK.Build
                     EditorUtility.DisplayProgressBar("Extracting...", limappPath, i / (float)limappPath.Length);
 
                     Debug.Log($"Processing: {limappPath}");
-                    yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExtractPack(limappPath, PlatformName, true));
+                    
+                    bool useSelectedOutputPath = EditorPrefs.HasKey(LimappOutputPathKey);
+
+                    yield return EditorCoroutineUtility.StartCoroutineOwnerless(ExtractPack(limappPath, PlatformName, useSelectedOutputPath));
                 }
 
                 yield return new EditorWaitForSeconds(1);
@@ -189,11 +213,11 @@ namespace Liminal.SDK.Build
 
         public static string GetDefaultOutputPath => Path.Combine(Application.dataPath, @"..\Limapp-output");
 
-        public static void SyncWithPlatform()
-        {
+        public static void SyncWithPlatform(bool useSelectedOutputPath = false) {
             // Copy the dll over
             var appManifest = AppBuilder.ReadAppManifest();
-            var asmFolder = $"{GetDefaultOutputPath}/Android/{appManifest.Id}/assemblyFolder/";
+            var outputPath = useSelectedOutputPath ? OutputDirectory : GetDefaultOutputPath;
+            var asmFolder = $"{outputPath}/Android/{appManifest.Id}/assemblyFolder/";
             var dllPaths = Directory.GetFiles(asmFolder);
             var platformDllFolder = $"{PlatformAppDirectory}/App/Limapps";
 
@@ -204,8 +228,9 @@ namespace Liminal.SDK.Build
                 if (fileName.Contains("App"))
                 {
                     dllName = fileName.Split(',')[0];
-                    fileName = dllName;
-                    var dest = $"{platformDllFolder}/{fileName}.dll";
+                    dllName = Path.GetFileNameWithoutExtension(dllName);
+                    var dest = $"{platformDllFolder}/{dllName}.dll";
+                    Debug.Log(dest);
                     File.Copy(dllPath, dest, true);
                 }
             }
@@ -220,7 +245,7 @@ namespace Liminal.SDK.Build
             else
             {
                 var linkerLine = File.ReadAllLines(linkerPath).ToList();
-                var newLinkerLine = $"<assembly fullname=\"{dllName}\" preserve=\"all\"/>";
+                var newLinkerLine = $"\t<assembly fullname=\"{dllName}\" preserve=\"all\"/>";
                 linkerLine.Insert(linkerLine.Count - 1, newLinkerLine);
 
                 File.WriteAllLines(linkerPath, linkerLine);
@@ -232,14 +257,24 @@ namespace Liminal.SDK.Build
 
             if (!scriptTexts.Contains($",{appManifest.Id}"))
             {
-                scriptLines[77] += $",{appManifest.Id}";
-                File.WriteAllLines(scriptPath, scriptLines);
+                // scriptLines[77] += $",{appManifest.Id}";
+                // File.WriteAllLines(scriptPath, scriptLines);
+                string sIdentifier = "//-->";
+                string eIdentifier = "//<--";
+
+                int sIndex = scriptTexts.IndexOf(sIdentifier);
+                int eIndex = scriptTexts.IndexOf(eIdentifier, sIndex + sIdentifier.Length);
+
+                string experienceIds = scriptTexts.Substring(sIndex + sIdentifier.Length, eIndex - sIndex - sIdentifier.Length);
+                scriptTexts = scriptTexts.Replace(experienceIds, experienceIds + $",{appManifest.Id}");
+                File.WriteAllText(scriptPath, scriptTexts);
             }
             else
             {
                 Debug.Log($"{appManifest.Id} already exist in script AppServerExperiencesController, no need to edit.");
             }
         }
+
 
         public static IEnumerator ExtractPack(string limappPath, string platformName, bool useSelectedOutputPath = false)
         {
@@ -255,8 +290,12 @@ namespace Liminal.SDK.Build
 
             // write all assemblies on disk
             var assmeblies = unpacker.Data.Assemblies;
-            var outputPath = useSelectedOutputPath ? OutputDirectory : $"{GetDefaultOutputPath}/{platformName}";
+            var outputPath = useSelectedOutputPath ? $"{OutputDirectory}/{platformName}" : $"{GetDefaultOutputPath}/{platformName}";
             var appFolder = $"{outputPath}/{unpacker.Data.ApplicationId}";
+
+            if (!Directory.Exists(outputPath)) {
+                Directory.CreateDirectory(appFolder);
+            }
 
             if (ProcessedFile.Contains(unpacker.Data.ApplicationId))
             {
@@ -266,6 +305,7 @@ namespace Liminal.SDK.Build
 
             var assemblyFolder = $"{appFolder}/assemblyFolder";
 
+            // USe this rob
             if (Directory.Exists(appFolder))
                 Directory.Delete(appFolder, true);
 
@@ -302,7 +342,9 @@ namespace Liminal.SDK.Build
 
             Debug.Log("Done!");
 
-            UnzipTest.ZipFolder(appFolder, $"{GetDefaultOutputPath}/{platformName}/{unpacker.Data.ApplicationId}.zip");
+            //UnzipTest.ZipFolder(appFolder, $"{GetDefaultOutputPath}/{platformName}/{unpacker.Data.ApplicationId}.zip");
+            UnzipTest.ZipFolder(appFolder, $"{outputPath}/{unpacker.Data.ApplicationId}.zip");
+            Debug.Log($"{GetDefaultOutputPath}/{platformName}/{unpacker.Data.ApplicationId}.zip");
         }
 
         public class AppManifest
@@ -346,6 +388,15 @@ namespace Liminal.SDK.Build
                 }
             }
             EditorGUILayout.EndHorizontal();
+        }
+
+        private bool IsValidLocation(string location) {
+            return !string.IsNullOrEmpty(location) && Directory.Exists(location);
+        }
+
+        public enum BuildTarget {
+            Android,
+            Standalone
         }
     }
 }

@@ -69,6 +69,11 @@ namespace Liminal.SDK.Build
 
             //! Replace save paths with a change check?
             if(EditorGUI.EndChangeCheck()) {
+
+                if(string.IsNullOrEmpty(OutputDirectory)) {
+                    OutputDirectory = GetDefaultOutputPath;
+                }
+
                 EditorPrefs.SetString(LimappInputPathKey, InputDirectory);
                 EditorPrefs.SetString(LimappOutputPathKey, OutputDirectory);
                 EditorPrefs.SetString(PlatformAppPathKey, PlatformAppDirectory);
@@ -91,8 +96,20 @@ namespace Liminal.SDK.Build
             {
                 ProcessedFile.Clear();
 
-                var limapps = Directory.GetFiles(InputDirectory);
-                EditorCoroutineUtility.StartCoroutineOwnerless(ExtractAll(limapps));
+                if(IsValidLocation(InputDirectory)) {
+
+                    var limapps = Directory.GetFiles(InputDirectory);
+
+                    if(limapps!=null) {
+                        EditorCoroutineUtility.StartCoroutineOwnerless(ExtractAll(limapps));
+                    }
+                    else {
+                        EditorUtility.DisplayDialog("Conversion Error", "No files were found at the specificed input directory. Please provide a valid limapp.", "Okay");
+                    }
+                }
+                else {
+                    EditorUtility.DisplayDialog("Conversion Error", "Invalid input directory. Please provide a valid location.", "Okay");
+                }
             }
 
             if (GUILayout.Button("Sync with Platform")) {

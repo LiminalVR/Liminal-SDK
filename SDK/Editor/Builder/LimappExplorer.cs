@@ -234,7 +234,7 @@ namespace Liminal.SDK.Build
             // Copy the dll over
             var appManifest = AppBuilder.ReadAppManifest();
             var outputPath = useSelectedOutputPath ? OutputDirectory : GetDefaultOutputPath;
-            var asmFolder = $"{outputPath}/Android/{appManifest.Id}/assemblyFolder/";
+            var asmFolder = $"{outputPath}/{PlatformName}/{appManifest.Id}/assemblyFolder/";
             var dllPaths = Directory.GetFiles(asmFolder);
             var platformDllFolder = $"{PlatformAppDirectory}/App/Limapps";
 

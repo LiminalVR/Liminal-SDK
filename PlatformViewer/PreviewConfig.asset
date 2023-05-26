@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4a3c01ccdeb50541b24baa71f9ecfbd, type: 3}
   m_Name: PreviewConfig
   m_EditorClassIdentifier: 
-  EmulatorPath: C:/Work/Liminal/Platform/Liminal-SDK - 2019/Liminal-SDK-Unity-Package/Assets
-  AndroidPath: C:/Work/Liminal/Platform/Liminal-SDK - 2019/Liminal-SDK-Unity-Package/Assets
+  EmulatorPath: C:/Users/Rober/Documents/Liminal/Projects/LiminalSdk/Liminal-SDK-Unity-Package/Assets
+  AndroidPath: C:/Users/Rober/Documents/Liminal/Projects/LiminalSdk/Liminal-SDK-Unity-Package/Assets
   AndroidAppFullName: GearVr - Descent-8f5c8ea5-e965-4583-bf7b-477550ae27c6.limapp

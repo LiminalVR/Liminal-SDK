@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using Liminal.SDK.Editor.Build;
 using Newtonsoft.Json;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -102,7 +101,7 @@ namespace Liminal.Shared
         [UnityEditor.MenuItem("Liminal/Limapp Data/Create", false)]
         public static void CreateData()
         {
-            var appManifest = AppBuilder.ReadAppManifest();
+            var appManifest = Liminal.SDK.Editor.Build.AppBuilder.ReadAppManifest();
             LimappDataContext.ExperienceId = appManifest.Id;
             LimappDataContext.CreateData();
         }

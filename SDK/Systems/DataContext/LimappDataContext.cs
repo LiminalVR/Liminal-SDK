@@ -29,6 +29,12 @@ namespace Liminal.Shared
         public static void CreateData()
         {
             var settings = new LimappRuntimeSettings();
+
+            settings.Features = new Dictionary<string, object>()
+            {
+                {"runtimeDuration", TimeSpan.FromSeconds(600)},
+            };
+
             CreateData(settings);
         }
 

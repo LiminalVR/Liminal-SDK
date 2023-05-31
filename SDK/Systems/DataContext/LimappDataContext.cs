@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using Liminal.SDK.Editor.Build;
 using Newtonsoft.Json;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace Liminal.Shared
 {
@@ -25,20 +28,19 @@ namespace Liminal.Shared
             return settings;
         }
 
-        [ContextMenu("Create Data")]
         public static void CreateData()
         {
-            var settings = new LimappRuntimeSettings();
-
-            settings.Features = new Dictionary<string, object>()
+            var settings = new LimappRuntimeSettings
             {
-                {"runtimeDuration", TimeSpan.FromSeconds(600)},
+                Features = new Dictionary<string, object>()
+                {
+                    {"runtimeDuration", TimeSpan.FromSeconds(600)},
+                }
             };
 
             CreateData(settings);
         }
 
-        [ContextMenu("Create Data")]
         public static void CreateData(LimappRuntimeSettings settings)
         {
             var settingsJson = JsonConvert.SerializeObject(settings, Formatting.Indented);
@@ -47,14 +49,6 @@ namespace Liminal.Shared
                 Directory.CreateDirectory(DataPath);
 
             File.WriteAllText(RuntimeSettingsPath, settingsJson);
-        }
-
-        [ContextMenu("Open Data Directory")]
-        public static void OpenDataDirectory()
-        {
-            // explorer doesn't like front slashes
-            var directoryPath = DataPath.Replace(@"/", @"\");
-            System.Diagnostics.Process.Start("explorer.exe", "/select," + directoryPath);
         }
     }
 
@@ -97,4 +91,26 @@ namespace Liminal.Shared
         public TimeSpan TimeSpan = TimeSpan.FromSeconds(600);
         public bool Unlimited;
     }
+
+#if UNITY_EDITOR
+
+    public static class LimappDataMenus
+    {
+        [UnityEditor.MenuItem("Liminal/Limapp Data/Open Directory", false)]
+        public static void OpenDataDirectory()
+        {
+            // explorer doesn't like front slashes
+            var directoryPath = LimappDataContext.DataPath.Replace(@"/", @"\");
+            System.Diagnostics.Process.Start("explorer.exe", "/select," + directoryPath);
+        }
+
+        [UnityEditor.MenuItem("Liminal/Limapp Data/Create", false)]
+        public static void CreateData()
+        {
+            var appManifest = AppBuilder.ReadAppManifest();
+            LimappDataContext.ExperienceId = appManifest.Id;
+            LimappDataContext.CreateData();
+        }
+    }
+#endif
 }

@@ -71,15 +71,10 @@ namespace Liminal.Shared
             var limappDuration = new LimappRuntimeDuration();
             if (Features.TryGetValue(RuntimeDurationKey, out var duration))
             {
-                switch (Type.GetTypeCode(duration.GetType()))
-                {
-                    case TypeCode.String:
-                        limappDuration.Unlimited = true;
-                        break;
-                    default:
-                        limappDuration.TimeSpan = (TimeSpan)duration;
-                        break;
-                }
+                if (TimeSpan.TryParse((string)duration, out var timeSpan))
+                    limappDuration.TimeSpan = timeSpan;
+                else
+                    limappDuration.Unlimited = true;
             }
 
             return limappDuration;

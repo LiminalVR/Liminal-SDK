@@ -17,12 +17,17 @@ namespace Liminal.Systems
             EDeviceModelType.RiftS,
             EDeviceModelType.HtcVivePro,
             EDeviceModelType.Quest2,
-            EDeviceModelType.QuestPro
+            EDeviceModelType.QuestPro,
+            EDeviceModelType.Quest3,
         };
 
         public static EDeviceModelType GetDeviceModelType()
         {
             var name = SystemInfo.deviceName;
+
+            if (name.Equals("Quest 3"))
+                return EDeviceModelType.Quest3;
+
             if (name.Equals("Meta Quest Pro"))
                 return EDeviceModelType.QuestPro;
 

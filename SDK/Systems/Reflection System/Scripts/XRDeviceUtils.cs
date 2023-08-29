@@ -25,7 +25,7 @@ namespace Liminal.Systems
         {
             var name = SystemInfo.deviceName;
 
-            if (name.Equals("Quest 3"))
+            if (name.Contains("Quest 3"))
                 return EDeviceModelType.Quest3;
 
             if (name.Equals("Meta Quest Pro"))

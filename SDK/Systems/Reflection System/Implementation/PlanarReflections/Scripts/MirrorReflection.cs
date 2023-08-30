@@ -57,7 +57,7 @@ namespace App
                 if (OVRPlugin.ipd >= 0.0655f)
                     IpdModel = Ipd68OffsetModel;
             }
-            else
+            else // Quest 2 
             {
                 if (OVRPlugin.ipd >= 0.055f && OVRPlugin.ipd < 0.062f)
                     IpdModel = Ipd58OffsetModel;
@@ -67,6 +67,12 @@ namespace App
 
                 if (OVRPlugin.ipd >= 0.067f)
                     IpdModel = Ipd68OffsetModel;
+            }
+
+            // There is an odd reason where Quest 3 in the Platform uses different IPD values than SDK.
+            if (deviceModel == EDeviceModelType.Quest3)
+            {
+                IpdModel = OVRPlugin.ipd >= 0.06f ? Ipd63OffsetModel : Ipd58OffsetModel;
             }
         }
 
@@ -85,7 +91,7 @@ namespace App
             m_Renderer.material.SetFloat("_Quest", OVRUtils.IsOculusQuest ? 1 : 0);
 #endif
             var model = XRDeviceUtils.GetDeviceModelType();
-
+            Debug.Log($"[Mirror Reflection] Model Name: {model}, is Quest: {OVRUtils.IsOculusQuest}");
 #if UNITY_STANDALONE
             m_Renderer.material.SetFloat(s_offsetEnabled, 1);
 
@@ -109,25 +115,15 @@ namespace App
             }
 #endif
 
-            if (model == EDeviceModelType.Quest2 || model == EDeviceModelType.QuestPro)
+            if (model == EDeviceModelType.Quest2 ||
+                model == EDeviceModelType.QuestPro ||
+                model == EDeviceModelType.Quest3)
             {
                 m_Renderer.material.SetFloat("_Quest", 0);
                 m_Renderer.material.SetFloat(s_offsetEnabled, 1);
                 m_Renderer.material.SetFloat("_Debug", 1);
 
                 SetMaterial(IpdModel);
-            }
-
-            if (model == EDeviceModelType.Quest3)
-            {
-                m_Renderer.material.SetFloat("_Quest", 0);
-                m_Renderer.material.SetFloat("_OffsetEnabled", 1);
-                m_Renderer.material.SetFloat("_Debug", 1);
-                m_Renderer.material.SetFloat("_OffsetRX", 1.230723f);
-                m_Renderer.material.SetFloat("_OffsetRY", 1);
-                m_Renderer.material.SetFloat("_OffsetRZ", -0.2374479f);
-                m_Renderer.material.SetFloat("_OffsetRW", 0);
-                m_Renderer.material.SetFloat("_OffsetX", 0.8047135f);
             }
 
             void SetMaterial(ReflectionOffsetModel m)
@@ -150,7 +146,7 @@ namespace App
         // camera will just work!
         public void OnWillRenderObject()
         {
-            if(m_Renderer == null)
+            if (m_Renderer == null)
                 return;
 
             if (!enabled || !m_Renderer || !m_Renderer.sharedMaterial || !m_Renderer.enabled)
@@ -233,10 +229,10 @@ namespace App
             try
             {
                 foreach (DictionaryEntry kvp in m_ReflectionCameras)
-                    DestroyImmediate(((Camera) kvp.Value).gameObject);
+                    DestroyImmediate(((Camera)kvp.Value).gameObject);
             }
-            catch 
-            { 
+            catch
+            {
                 Debug.Log("Caught reflection camera not destroying properly");
             }
 

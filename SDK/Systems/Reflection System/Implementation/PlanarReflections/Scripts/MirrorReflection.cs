@@ -72,8 +72,16 @@ namespace App
             // There is an odd reason where Quest 3 in the Platform uses different IPD values than SDK.
             if (deviceModel == EDeviceModelType.Quest3)
             {
-                IpdModel = OVRPlugin.ipd >= 0.06f ? Ipd63OffsetModel : Ipd58OffsetModel;
+                if (OVRPlugin.ipd < 0.060f)
+                    IpdModel = Ipd58OffsetModel;
+                else if (OVRPlugin.ipd < 0.0665f)
+                    IpdModel = Ipd63OffsetModel;
+                else
+                    IpdModel = Ipd68OffsetModel;
             }
+
+
+            Debug.Log($"IPD {OVRPlugin.ipd}");
         }
 
         private void Start()

@@ -30,17 +30,27 @@ namespace App
         // This is used by the Editor
         public static IVRDevice CreateDevice(ESDKType sdkType)
         {
+            Debug.Log("[Device Utils] - Forcing UNITY XR for Android for now.");
+
+            if (!Application.isEditor)
+            {
+                return new UnityXRDevice();
+            }
+
             switch (sdkType)
             {
 #if UNITY_XR
                 case ESDKType.UnityXR:
+                    Debug.Log("[Device Utils] - Creating Unity XR");
                     return new UnityXRDevice();
 #endif
                 case ESDKType.OVR:
+                    Debug.Log("[Device Utils] - Creating OVR");
                     XRSettings.enabled = true;
                     return new GearVRDevice();
 
                 case ESDKType.OpenVR:
+                    Debug.Log("[Device Utils] - Creating OpenVR");
                     return new OpenVRDevice();
 
                 default:

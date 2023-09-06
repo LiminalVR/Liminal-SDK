@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Liminal.Cecil.Mono.Cecil;
 using Liminal.SDK.VR.Avatars;
 using UnityEditor;
 using UnityEngine;
@@ -246,9 +247,65 @@ namespace Liminal.SDK.Build
                         , WarningTexture, GUILayout.MaxWidth(16), GUILayout.MaxHeight(16));
                 }
 
+                ListTaggedObjects(allTags);
+
                 GUILayout.Space(EditorGUIUtility.singleLineHeight);
                 EditorGUI.indentLevel--;
             });
+        }
+
+        private List<GameObject> _taggedGameObjects = new List<GameObject>();
+        private int _tagsMask;
+        private void ListTaggedObjects(string[] allTags)
+        {
+            GUILayout.Space(EditorGUIUtility.singleLineHeight);
+            GUILayout.Label("Tagged Objects", EditorStyles.boldLabel);
+            
+            GUILayout.BeginHorizontal();
+            var customTags = allTags.Skip(7).ToArray();
+            var selectedTags = new List<string>();
+            for (int i = 0; i < customTags.Length; i++)
+            {
+                int layer = 1 << i;
+                if ((_tagsMask & layer) != 0)
+                {
+                    selectedTags.Add(customTags[i]);
+                }
+            }
+            
+            if (GUILayout.Button("Find Tagged GameObjects", GUILayout.MaxWidth(200)))
+            {
+                var allObjs = Resources.FindObjectsOfTypeAll<GameObject>();
+
+                _taggedGameObjects = new List<GameObject>();
+                foreach (var obj in allObjs)
+                {
+                    if(obj == null)
+                        continue;
+
+                    if (selectedTags.Contains(obj.tag))
+                    {
+                        _taggedGameObjects.Add(obj.gameObject);
+                        _taggedGameObjects = _taggedGameObjects.OrderBy(x => x.tag).ThenBy(x => x.name).ToList();
+                    }
+                }
+            }
+            _tagsMask = EditorGUILayout.MaskField(_tagsMask, customTags);
+            GUILayout.EndHorizontal();
+
+            foreach (var o in _taggedGameObjects)
+            {
+                string str;
+                str = !o.activeInHierarchy
+                    ? $"<color=#aaa>{o.name}</color>\t<color=#7d7d18>tag = <b>{o.tag}</b></color>"
+                    : $"{o.name}\t<color=#eeee00>tag = <b>{o.tag}</b></color>";
+
+                if (GUILayout.Button(str, new GUIStyle("ObjectPickerTab"){richText = true}))
+                {
+                    Selection.activeGameObject = o;
+                    EditorGUIUtility.PingObject(o);
+                }
+            }
         }
 
         private void CheckIncompatibility()

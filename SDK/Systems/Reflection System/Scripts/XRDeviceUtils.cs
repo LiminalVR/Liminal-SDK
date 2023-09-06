@@ -17,18 +17,21 @@ namespace Liminal.Systems
             EDeviceModelType.RiftS,
             EDeviceModelType.HtcVivePro,
             EDeviceModelType.Quest2,
-            EDeviceModelType.Pico,
-            EDeviceModelType.PicoNeo3
+            EDeviceModelType.QuestPro,
+            EDeviceModelType.Quest3,
         };
 
         public static EDeviceModelType GetDeviceModelType()
         {
-            //SystemInfo.deviceName = Pico Neo 3
-            Debug.Log("XR Model: " + SystemInfo.deviceModel);
-            Debug.Log("Device Name: " + SystemInfo.deviceName);
-            Debug.Log("Device Model " + SystemInfo.deviceModel);
+            var name = SystemInfo.deviceName;
 
-            var model = SystemInfo.deviceModel;
+            if (name.Contains("Quest 3"))
+                return EDeviceModelType.Quest3;
+
+            if (name.Equals("Meta Quest Pro"))
+                return EDeviceModelType.QuestPro;
+
+            var model = XRDevice.model;
             var type = EDeviceModelType.Unknown;
             model = model.ToLower();
 

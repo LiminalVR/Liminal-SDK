@@ -242,13 +242,13 @@ namespace Liminal.SDK.VR.Devices.GearVR
 
                 var mesh = hand.GetControllerVisual().GetComponentInChildren<MeshRenderer>();
 
-                if (mesh.material.shader.name.Equals(("Standard")))
+                if (mesh.material.shader.name.Equals("Liminal/QuestController"))
                 {
                     continue;
                 }
 
                 var oldMat = mesh.material;
-                var newMat = new Material(Shader.Find("Standard"))
+                var newMat = new Material(Shader.Find("Liminal/QuestController"))
                 {
                     mainTexture = oldMat.GetTexture(BaseMap), color = oldMat.GetColor(BaseColor)
                 };

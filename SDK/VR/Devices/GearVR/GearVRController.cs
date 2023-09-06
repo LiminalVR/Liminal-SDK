@@ -16,8 +16,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
         public override string Name => "GearVRController";
         public override int ButtonCount { get { return 3; } }
 
-        public static readonly OVRInput.Controller RightHandControllerMask = OVRInput.Controller.RTouch;
-        public static readonly OVRInput.Controller LeftHandControllerMask = OVRInput.Controller.LTouch;
+        public static readonly OVRInput.Controller RightHandControllerMask = OVRInput.Controller.RTouch | OVRInput.Controller.RTrackedRemote;
+        public static readonly OVRInput.Controller LeftHandControllerMask = OVRInput.Controller.LTouch | OVRInput.Controller.LTrackedRemote;
         public static readonly OVRInput.Controller AllHandControllersMask = RightHandControllerMask | LeftHandControllerMask;
 
         private static readonly VRInputDeviceCapability _capabilities =
@@ -32,9 +32,16 @@ namespace Liminal.SDK.VR.Devices.GearVR
         {
             get
             {
-                return _hand == VRInputDeviceHand.Right
-                    ? OVRInput.Controller.RTouch
-                    : OVRInput.Controller.LTouch;
+                if (OVRUtils.IsOculusQuest)
+                {
+                    return _hand == VRInputDeviceHand.Right
+                        ? OVRInput.Controller.RTouch
+                        : OVRInput.Controller.LTouch;
+                }
+                else
+                {
+                    return OVRInput.Controller.RTrackedRemote | OVRInput.Controller.LTrackedRemote;
+                }
             }
         }
 
@@ -51,12 +58,36 @@ namespace Liminal.SDK.VR.Devices.GearVR
         // Note, on the Touch Controllers (Oculus Quest controllers), there are two triggers that provide 1Axis.
         // The HandTrigger is the Grip on the side of the controller.
         // The IndexTrigger is the common trigger, like firing a gun.
+        // VRAxis.One and VRAxis.OneRaw is reserved for the thumbstick
         public override float GetAxis1D(string axis)
         {
             if (OVRUtils.IsOculusQuest)
             {
-                // TODO: Add HandTrigger support and IndexTrigger support since Oculus Quest can provide an Axis.
-                //
+                switch (axis)
+                {
+                    case VRAxis.TwoRaw:
+                        var rawAxis = Controller == OVRInput.Controller.LTouch ?
+                            OVRInput.RawAxis1D.LIndexTrigger : OVRInput.RawAxis1D.RIndexTrigger;
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, base.ControllerMask);
+
+                    case VRAxis.Two:
+                        var allAxis = Controller == OVRInput.Controller.LTouch ?
+                            OVRInput.Axis1D.PrimaryIndexTrigger : OVRInput.Axis1D.SecondaryIndexTrigger;
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryIndexTrigger, Controller);
+
+                    case VRAxis.ThreeRaw:
+                        var threeRawAxis = Controller == OVRInput.Controller.LTouch ?
+                            OVRInput.RawAxis1D.LHandTrigger : OVRInput.RawAxis1D.RHandTrigger;
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, base.ControllerMask);
+
+                    case VRAxis.Three:
+                        var threeAxis = Controller == OVRInput.Controller.LTouch ?
+                            OVRInput.Axis1D.PrimaryHandTrigger : OVRInput.Axis1D.SecondaryHandTrigger;
+                        return OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger, Controller);
+
+                    default:
+                        return 0;
+                }
             }
 
             // No 1D axes on the GearVR controller.

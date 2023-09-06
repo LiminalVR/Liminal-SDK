@@ -12,6 +12,7 @@ namespace Liminal.SDK.VR
     [AddComponentMenu("VR/Emulator Setup")]
     public class VREmulator : MonoBehaviour, IVRDeviceInitializer
     {
+        [Header("Quest Link is not supported with Emulator mode. Using OVR may lead to camera calculation errors.")]
         public ESDKType BuildType = ESDKType.OVR;
         public ESDKType EditorType = ESDKType.Emulator;
 

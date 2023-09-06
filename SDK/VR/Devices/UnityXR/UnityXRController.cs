@@ -125,7 +125,6 @@ namespace Liminal.SDK.XR
             _controller = controller;
             _avatarHand = avatarHand;
             _pointer = pointer;
-
 			SyncControllers();
         }
 

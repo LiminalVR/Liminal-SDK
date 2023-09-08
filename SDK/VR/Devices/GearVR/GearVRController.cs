@@ -16,8 +16,8 @@ namespace Liminal.SDK.VR.Devices.GearVR
         public override string Name => "GearVRController";
         public override int ButtonCount { get { return 3; } }
 
-        public static readonly OVRInput.Controller RightHandControllerMask = OVRInput.Controller.RTouch | OVRInput.Controller.RTrackedRemote;
-        public static readonly OVRInput.Controller LeftHandControllerMask = OVRInput.Controller.LTouch | OVRInput.Controller.LTrackedRemote;
+        public static readonly OVRInput.Controller RightHandControllerMask = OVRInput.Controller.RTouch;
+        public static readonly OVRInput.Controller LeftHandControllerMask = OVRInput.Controller.LTouch;
         public static readonly OVRInput.Controller AllHandControllersMask = RightHandControllerMask | LeftHandControllerMask;
 
         private static readonly VRInputDeviceCapability _capabilities =
@@ -32,16 +32,9 @@ namespace Liminal.SDK.VR.Devices.GearVR
         {
             get
             {
-                if (OVRUtils.IsOculusQuest)
-                {
-                    return _hand == VRInputDeviceHand.Right
-                        ? OVRInput.Controller.RTouch
-                        : OVRInput.Controller.LTouch;
-                }
-                else
-                {
-                    return OVRInput.Controller.RTrackedRemote | OVRInput.Controller.LTrackedRemote;
-                }
+                return _hand == VRInputDeviceHand.Right
+                    ? OVRInput.Controller.RTouch
+                    : OVRInput.Controller.LTouch;
             }
         }
 

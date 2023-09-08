@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Linq.Expressions;
 using System;
 using UnityEditorInternal;
-using Valve.Newtonsoft.Json;
 
 namespace Valve.VR
 {

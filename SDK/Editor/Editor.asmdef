@@ -1,12 +1,12 @@
 {
     "name": "Editor",
+    "rootNamespace": "",
     "references": [
         "Platform",
         "LiminalSdk",
         "Oculus.VR.Editor",
         "Unity.EditorCoroutines.Editor"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
@@ -16,5 +16,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

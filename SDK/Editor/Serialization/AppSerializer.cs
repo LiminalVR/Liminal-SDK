@@ -1,10 +1,12 @@
 ﻿using Liminal.SDK.Serialization;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
+
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -34,6 +36,8 @@ namespace Liminal.SDK.Editor.Serialization
             {
                 ContractResolver = new UnityJsonContractResolver(assemblyDataProvider, mAssetLookup)
             };
+
+
         }
 
         /// <summary>

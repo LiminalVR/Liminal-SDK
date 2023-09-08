@@ -14,7 +14,7 @@ using Assembly = System.Reflection.Assembly;
 
 namespace Liminal.SDK.Build
 {
-    public class LimappExplorer : BaseWindowDrawer
+    public class LimapPatchWindow : BaseWindowDrawer
     {
         public static string OutputDirectory;
         public static string InputDirectory;

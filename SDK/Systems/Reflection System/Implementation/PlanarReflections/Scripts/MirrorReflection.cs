@@ -80,7 +80,6 @@ namespace App
                     IpdModel = Ipd68OffsetModel;
             }
 
-
             Debug.Log($"IPD {OVRPlugin.ipd}");
         }
 
@@ -132,6 +131,19 @@ namespace App
                 m_Renderer.material.SetFloat("_Debug", 1);
 
                 SetMaterial(IpdModel);
+            }
+
+            // On Quest 3 with Focus Aware attribute in Android Manifest. Seems like we should using this value.
+            if (model == EDeviceModelType.Quest3)
+            {
+                m_Renderer.material.SetFloat("_Quest", 0);
+                m_Renderer.material.SetFloat("_OffsetEnabled", 1);
+                m_Renderer.material.SetFloat("_Debug", 1);
+                m_Renderer.material.SetFloat("_OffsetRX", 1.230723f);
+                m_Renderer.material.SetFloat("_OffsetRY", 1);
+                m_Renderer.material.SetFloat("_OffsetRZ", -0.2374479f);
+                m_Renderer.material.SetFloat("_OffsetRW", 0);
+                m_Renderer.material.SetFloat("_OffsetX", 0.8047135f);
             }
 
             void SetMaterial(ReflectionOffsetModel m)

@@ -30,10 +30,8 @@ namespace App
 #if SMOOTH_CAM
         public Camera Cam => GameObject.Find("SmoothCam").GetComponent<Camera>();
 #else
-        public Camera Cam => PrimaryEye.Instance?.Camera ?? Camera.main;
+        public Camera Cam => Camera.main;
 #endif
-
-        public Camera OverrideCamera;
 
         public ReflectionOffsetModel Ipd58OffsetModel = new ReflectionOffsetModel(1.194927f, -0.186721f, 0.8499745f);
         public ReflectionOffsetModel Ipd63OffsetModel = new ReflectionOffsetModel(1.077431f, -0.07495025f, 0.9323733f);
@@ -81,7 +79,6 @@ namespace App
                 else
                     IpdModel = Ipd68OffsetModel;
             }
-
 
             Debug.Log($"IPD {OVRPlugin.ipd}");
         }
@@ -136,38 +133,18 @@ namespace App
                 SetMaterial(IpdModel);
             }
 
-            if (model == EDeviceModelType.Pico)
+            // For some highly unknown reason the SDK only works with below. I do not know why and really want to know why!
+            /*if (model == EDeviceModelType.Quest3)
             {
-                /*
                 m_Renderer.material.SetFloat("_Quest", 0);
-                m_Renderer.material.SetFloat(s_offsetEnabled, 1);
+                m_Renderer.material.SetFloat("_OffsetEnabled", 1);
                 m_Renderer.material.SetFloat("_Debug", 1);
-                m_Renderer.material.SetFloat("_OffsetX", 1);
-                */
-                m_Renderer.material.SetFloat("_OffsetRX", 1);
+                m_Renderer.material.SetFloat("_OffsetRX", 1.230723f);
                 m_Renderer.material.SetFloat("_OffsetRY", 1);
-                m_Renderer.material.SetFloat("_OffsetRZ", 0);
+                m_Renderer.material.SetFloat("_OffsetRZ", -0.2374479f);
                 m_Renderer.material.SetFloat("_OffsetRW", 0);
-                m_Renderer.material.SetFloat("_OffsetX", 1);
-
-                Debug.Log("Using Pico Neo 2 Values");
-            }
-
-            if (model == EDeviceModelType.PicoNeo3)
-            {
-                m_Renderer.material.SetFloat("_Quest", 0);
-                m_Renderer.material.SetFloat(s_offsetEnabled, 1);
-                m_Renderer.material.SetFloat("_Debug", 1);
-
-                m_Renderer.material.SetFloat("_OffsetRX", 1.0143f);
-                m_Renderer.material.SetFloat("_OffsetRY", 1f);
-                m_Renderer.material.SetFloat("_OffsetRZ", -0.009f);
-                m_Renderer.material.SetFloat("_OffsetRW", 0f);
-
-                m_Renderer.material.SetFloat("_OffsetX", 1);
-
-                Debug.Log("Using Pico Neo 3 Values");
-            }
+                m_Renderer.material.SetFloat("_OffsetX", 0.8047135f);
+            }*/
 
             void SetMaterial(ReflectionOffsetModel m)
             {

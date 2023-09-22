@@ -2,6 +2,7 @@
 using Liminal.SDK.Editor.Build;
 using System.Collections.Generic;
 using System.Reflection;
+using Newtonsoft.Json.Serialization;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;

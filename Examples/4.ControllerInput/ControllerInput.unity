@@ -2211,15 +2211,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1260162968516261969, guid: 22276a8657744e04cba8ad0a2caf4195,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 2.72
-      objectReference: {fileID: 0}
     - target: {fileID: 1260162968766363323, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: InteractableLayers.m_Bits
       value: 39
+      objectReference: {fileID: 0}
+    - target: {fileID: 1260162968516261969, guid: 22276a8657744e04cba8ad0a2caf4195,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.72
       objectReference: {fileID: 0}
     - target: {fileID: 1260162970045296578, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
@@ -2231,10 +2231,15 @@ PrefabInstance:
       propertyPath: m_Type
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 1260162969591820546, guid: 22276a8657744e04cba8ad0a2caf4195,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1260162970260054300, guid: 22276a8657744e04cba8ad0a2caf4195,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 22276a8657744e04cba8ad0a2caf4195, type: 3}

@@ -15,7 +15,7 @@ permissions and limitations under the License.
 ************************************************************************************/
 
 using UnityEngine;
-using System.Collections;
+using Liminal.Systems;
 
 /// <summary>
 /// Simple helper script that conditionally enables rendering of a controller if it is connected.
@@ -57,9 +57,14 @@ public class OVRControllerHelper : MonoBehaviour
 	/// </summary>
 	public OVRInput.Controller m_controller;
 
+
+    public GameObject m_Quest3LeftController;
+    public GameObject m_Quest3RightController;
+
+
 	private enum ControllerType
 	{
-		GearVR, Go, QuestAndRiftS, Rift
+		GearVR, Go, QuestAndRiftS, Rift, Quest3
 	}
 
 	private ControllerType activeControllerType = ControllerType.Rift;
@@ -124,12 +129,24 @@ public class OVRControllerHelper : MonoBehaviour
 				m_controller = OVRInput.Controller.RTrackedRemote;
 			}
 		}
+
+        var deviceModel = XRDeviceUtils.GetDeviceModelType();
+        if (deviceModel == EDeviceModelType.Quest3)
+        {
+            activeControllerType = ControllerType.Quest3;
+		}
+        else
+        {
+            m_Quest3LeftController.gameObject.SetActive(false);
+            m_Quest3RightController.gameObject.SetActive(false);
+		}
 	}
 
 	void Update()
 	{
 		bool controllerConnected = OVRInput.IsControllerConnected(m_controller);
 
+		// TODO this has gotten out of hand also we don't need to support gear and go anymore. Ah but keep in mind, it also hide turned off controllers.
 		if ((controllerConnected != m_prevControllerConnected) || !m_prevControllerConnectedCached)
 		{
 			if (activeControllerType == ControllerType.GearVR || activeControllerType == ControllerType.Go)
@@ -150,6 +167,18 @@ public class OVRControllerHelper : MonoBehaviour
 				m_modelOculusTouchRiftLeftController.SetActive(false);
 				m_modelOculusTouchRiftRightController.SetActive(false);
 			}
+			else if (activeControllerType == ControllerType.Quest3)
+            {
+                m_modelOculusGoController.SetActive(false);
+                m_modelGearVrController.SetActive(false);
+                m_modelOculusTouchQuestAndRiftSLeftController.SetActive(false);
+                m_modelOculusTouchQuestAndRiftSRightController.SetActive(false);
+                m_modelOculusTouchRiftLeftController.SetActive(false);
+                m_modelOculusTouchRiftRightController.SetActive(false);
+
+                m_Quest3LeftController.gameObject.SetActive(controllerConnected && (m_controller == OVRInput.Controller.LTouch));
+                m_Quest3RightController.gameObject.SetActive(controllerConnected && (m_controller == OVRInput.Controller.RTouch));
+			}
 			else // if (activeControllerType == ControllerType.Rift)
 			{
 				m_modelOculusGoController.SetActive(false);
@@ -163,7 +192,7 @@ public class OVRControllerHelper : MonoBehaviour
 			m_prevControllerConnected = controllerConnected;
 			m_prevControllerConnectedCached = true;
 		}
-
+		
 		if (!controllerConnected)
 		{
 			return;

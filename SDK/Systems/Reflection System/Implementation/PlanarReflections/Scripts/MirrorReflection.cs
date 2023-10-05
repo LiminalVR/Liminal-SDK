@@ -74,7 +74,7 @@ namespace App
             {
                 if (OVRPlugin.ipd < 0.060f)
                     IpdModel = Ipd58OffsetModel;
-                else if (OVRPlugin.ipd < 0.0665f)
+                else if (OVRPlugin.ipd < 0.066f)
                     IpdModel = Ipd63OffsetModel;
                 else
                     IpdModel = Ipd68OffsetModel;

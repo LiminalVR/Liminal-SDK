@@ -25,8 +25,8 @@ namespace Liminal.SDK.Build
             DrawDirectorySelection(ref OutputDirectory, "Output Directory");
             DrawDirectorySelection(ref InputDirectory, "Input Directory");
 
-            var input = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Assets\TestApp\DLLs\App000000000017.dll";
-            var output = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\DLLFixes\App000000000017.dll";
+            var input = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Assets\TestApp\DLLs\App000000000042.dll";
+            var output = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\DLLFixes\App000000000042.dll";
 
             if (GUILayout.Button("Read from Input"))
             {
@@ -40,17 +40,119 @@ namespace Liminal.SDK.Build
             {
                 var asmDef = AssemblyDefinition.ReadAssembly(input);
                 AddAssemblyReference(asmDef);
+
+                Test(asmDef);
+                // Change UnityEngine.GUIText.Text to UnityEngine.UI.Text
             }
 
             // Take a dll and rebuild it with Cecil.
             if (GUILayout.Button("Read from Output"))
             {
                 var asmDef = AssemblyDefinition.ReadAssembly(output);
-                foreach (var item in asmDef.MainModule.AssemblyReferences)
+                /*foreach (var item in asmDef.MainModule.AssemblyReferences)
                     Debug.Log(item.FullName);
 
                 foreach (var item in asmDef.MainModule.Types)
-                    Debug.Log(item.FullName);
+                    Debug.Log(item.FullName);*/
+
+                foreach (var module in asmDef.Modules)
+                {
+                    foreach (var type in module.Types)
+                    {
+                        // Check fields
+                        foreach (var field in type.Fields)
+                        {
+                            if (field.FieldType.FullName == "UnityEngine.GUIText")
+                            {
+                                Debug.Log($"Field '{field.Name}' in type '{type.FullName}' uses GUIText.");
+                            }
+                        }
+
+                        // Check method parameters
+                        foreach (var method in type.Methods)
+                        {
+                            foreach (var parameter in method.Parameters)
+                            {
+                                if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
+                                {
+                                    Debug.Log($"Method '{method.Name}' in type '{type.FullName}' has a parameter '{parameter.Name}' that uses GUIText.");
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (var type in module.Types)
+                    {
+                        // Existing updates for fields, method parameters, and properties
+
+                        // Update method return types
+                        foreach (var method in type.Methods)
+                        {
+                            if (method.ReturnType.FullName == "UnityEngine.GUIText")
+                            {
+                                //method.ReturnType = newTextType;
+                                Debug.Log($"Return type of method '{method.Name}' in type '{type.FullName}' updated from GUIText to Text.");
+                            }
+
+                            // Update local variables
+                            if (method.HasBody)
+                            {
+                                foreach (var variable in method.Body.Variables)
+                                {
+                                    if (variable.VariableType.FullName == "UnityEngine.GUIText")
+                                    {
+                                        //variable.VariableType = newTextType;
+                                        Debug.Log($"Local variable in method '{method.Name}' in type '{type.FullName}' updated from GUIText to Text.");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                /*var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.UI.Text));
+                var methods = GetAllMethodDefinitions(asmDef);
+                foreach (var methodDef in methods)
+                {
+                    Replace(methodDef, newInputType, "UnityEngine.GUIText");
+                }*/
+            }
+
+            void Test(AssemblyDefinition asmDef)
+            {
+                var newTextType = asmDef.MainModule.ImportReference(typeof(UnityEngine.UI.Text));
+
+                foreach (var module in asmDef.Modules)
+                {
+                    foreach (var type in module.Types)
+                    {
+                        // Check fields
+                        foreach (var field in type.Fields)
+                        {
+                            if (field.FieldType.FullName == "UnityEngine.GUIText")
+                            {
+                                field.FieldType = newTextType;
+                                Debug.Log($"Field '{field.Name}' in type '{type.FullName}' uses GUIText.");
+                            }
+                        }
+
+                        // Check method parameters
+                        foreach (var method in type.Methods)
+                        {
+                            foreach (var parameter in method.Parameters)
+                            {
+                                if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
+                                {
+                                    parameter.ParameterType = newTextType;
+                                    Debug.Log($"Method '{method.Name}' in type '{type.FullName}' has a parameter '{parameter.Name}' that uses GUIText.");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                asmDef.Write(output);
+                Debug.Log("Assembly updated and saved successfully.");
             }
 
             void AddAssemblyReference(AssemblyDefinition asmDef)
@@ -58,21 +160,22 @@ namespace Liminal.SDK.Build
                 //asmDef.Name.Name = asmDef.Name.Name.Replace(ipp, version);
                 var reference = AssemblyNameReference.Parse("UnityEngine.InputLegacyModule, Version=0.0.0.0");
                 asmDef.MainModule.AssemblyReferences.Add(reference);
+
                 var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Input));
+                
 
                 var methods = GetAllMethodDefinitions(asmDef);
                 foreach (var methodDef in methods)
                 {
-                    //ReplaceInstantiateCallsInMethod(methodDef, unityObjectTypeRef, liminalObjectTypeRef);
-                    Replace(methodDef, newInputType, typeof(UnityEngine.Input));
+                    Replace(methodDef, newInputType, nameof(UnityEngine.Input));
                 }
-
+                
                 //Debug.Log(inputTypeRef.FullName);
 
                 asmDef.Write(output);
             }
 
-            void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, Type type)
+            void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, string type)
             {
                 if (!targetMethod.HasBody)
                     return;
@@ -86,7 +189,7 @@ namespace Liminal.SDK.Build
                     if (instruction.Operand is not MethodReference mRef)
                         continue;
 
-                    if (!mRef.DeclaringType.Name.Equals(type.Name)) 
+                    if (!mRef.DeclaringType.Name.Equals(type)) 
                         continue;
 
                     Debug.Log($"{mRef.Name}, Declare Type {mRef.DeclaringType}");

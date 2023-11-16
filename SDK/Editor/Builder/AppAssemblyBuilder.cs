@@ -121,7 +121,10 @@ namespace Liminal.SDK.Editor.Build
                 InMemory = true,
                 ReadSymbols = true
             };
-            var asmDef = AssemblyDefinition.ReadAssembly(outputPath, readerParameters);
+
+            var readPath = "Assets/_Builds/AppModule.dll.dll";
+            var asmDef = AssemblyDefinition.ReadAssembly(readPath, readerParameters);
+
             asmDef.Name.Name = asmName;
             asmDef.Name.Version = new Version(0, buildInfo.Version);
             asmDef.MainModule.Name = asmName + ".dll";
@@ -153,11 +156,14 @@ namespace Liminal.SDK.Editor.Build
             //}
 
             // CJS: This `should` be the same as the block above?!?
-            asmDef.Write(outputPath, new WriterParameters(){WriteSymbols = true});
+            asmDef.Write(outputPath, new WriterParameters() { WriteSymbols = true });
 
             //asmDef.Write(outputPath + ".foo", new WriterParameters(){WriteSymbols = true});
+
+            var appModulePath = $"{Application.dataPath}/_Builds/AppModule.dll.dll";
+            File.Delete(appModulePath);
         }
-        
+
         private bool FindExperienceAppEndCall(AssemblyDefinition asmDef, IEnumerable<MethodDefinition> methods)
         {
             TypeReference appTypeRef;

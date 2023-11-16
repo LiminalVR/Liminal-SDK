@@ -29,6 +29,7 @@ public class BuildWindowConfig
             "UnityEngine.VRModule",
             "UnityEngine.DirectorModule",
             "UnityEngine.WindModule",
+            "UnityEngine.InputLegacyModule"
         };
 
     public BuildPlatform SelectedPlatform = BuildPlatform.Current;

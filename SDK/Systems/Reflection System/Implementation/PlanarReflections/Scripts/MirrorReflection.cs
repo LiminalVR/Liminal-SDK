@@ -39,8 +39,12 @@ namespace App
 
         public static ReflectionOffsetModel IpdModel = null;
 
+        public bool HasQuest2FOV;
+
         private void Awake()
         {
+            HasQuest2FOV = Cam.fieldOfView <= 100;
+
             if (IpdModel != null)
                 return;
 
@@ -74,7 +78,7 @@ namespace App
             {
                 if (OVRPlugin.ipd < 0.060f)
                     IpdModel = Ipd58OffsetModel;
-                else if (OVRPlugin.ipd < 0.0665f)
+                else if (OVRPlugin.ipd < 0.066f)
                     IpdModel = Ipd63OffsetModel;
                 else
                     IpdModel = Ipd68OffsetModel;
@@ -132,6 +136,29 @@ namespace App
 
                 SetMaterial(IpdModel);
             }
+
+            HasQuest2FOV = Cam.fieldOfView <= 100;
+
+            // Meta has a hack in 2023 for app with com.LiminalVR.Liminal as the package name
+            // The hack would enforce FOV of Quest 2. 
+            // So here we are checking if this hack has been removed on this device. (could be through meta switch or firmware.)
+            // And if so, use these values, they work for all IPD!
+            if (!HasQuest2FOV)
+            {
+                if (model == EDeviceModelType.Quest3 || model == EDeviceModelType.QuestPro)
+                {
+                    m_Renderer.material.SetFloat("_Quest", 0);
+                    m_Renderer.material.SetFloat("_OffsetEnabled", 1);
+                    m_Renderer.material.SetFloat("_Debug", 1);
+                    m_Renderer.material.SetFloat("_UseL", 0);
+                    m_Renderer.material.SetFloat("_OffsetRX", 1.233837f);
+                    m_Renderer.material.SetFloat("_OffsetRY", 1);
+                    m_Renderer.material.SetFloat("_OffsetRZ", -0.2374479f);
+                    m_Renderer.material.SetFloat("_OffsetRW", 0);
+                    m_Renderer.material.SetFloat("_OffsetX", 0.8047135f);
+                }
+            }
+
 
             // For some highly unknown reason the SDK only works with below. I do not know why and really want to know why!
             /*if (model == EDeviceModelType.Quest3)

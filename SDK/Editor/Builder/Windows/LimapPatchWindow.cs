@@ -37,6 +37,19 @@ namespace Liminal.SDK.Build
             var output = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\DLLFixes\App000000000042.dll";
 
             GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Copy Project DLL"))
+            {
+                var manifest = AppBuilder.ReadAppManifest();
+                var dllPath = $"{Application.dataPath}/../Library/ScriptAssemblies/{manifest.Name}.dll";
+
+                if (File.Exists(dllPath))
+                {
+                    Debug.Log($"Found dll, {dllPath}");
+                    File.Copy(dllPath, $@"C:\Work\Liminal\2022\DLLs\{manifest.Name}.dll", true);
+                }
+            }
+
             if (GUILayout.Button("Add Root ASM Def"))
             {
                 CreateAssemblyDefinition(Application.dataPath, true);

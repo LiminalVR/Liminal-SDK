@@ -1,14 +1,20 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Liminal.Cecil.Mono.Cecil;
 using Liminal.Cecil.Mono.Cecil.Cil;
+using Liminal.SDK.Editor.Build;
 using Liminal.SDK.Serialization;
+using Newtonsoft.Json;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.Compilation;
+using UnityEditor.SearchService;
+using UnityEditorInternal;
 using UnityEngine;
 using Assembly = System.Reflection.Assembly;
 
@@ -20,6 +26,8 @@ namespace Liminal.SDK.Build
         public static string InputDirectory;
         public static HashSet<int> ProcessedFile = new HashSet<int>();
 
+        private static string SDKPath = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Assets";
+
         public override void Draw(BuildWindowConfig config)
         {
             DrawDirectorySelection(ref OutputDirectory, "Output Directory");
@@ -27,6 +35,41 @@ namespace Liminal.SDK.Build
 
             var input = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Assets\TestApp\DLLs\App000000000042.dll";
             var output = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\DLLFixes\App000000000042.dll";
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Add Root ASM Def"))
+            {
+                CreateAssemblyDefinition(Application.dataPath, true);
+            }
+
+            if (GUILayout.Button("Add ASM Def for Editors"))
+            {
+                AddAssemblyDefinitionToEditorFolders();
+            }
+
+            if (GUILayout.Button("Read Editor Folders from Selection"))
+            {
+                FindAllEditorFoldersFromSelection();
+            }
+            
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Open Explorer"))
+            {
+                EditorUtility.RevealInFinder($"{LimappExplorer.GetDefaultOutputPath}/");
+            }
+
+            if (GUILayout.Button("Open SDK Streaming Asset"))
+            {
+                EditorUtility.RevealInFinder($"{SDKPath}/StreamingAssets/Limapps/");
+            }
+
+            if (GUILayout.Button("Open SDK DLL"))
+            {
+                EditorUtility.RevealInFinder($"{SDKPath}/TestApp/DLLs/2022/");
+            }
+            GUILayout.EndHorizontal();
 
             if (GUILayout.Button("Read from Input"))
             {
@@ -330,6 +373,304 @@ namespace Liminal.SDK.Build
                 yield break;
             }
 
+        }
+
+        private static void FindAllEditorFoldersFromSelection()
+        {
+            // Get GUIDs of the selected assets or folders
+            string[] selectedGUIDs = Selection.assetGUIDs;
+
+            if (selectedGUIDs.Length == 0)
+            {
+                Debug.Log("No assets or folders selected.");
+                return;
+            }
+
+            bool foundAtLeastOneEditorFolder = false;
+
+            foreach (string guid in selectedGUIDs)
+            {
+                // Convert the GUID to an asset path
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+
+                // Check and process if the asset path is a valid folder
+                if (AssetDatabase.IsValidFolder(assetPath))
+                {
+                    ProcessFolderRecursively(assetPath, ref foundAtLeastOneEditorFolder);
+                }
+            }
+
+            if (!foundAtLeastOneEditorFolder)
+            {
+                Debug.Log("No Editor folders found in the selection.");
+            }
+        }
+
+        private static void ProcessFolderRecursively(string folderPath, ref bool foundAtLeastOneEditorFolder)
+        {
+            // Check if the folder is an Editor folder
+            if (folderPath.Contains("/Editor") || folderPath.EndsWith("/Editor"))
+            {
+                Debug.Log($"Editor Folder: {folderPath}");
+                if (!foundAtLeastOneEditorFolder)
+                {
+                    foundAtLeastOneEditorFolder = true;
+                }
+            }
+
+            // Get all subdirectories
+            string[] subFolders = AssetDatabase.GetSubFolders(folderPath);
+            foreach (string subFolder in subFolders)
+            {
+                ProcessFolderRecursively(subFolder, ref foundAtLeastOneEditorFolder);
+            }
+        }
+
+        private static void AddAssemblyDefinitionToEditorFolders()
+        {
+            // Get GUIDs of the selected assets or folders
+            string[] selectedGUIDs = Selection.assetGUIDs;
+
+            if (selectedGUIDs.Length == 0)
+            {
+                Debug.Log("No assets or folders selected.");
+                return;
+            }
+
+            foreach (string guid in selectedGUIDs)
+            {
+                // Convert the GUID to an asset path
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+
+                // Check and process if the asset path is a valid folder
+                if (AssetDatabase.IsValidFolder(assetPath))
+                {
+                    ProcessFolderRecursively(assetPath);
+                }
+            }
+        }
+
+        private static void ProcessFolderRecursively(string folderPath)
+        {
+            // Check if the folder is an Editor folder
+            if (folderPath.Contains("/Editor") || folderPath.EndsWith("/Editor"))
+            {
+                CreateAssemblyDefinition(folderPath, false);
+            }
+
+            // Get all subdirectories
+            string[] subFolders = AssetDatabase.GetSubFolders(folderPath);
+            foreach (string subFolder in subFolders)
+            {
+                ProcessFolderRecursively(subFolder);
+            }
+        }
+
+        private static void CreateAssemblyDefinition(string folderPath, bool isPrimary)
+        {
+            var appManifest = AppBuilder.ReadAppManifest();
+            var primaryName = appManifest.Name;
+
+            var relativeFolderPath = folderPath.Substring(folderPath.IndexOf("Assets"));
+            var uniqueName = relativeFolderPath.Replace('/', '.').Replace('\\', '.');
+
+            if (isPrimary)
+                uniqueName = primaryName;
+
+            var fileName = uniqueName + ".asmdef";
+            var fullPath = System.IO.Path.Combine(folderPath, fileName);
+
+            // TODO just make a class!
+            var sdkReferences = $"    \"references\": [\"LiminalSdk\"]\n";
+            var references = isPrimary ? sdkReferences : $"    \"references\": [\"{primaryName}\"]\n";
+            var includePlatform = isPrimary ? "" : $"    \"includePlatforms\": [\"Editor\"],\n";
+            var autoReferences = isPrimary ? $"    \"autoReferenced\": true,\n" : $"    \"autoReferenced\": false,\n";
+
+            // if file exist, delete it?
+
+            var overwrite = true;
+            if (!System.IO.File.Exists(fullPath))
+            {
+                var newAsm = new AsmDef
+                {
+                    Name = uniqueName,
+                    AutoReferenced = true,
+                    References = new List<string>(),
+                    IncludePlatforms = new List<string>()
+                };
+
+                if (isPrimary)
+                {
+                    newAsm.References.Add("LiminalSdk");
+                }
+                else
+                {
+                    newAsm.References.Add(primaryName);
+                    newAsm.IncludePlatforms.Add("Editor");
+                }
+
+                var newAsmJson = JsonConvert.SerializeObject(newAsm, Formatting.Indented);
+
+                // Manually create the JSON string
+                /*string assemblyDefinitionContent = $"{{\n" +
+                                                   $"    \"name\": \"{uniqueName}\",\n" +
+                                                   autoReferences +
+                                                   includePlatform +
+                                                   references +
+                                                   $"}}";*/
+
+                System.IO.File.WriteAllText(fullPath, newAsmJson);
+                AssetDatabase.Refresh(); // Ensure the AssetDatabase is refreshed
+                AssetDatabase.ImportAsset(fullPath);
+
+                Debug.Log($"Assembly Definition File created at: {fullPath}");
+            }
+            else
+            {
+                var asmJson = File.ReadAllText(fullPath);
+                var asm = JsonConvert.DeserializeObject<AsmDef>(asmJson);
+                Debug.Log($"Assembly Definition File {asm.Name} already exists at: {fullPath}");
+            }
+        }
+
+        public class AsmDef
+        {
+            [JsonProperty("name")]
+            public string Name { get; set; }
+
+            [JsonProperty("rootNamespace")]
+            public string RootNamespace { get; set; }
+
+            [JsonProperty("references")]
+            public List<string> References { get; set; }
+
+            [JsonProperty("includePlatforms")]
+            public List<string> IncludePlatforms { get; set; }
+
+            [JsonProperty("excludePlatforms")]
+            public List<string> ExcludePlatforms { get; set; }
+
+            [JsonProperty("allowUnsafeCode")]
+            public bool AllowUnsafeCode { get; set; }
+
+            [JsonProperty("overrideReferences")]
+            public bool OverrideReferences { get; set; }
+
+            [JsonProperty("precompiledReferences")]
+            public List<string> PrecompiledReferences { get; set; }
+
+            [JsonProperty("autoReferenced")]
+            public bool AutoReferenced { get; set; }
+
+            [JsonProperty("defineConstraints")]
+            public List<string> DefineConstraints { get; set; }
+
+            [JsonProperty("versionDefines")]
+            public List<string> VersionDefines { get; set; }
+
+            [JsonProperty("noEngineReferences")]
+            public bool NoEngineReferences { get; set; }
+        }
+
+        private void BuildAssetBundle()
+        {
+            List<AssetBundleBuild> assetBundleDefinitionList = new();
+            // Define two asset bundles, populated based on file system structure
+            // The first bundle is all the scene files in the Scenes directory (non-recursive)
+            {
+                AssetBundleBuild ab = new();
+                ab.assetBundleName = "Scenes";
+                ab.assetNames = Directory.EnumerateFiles("Assets/_Project/" + ab.assetBundleName, "*.unity", SearchOption.TopDirectoryOnly).ToArray();
+                assetBundleDefinitionList.Add(ab);
+            }
+            // The second bundle is all the asset files found recursively in the Meshes directory
+            /*{
+                AssetBundleBuild ab = new();
+                ab.assetBundleName = "Meshes";
+                ab.assetNames = RecursiveGetAllAssetsInDirectory("Assets/" + ab.assetBundleName).ToArray();
+                assetBundleDefinitionList.Add(ab);
+            }*/
+
+            string outputPath = "MyBuild";  // Subfolder of the current project
+            if (!Directory.Exists(outputPath))
+                Directory.CreateDirectory(outputPath);
+            // Assemble all the input needed to perform the build in this structure.
+            // The project's current build settings will be used because target and subtarget fields are not filled in
+            BuildAssetBundlesParameters buildInput = new()
+            {
+                outputPath = outputPath,
+                options = BuildAssetBundleOptions.AssetBundleStripUnityVersion,
+                bundleDefinitions = assetBundleDefinitionList.ToArray()
+            };
+            AssetBundleManifest manifest = BuildPipeline.BuildAssetBundles(buildInput);
+            // Look at the results
+            if (manifest != null)
+            {
+                foreach (var bundleName in manifest.GetAllAssetBundles())
+                {
+                    string projectRelativePath = buildInput.outputPath + "/" + bundleName;
+                    Debug.Log($"Size of AssetBundle {projectRelativePath} is {new FileInfo(projectRelativePath).Length}");
+                }
+            }
+            else
+            {
+                Debug.Log("Build failed, see Console and Editor log for details");
+            }
+        }
+
+        private void BuildAssembly(bool wait = true)
+        {
+            var scripts = new[] { @$"{Application.dataPath}/_Project/Scripts/IonTestScript.cs" };
+            var outputAssembly = @$"{Application.dataPath}/../Limapp-output/Ion.dll";
+
+            Directory.CreateDirectory("Temp/MyAssembly");
+
+            // Create scripts
+            foreach (var scriptPath in scripts)
+            {
+                //var scriptName = Path.GetFileNameWithoutExtension(scriptPath);
+                //File.WriteAllText(scriptPath, string.Format("using UnityEngine; public class {0} : MonoBehaviour {{ void Start() {{ Debug.Log(\"{0}\"); }} }}", scriptName));
+            }
+
+            var assemblyBuilder = new AssemblyBuilder(outputAssembly, scripts);
+
+            // Exclude a reference to the copy of the assembly in the Assets folder, if any.
+            //assemblyBuilder.excludeReferences = new string[] { assemblyProjectPath };
+
+            // Called on main thread
+            assemblyBuilder.buildStarted += delegate (string assemblyPath)
+            {
+                Debug.LogFormat("Assembly build started for {0}", assemblyPath);
+            };
+
+            // Called on main thread
+            assemblyBuilder.buildFinished += delegate (string assemblyPath, CompilerMessage[] compilerMessages)
+            {
+                var errorCount = compilerMessages.Count(m => m.type == CompilerMessageType.Error);
+                var warningCount = compilerMessages.Count(m => m.type == CompilerMessageType.Warning);
+
+                Debug.LogFormat("Assembly build finished for {0}", assemblyPath);
+                Debug.LogFormat("Warnings: {0} - Errors: {0}", errorCount, warningCount);
+
+                if (errorCount == 0)
+                {
+                    //File.Copy(outputAssembly, assemblyProjectPath, true);
+                    //AssetDatabase.ImportAsset(assemblyProjectPath);
+                }
+            };
+
+            // Start build of assembly
+            if (!assemblyBuilder.Build())
+            {
+                Debug.LogErrorFormat("Failed to start build of assembly {0}!", assemblyBuilder.assemblyPath);
+                return;
+            }
+
+            if (wait)
+            {
+                while (assemblyBuilder.status != AssemblyBuilderStatus.Finished)
+                    System.Threading.Thread.Sleep(10);
+            }
         }
 
         public void DrawDirectorySelection(ref string directoryPath, string title)

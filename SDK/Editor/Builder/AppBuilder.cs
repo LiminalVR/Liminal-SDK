@@ -202,8 +202,6 @@ namespace Liminal.SDK.Editor.Build
                 var sceneBundleProc = new SceneBundleProcessor(BuildConsts.ProjectAssemblyName, asmName);
                 sceneBundleProc.Process(sceneBundlePath);
 
-
-
                 // We need to replace it with addressable
                 //var settings = AddressableAssetSettingsDefaultObject.Settings;
                 //if (settings == null)
@@ -291,6 +289,7 @@ namespace Liminal.SDK.Editor.Build
         {
             LimapPatchWindow.ProcessedFile.Clear();
             EditorCoroutineUtility.StartCoroutineOwnerless(LimappExplorer.ExtractPack(appPath, platformName));
+            
         }
 
         private static string GetFileExtension(ECompressionType compressionType = ECompressionType.LMZA)

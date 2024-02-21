@@ -74,7 +74,7 @@ namespace Liminal.SDK.Editor.Build
                 buildTarget = buildInfo.BuildTarget,
                 additionalReferences = additionalReferences,
             };
-
+            
             // Hook in listeners
             builder.buildStarted += (path) => Debug.LogFormat("[Liminal.Build] Assembly build started: {0}", buildInfo.Name);
             builder.buildFinished += (path, messages) =>
@@ -122,11 +122,18 @@ namespace Liminal.SDK.Editor.Build
                 ReadSymbols = true
             };
 
-            var readPath = "Assets/_Builds/AppModule.dll.dll";
+            var projectPath = Application.dataPath;
+            var current = $"{projectPath}/_Builds/AppModule.dll.dll";
+            var newModulePath = $"{projectPath}/_Builds/AppModule.dll.bytes";
+
+            File.Copy(current, newModulePath);
+            File.Delete(current);
+
+            var readPath = "Assets/_Builds/AppModule.dll.bytes";
             var asmDef = AssemblyDefinition.ReadAssembly(readPath, readerParameters);
 
             asmDef.Name.Name = asmName;
-            asmDef.Name.Version = new Version(0, buildInfo.Version);
+            asmDef.Name.Version = new Version(0, 0);
             asmDef.MainModule.Name = asmName + ".dll";
 
             // Change all assembly references within the main module to point to the new assembly name
@@ -160,7 +167,7 @@ namespace Liminal.SDK.Editor.Build
 
             //asmDef.Write(outputPath + ".foo", new WriterParameters(){WriteSymbols = true});
 
-            var appModulePath = $"{Application.dataPath}/_Builds/AppModule.dll.dll";
+            var appModulePath = $"{Application.dataPath}/_Builds/AppModule.dll";
             File.Delete(appModulePath);
         }
 

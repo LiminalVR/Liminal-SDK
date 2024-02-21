@@ -2,6 +2,7 @@
 using Liminal.SDK.Editor.Utils;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
+using static Liminal.SDK.Build.LimappExplorer;
 
 namespace Liminal.SDK.Build
 {
@@ -12,6 +13,8 @@ namespace Liminal.SDK.Build
     {
         internal const string Path = "Assets/Liminal/liminalapp.json";
         internal const int MaxIdLength = 12;
+
+        public string Name => "App" + Id.ToString().PadLeft(AppManifest.MaxIdLength, '0');
 
         /// <summary>
         /// Gets the unique identifier for the application.

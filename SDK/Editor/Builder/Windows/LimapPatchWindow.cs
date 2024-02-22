@@ -41,12 +41,16 @@ namespace Liminal.SDK.Build
             if (GUILayout.Button("Transfer Files"))
             {
                 var manifest = AppBuilder.ReadAppManifest();
-                var dllPath = $"{Application.dataPath}/../Library/ScriptAssemblies/{manifest.Name}.dll";
+                var dllPath = $"{Application.dataPath}/../Library/Bee/PlayerScriptAssemblies/{manifest.Name}.dll";
 
                 if (File.Exists(dllPath))
                 {
                     Debug.Log($"Found dll, {dllPath}");
                     File.Copy(dllPath, $@"C:\Work\Liminal\2022\DLLs\{manifest.Name}.dll", true);
+                }
+                else
+                {
+                    Debug.LogError("Could not find dll, you need to perform a manual build.");
                 }
 
                 var bundleStandalonePath = $"{Application.dataPath}/../AssetBundles/StandaloneWindows";
@@ -78,7 +82,7 @@ namespace Liminal.SDK.Build
                     if (Directory.Exists(newFolder))
                         Directory.Delete(newFolder, true);
 
-                    FileUtil.CopyFileOrDirectory(bundleStandalonePath, newFolder);
+                    FileUtil.CopyFileOrDirectory(bundleAndroidPath, newFolder);
                 }
             }
 

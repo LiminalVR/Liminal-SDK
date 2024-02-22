@@ -139,6 +139,11 @@ namespace App
 
             HasQuest2FOV = Cam.fieldOfView <= 100;
 
+            // In 2022, even without Meta's hack, our FOV is 95. 
+#if UNITY_2022_1_OR_NEWER
+            HasQuest2FOV = false;
+#endif
+
             // Meta has a hack in 2023 for app with com.LiminalVR.Liminal as the package name
             // The hack would enforce FOV of Quest 2. 
             // So here we are checking if this hack has been removed on this device. (could be through meta switch or firmware.)

@@ -38,7 +38,7 @@ namespace Liminal.SDK.Build
 
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("Copy Project DLL"))
+            if (GUILayout.Button("Transfer Files"))
             {
                 var manifest = AppBuilder.ReadAppManifest();
                 var dllPath = $"{Application.dataPath}/../Library/ScriptAssemblies/{manifest.Name}.dll";
@@ -47,6 +47,38 @@ namespace Liminal.SDK.Build
                 {
                     Debug.Log($"Found dll, {dllPath}");
                     File.Copy(dllPath, $@"C:\Work\Liminal\2022\DLLs\{manifest.Name}.dll", true);
+                }
+
+                var bundleStandalonePath = $"{Application.dataPath}/../AssetBundles/StandaloneWindows";
+                if (Directory.Exists(bundleStandalonePath))
+                {
+                    var folderRoot = $@"C:\Work\Liminal\2022\Bundles\{manifest.Id}";
+                    if (!Directory.Exists(folderRoot))
+                    {
+                        Directory.CreateDirectory(folderRoot);
+                    }
+
+                    var newFolder = $@"{folderRoot}\StandaloneWindows";
+                    if (Directory.Exists(newFolder))
+                        Directory.Delete(newFolder, true);
+
+                    FileUtil.CopyFileOrDirectory(bundleStandalonePath, newFolder);
+                }
+
+                var bundleAndroidPath = $"{Application.dataPath}/../AssetBundles/Android";
+                if (Directory.Exists(bundleAndroidPath))
+                {
+                    var folderRoot = $@"C:\Work\Liminal\2022\Bundles\{manifest.Id}";
+                    if (!Directory.Exists(folderRoot))
+                    {
+                        Directory.CreateDirectory(folderRoot);
+                    }
+
+                    var newFolder = $@"{folderRoot}\Android";
+                    if (Directory.Exists(newFolder))
+                        Directory.Delete(newFolder, true);
+
+                    FileUtil.CopyFileOrDirectory(bundleStandalonePath, newFolder);
                 }
             }
 

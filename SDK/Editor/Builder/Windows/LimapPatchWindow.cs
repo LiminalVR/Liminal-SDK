@@ -42,15 +42,21 @@ namespace Liminal.SDK.Build
             {
                 var manifest = AppBuilder.ReadAppManifest();
                 var dllPath = $"{Application.dataPath}/../Library/Bee/PlayerScriptAssemblies/{manifest.Name}.dll";
+                var dllPath2 = $"{Application.dataPath}/../Library/Bee/artifacts/1300b0aP.dag/{manifest.Name}.dll";
 
                 if (File.Exists(dllPath))
                 {
                     Debug.Log($"Found dll, {dllPath}");
                     File.Copy(dllPath, $@"C:\Work\Liminal\2022\DLLs\{manifest.Name}.dll", true);
                 }
+                else if (File.Exists(dllPath2))
+                {
+                    Debug.Log($"Found dll, {dllPath2}");
+                    File.Copy(dllPath2, $@"C:\Work\Liminal\2022\DLLs\{manifest.Name}.dll", true);
+                }
                 else
                 {
-                    Debug.LogError("Could not find dll, you need to perform a manual build.");
+                    Debug.LogError("Could not find dll, you need to perform a manual build or add an assembly definition.");
                 }
 
                 var bundleStandalonePath = $"{Application.dataPath}/../AssetBundles/StandaloneWindows";

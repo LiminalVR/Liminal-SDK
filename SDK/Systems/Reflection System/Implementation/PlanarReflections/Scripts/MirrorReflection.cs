@@ -137,12 +137,16 @@ namespace App
                 SetMaterial(IpdModel);
             }
 
+            // This is only true in Unity 2019!
             HasQuest2FOV = Cam.fieldOfView <= 100;
 
             // In 2022, even without Meta's hack, our FOV is 95. 
+            // This should be renamed to HasMetaHack
 #if UNITY_2022_1_OR_NEWER
             HasQuest2FOV = false;
 #endif
+
+            
 
             // Meta has a hack in 2023 for app with com.LiminalVR.Liminal as the package name
             // The hack would enforce FOV of Quest 2. 

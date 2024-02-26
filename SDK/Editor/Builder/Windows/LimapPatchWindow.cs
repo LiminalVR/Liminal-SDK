@@ -38,9 +38,19 @@ namespace Liminal.SDK.Build
 
             GUILayout.BeginHorizontal();
 
+            var manifest = AppBuilder.ReadAppManifest();
+            var folderRoot = $@"C:\Work\Liminal\2022\Bundles\{manifest.Id}";
+
+            if (GUILayout.Button("Open Copy Folder"))
+            {
+                if (!Directory.Exists(folderRoot))
+                    Directory.CreateDirectory(folderRoot);
+
+                EditorUtility.RevealInFinder($"{folderRoot}/");
+            }
+
             if (GUILayout.Button("Transfer Files"))
             {
-                var manifest = AppBuilder.ReadAppManifest();
                 var dllPath = $"{Application.dataPath}/../Library/Bee/PlayerScriptAssemblies/{manifest.Name}.dll";
                 var dllPath2 = $"{Application.dataPath}/../Library/Bee/artifacts/1300b0aP.dag/{manifest.Name}.dll";
 
@@ -62,11 +72,8 @@ namespace Liminal.SDK.Build
                 var bundleStandalonePath = $"{Application.dataPath}/../AssetBundles/StandaloneWindows";
                 if (Directory.Exists(bundleStandalonePath))
                 {
-                    var folderRoot = $@"C:\Work\Liminal\2022\Bundles\{manifest.Id}";
                     if (!Directory.Exists(folderRoot))
-                    {
                         Directory.CreateDirectory(folderRoot);
-                    }
 
                     var newFolder = $@"{folderRoot}\StandaloneWindows";
                     if (Directory.Exists(newFolder))
@@ -78,11 +85,8 @@ namespace Liminal.SDK.Build
                 var bundleAndroidPath = $"{Application.dataPath}/../AssetBundles/Android";
                 if (Directory.Exists(bundleAndroidPath))
                 {
-                    var folderRoot = $@"C:\Work\Liminal\2022\Bundles\{manifest.Id}";
                     if (!Directory.Exists(folderRoot))
-                    {
                         Directory.CreateDirectory(folderRoot);
-                    }
 
                     var newFolder = $@"{folderRoot}\Android";
                     if (Directory.Exists(newFolder))

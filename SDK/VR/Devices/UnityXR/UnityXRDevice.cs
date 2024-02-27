@@ -145,8 +145,9 @@ namespace Liminal.SDK.XR
 			// Maybe a way to pass in one?
 			// Instantiate a new one
             var xrReferences = avatar.Transform.GetComponentInChildren<XRInputReferences>(true);
-            if(xrReferences == null)
-                xrReferences = GameObject.FindObjectOfType<XRInputReferences>();
+            
+            //if(xrReferences == null)
+            //    xrReferences = GameObject.FindObjectOfType<XRInputReferences>();
 			
             if (xrReferences == null)
             {
@@ -175,8 +176,8 @@ namespace Liminal.SDK.XR
 			var rightPointer = ActivatePointer(avatar.PrimaryHand, rightHand);
 			var leftPointer = ActivatePointer(avatar.SecondaryHand, leftHand);
 
-            mRightController.Bind(leftHand, avatar.PrimaryHand, rightPointer);
-			mLeftController.Bind(rightHand, avatar.SecondaryHand, leftPointer);
+            mRightController.Bind(rightHand, avatar.PrimaryHand, rightPointer);
+			mLeftController.Bind(leftHand, avatar.SecondaryHand, leftPointer);
 		}
 
 		public LaserPointerVisual ActivatePointer(IVRAvatarHand hand, ActionBasedController xrController)
@@ -198,7 +199,13 @@ namespace Liminal.SDK.XR
             //controllerInstance.transform.localEulerAngles = Vector3.zero;
 
 			// if the controller instance has laser pointer, no pointer making one
+			// Intentionally not picking up disabled pointers.
 			var pointerVisual = xrController.GetComponentInChildren<LaserPointerVisual>();
+
+            if (pointerVisual == null)
+            {
+                pointerVisual = xrController.GetComponentInChildren<LaserPointerVisual>();
+            }
 
             if (pointerVisual == null)
             {
@@ -207,7 +214,8 @@ namespace Liminal.SDK.XR
                 pointerVisual = pointerVisualGO.GetComponent<LaserPointerVisual>();
             }
 
-            pointerVisual.Bind(hand.InputDevice.Pointer);
+			
+            pointerVisual?.Bind(hand.InputDevice.Pointer);
 
 			// Apparently it's binding to the wrong one.
 			var device = hand.InputDevice as UnityXRController;
@@ -280,6 +288,8 @@ namespace Liminal.SDK.XR
 
 			// The camera floor offset object is necessary to match the head position to make sure the controllers are in place.
 			// Do note a problem that will exist is if you bend up and down, that would kind of add an offset?
+
+			// I think was for PICO
             var avatar = VRAvatar.Active;
             var xrRig = CreateXRRig(avatar);
             xrRig.CameraFloorOffsetObject.transform.position = _offset.transform.position;

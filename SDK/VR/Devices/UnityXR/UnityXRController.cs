@@ -141,7 +141,8 @@ namespace Liminal.SDK.XR
 				Debug.Log("Has controller visual, so move it over!");
                 _controller.hideControllerModel = false;
 
-				_controller.modelParent = _avatarHand.Anchor;
+                //_controller.modelParent = _avatarHand.Anchor;
+                _controller.modelParent = controllerVisual.transform;
                 _controller.model.localPosition = Vector3.zero;
             }
             else

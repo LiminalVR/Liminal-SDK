@@ -149,9 +149,16 @@ namespace Liminal.SDK.XR
                 _controller.hideControllerModel = true;
             }
 
-            _pointer.transform.SetParent(_controller.model);
-            _pointer.transform.localPosition = Vector3.zero;
-		}
+            if (_pointer != null)
+            {
+                _pointer.transform.SetParent(_controller.model);
+                _pointer.transform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                Debug.Log("[Unity XR Controller] - No pointers found.");
+            }
+        }
 
 		/// <summary>
 		/// We decided to provide an input refs as we don't want a major dependency on the ActionBasedController.

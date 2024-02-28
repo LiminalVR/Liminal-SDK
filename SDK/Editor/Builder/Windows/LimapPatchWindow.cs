@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Liminal.Cecil.Mono.Cecil;
 using Liminal.Cecil.Mono.Cecil.Cil;
 using Liminal.SDK.Editor.Build;
@@ -13,8 +11,6 @@ using Newtonsoft.Json;
 using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.Compilation;
-using UnityEditor.SearchService;
-using UnityEditorInternal;
 using UnityEngine;
 using Assembly = System.Reflection.Assembly;
 
@@ -22,8 +18,8 @@ namespace Liminal.SDK.Build
 {
     public class LimapPatchWindow : BaseWindowDrawer
     {
-        public static string OutputDirectory;
-        public static string InputDirectory;
+        public static string OutputDirectory = @"C:\Work\Liminal\2019\DLL\2022";
+        public static string InputDirectory = @"C:\Work\Liminal\2019\DLL\2019";
         public static HashSet<int> ProcessedFile = new HashSet<int>();
 
         private static string SDKPath = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Assets";
@@ -32,9 +28,6 @@ namespace Liminal.SDK.Build
         {
             DrawDirectorySelection(ref OutputDirectory, "Output Directory");
             DrawDirectorySelection(ref InputDirectory, "Input Directory");
-
-            var input = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Assets\TestApp\DLLs\App000000000042.dll";
-            var output = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\DLLFixes\App000000000042.dll";
 
             GUILayout.BeginHorizontal();
 
@@ -132,22 +125,38 @@ namespace Liminal.SDK.Build
 
             if (GUILayout.Button("Read from Input"))
             {
-                var asmDef = AssemblyDefinition.ReadAssembly(input);
-                foreach (var item in asmDef.MainModule.AssemblyReferences)
-                    Debug.Log(item.FullName);
+                var dllFiles = FindAllDllsInPath(InputDirectory);
+
+                foreach (var dllFile in dllFiles)
+                {
+                    var asmDef = AssemblyDefinition.ReadAssembly(dllFile);
+                    foreach (var item in asmDef.MainModule.AssemblyReferences)
+                        Debug.Log(item.FullName);
+                }
             }
 
             // Take a dll and rebuild it with Cecil.
             if (GUILayout.Button("Update DLL"))
             {
-                var asmDef = AssemblyDefinition.ReadAssembly(input);
-                AddAssemblyReference(asmDef);
+                var dllFiles = FindAllDllsInPath(InputDirectory);
 
-                Test(asmDef);
+                foreach (var dllFile in dllFiles)
+                {
+                    var asmDef = AssemblyDefinition.ReadAssembly(dllFile);
+                    var fileName = Path.GetFileName(dllFile);
+                    var output = Path.Combine(OutputDirectory, fileName);
+                    AddAssemblyReference(asmDef, output);
+                    Test(asmDef, output);
+                    
+                    asmDef.Write(output);
+                    Debug.Log("Assembly updated and saved successfully.");
+                }
+
                 // Change UnityEngine.GUIText.Text to UnityEngine.UI.Text
             }
 
             // Take a dll and rebuild it with Cecil.
+            /*
             if (GUILayout.Button("Read from Output"))
             {
                 var asmDef = AssemblyDefinition.ReadAssembly(output);
@@ -155,7 +164,7 @@ namespace Liminal.SDK.Build
                     Debug.Log(item.FullName);
 
                 foreach (var item in asmDef.MainModule.Types)
-                    Debug.Log(item.FullName);*/
+                    Debug.Log(item.FullName);#1#
 
                 foreach (var module in asmDef.Modules)
                 {
@@ -217,15 +226,18 @@ namespace Liminal.SDK.Build
                 foreach (var methodDef in methods)
                 {
                     Replace(methodDef, newInputType, "UnityEngine.GUIText");
-                }*/
+                }#1#
             }
+            */
 
-            void Test(AssemblyDefinition asmDef)
+            void Test(AssemblyDefinition asmDef, string output)
             {
                 var newTextType = asmDef.MainModule.ImportReference(typeof(UnityEngine.UI.Text));
+                var guiTextTypeFullName = "UnityEngine.GUIText";
 
                 foreach (var module in asmDef.Modules)
                 {
+
                     foreach (var type in module.Types)
                     {
                         // Check fields
@@ -250,14 +262,94 @@ namespace Liminal.SDK.Build
                                 }
                             }
                         }
+
+                        // Check method bodies for references to GUIText
+                        foreach (var method in type.Methods)
+                        {
+                            Debug.Log($"Method Type {type.Name} and method {method.Name}");
+
+                            if (!method.HasBody)
+                                continue;
+
+                            var ilProcessor = method.Body.GetILProcessor();
+
+                            foreach (var instruction in method.Body.Instructions)
+                            {
+                                // Check if the instruction is a call to UnityEngine.Input.get_touchCount
+                                if (instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference operand)
+                                {
+                                    if(operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touchCount" ||
+                                       operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touches")
+                                        instruction.Operand = CloneMethodWithDeclaringType(operand, newTextType);
+                                }
+                            }
+                            
+
+                            if (type.Name == "SimpleActivatorMenu")
+                            {
+                                if (method.Name == "OnEnable")
+                                {
+                                    var instructions = method.Body.Instructions;
+
+                                    for (int i = 0; i < instructions.Count; i++)
+                                    {
+                                        // We found the name here.
+                                        if (instructions[i].OpCode == OpCodes.Callvirt && instructions[i].Operand is MethodReference methodRef && methodRef.DeclaringType.FullName == "UnityEngine.GUIText" && methodRef.Name == "set_text")
+                                        {
+                                            Debug.Log($"Method Types {methodRef.DeclaringType}, {methodRef.ReturnType}, {methodRef.MethodReturnType}");
+                                            instructions[i].Operand = CloneMethodWithDeclaringType(methodRef, newTextType);
+                                            methodRef.DeclaringType = newTextType;
+                                        }
+
+                                        // This is a highly simplified and specific example. You will need to adapt
+                                        // it based on the actual IL instructions you are dealing with.
+
+                                        if (instructions[i].Operand != null)
+                                        {
+                                            Debug.Log($"Operand Type {instructions[i].Operand.ToString()} : {instructions[i].Operand.GetType()}");
+
+                                        }
+
+                                        if (instructions[i].Operand is Type tRef)
+                                        {
+                                            Debug.Log($"Found Type Ref {tRef.FullName}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-
-                asmDef.Write(output);
-                Debug.Log("Assembly updated and saved successfully.");
             }
 
-            void AddAssemblyReference(AssemblyDefinition asmDef)
+            // Utility method to find a method on a given type
+            MethodReference FindMethod(ModuleDefinition module, TypeReference typeRef, string methodName, params Type[] parameterTypes)
+            {
+                var typeDef = typeRef.Resolve();
+                foreach (var method in typeDef.Methods)
+                {
+                    if (method.Name != methodName || method.Parameters.Count != parameterTypes.Length)
+                        continue;
+
+                    bool parametersMatch = true;
+                    for (int i = 0; i < method.Parameters.Count; i++)
+                    {
+                        // Using the module to import the parameter type reference for comparison
+                        if (method.Parameters[i].ParameterType.FullName != module.ImportReference(parameterTypes[i]).FullName)
+                        {
+                            parametersMatch = false;
+                            break;
+                        }
+                    }
+
+                    if (parametersMatch)
+                        return module.ImportReference(method); // Import the method reference through the provided module
+                }
+                return null;
+            }
+
+
+            void AddAssemblyReference(AssemblyDefinition asmDef, string output)
             {
                 //asmDef.Name.Name = asmDef.Name.Name.Replace(ipp, version);
                 var reference = AssemblyNameReference.Parse("UnityEngine.InputLegacyModule, Version=0.0.0.0");
@@ -273,8 +365,7 @@ namespace Liminal.SDK.Build
                 }
                 
                 //Debug.Log(inputTypeRef.FullName);
-
-                asmDef.Write(output);
+                //asmDef.Write(output);
             }
 
             void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, string type)
@@ -387,6 +478,23 @@ namespace Liminal.SDK.Build
                 EditorUtility.ClearProgressBar();
             }
 
+            string[] FindAllDllsInPath(string path)
+            {
+                // Search for all DLL files in the specified path. 
+                // The search pattern "*.dll" matches all files with a .dll extension.
+                // SearchOption.TopDirectoryOnly searches the current directory only, not subdirectories.
+                // To include all subdirectories, use SearchOption.AllDirectories.
+                try
+                {
+                    string[] dllFiles = Directory.GetFiles(path, "*.dll", SearchOption.AllDirectories);
+                    return dllFiles;
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("An error occurred: " + e.Message);
+                    return new string[0]; // Return an empty array if an error occurs
+                }
+            }
 
             IEnumerator ExtractPack(byte[] appBytes, string limappPath)
             {

@@ -199,12 +199,12 @@ namespace Liminal.SDK.XR
             //controllerInstance.transform.localEulerAngles = Vector3.zero;
 
 			// if the controller instance has laser pointer, no pointer making one
-			// Intentionally not picking up disabled pointers.
+
 			var pointerVisual = xrController.GetComponentInChildren<LaserPointerVisual>();
 
             if (pointerVisual == null)
             {
-                pointerVisual = xrController.GetComponentInChildren<LaserPointerVisual>();
+                pointerVisual = controllerComponent.GetComponentInChildren<LaserPointerVisual>();
             }
 
             if (pointerVisual == null)

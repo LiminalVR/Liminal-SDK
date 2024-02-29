@@ -248,6 +248,8 @@ namespace Liminal.SDK.Build
                                 field.FieldType = newTextType;
                                 Debug.Log($"Field '{field.Name}' in type '{type.FullName}' uses GUIText.");
                             }
+
+                            Debug.Log($"Field: {field.FieldType.FullName}");
                         }
 
                         // Check method parameters
@@ -263,6 +265,11 @@ namespace Liminal.SDK.Build
                             }
                         }
 
+                        foreach (var property in type.Properties)
+                        {
+                            Debug.Log($"Property {property.PropertyType.FullName} {property.DeclaringType} {property.Name}");
+                        }
+
                         // Check method bodies for references to GUIText
                         foreach (var method in type.Methods)
                         {
@@ -272,15 +279,71 @@ namespace Liminal.SDK.Build
                                 continue;
 
                             var ilProcessor = method.Body.GetILProcessor();
-
                             foreach (var instruction in method.Body.Instructions)
                             {
                                 // Check if the instruction is a call to UnityEngine.Input.get_touchCount
                                 if (instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference operand)
                                 {
-                                    if(operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touchCount" ||
-                                       operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touches")
-                                        instruction.Operand = CloneMethodWithDeclaringType(operand, newTextType);
+                                    if (operand.DeclaringType.FullName == "UnityEngine.Input")
+                                    {
+                                        Debug.Log($"[HELP] - {operand.Name}");
+                                    }
+
+                                    if (operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touchCount" ||
+                                        operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touches")
+                                    {
+                                        var inputPath = @"C:\Program Files\Unity\Hub\Editor\2022.3.16f1\Editor\Data\Managed\UnityEngine\UnityEngine.InputLegacyModule.dll";
+                                        var reference = AssemblyNameReference.Parse("UnityEngine.InputLegacyModule, Version=0.0.0.0");
+                                        var inputAsm = AssemblyDefinition.ReadAssembly(inputPath);
+
+                                        // go through this asm, get the op for the same type and replace it!
+
+                                        //instruction.Operand = CloneMethodWithDeclaringType(operand, newInputType);
+
+
+
+
+
+
+                                        // Assuming asmDef is your AssemblyDefinition
+                                        // You need to create a reference to CustomInputHandler.GetOverrideTouch
+                                        // First, get a TypeReference to CustomInputHandler
+
+
+                                        /*string assemblyCSharpPath = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Library\ScriptAssemblies\Assembly-CSharp.dll";
+                                        var assemblyCSharp = AssemblyDefinition.ReadAssembly(assemblyCSharpPath);
+
+                                        var customInputHandlerType = assemblyCSharp.MainModule.Types.FirstOrDefault(t => t.FullName == "Liminal.Test.CustomInputHandler");
+                                        if (customInputHandlerType == null)
+                                        {
+                                            throw new InvalidOperationException("CustomInputHandler type not found in Assembly-CSharp.");
+                                        }
+
+
+                                        // Ensure the CustomInputHandler type is resolved
+                                        var resolvedCustomInputHandlerType = customInputHandlerType.Resolve();
+                                        if (resolvedCustomInputHandlerType == null)
+                                        {
+                                            throw new InvalidOperationException("CustomInputHandler could not be resolved.");
+                                        }
+
+                                        // Find the GetOverrideTouch method
+                                        var getOverrideTouchMethod = resolvedCustomInputHandlerType.Methods.FirstOrDefault(m => m.Name == "GetOverrideTouch" && m.IsStatic);
+                                        if (getOverrideTouchMethod == null)
+                                        {
+                                            throw new InvalidOperationException("GetOverrideTouch method not found.");
+                                        }
+
+                                        // Import the method reference into the assembly being modified
+                                        var getOverrideTouchMethodRef = asmDef.MainModule.ImportReference(getOverrideTouchMethod);
+
+                                        // Replace the operand with the new method reference
+                                        if (instruction.Operand is MethodReference methodRef)
+                                        {
+                                            instruction.Operand = getOverrideTouchMethodRef;
+                                        }*/
+
+                                    }
                                 }
                             }
                             

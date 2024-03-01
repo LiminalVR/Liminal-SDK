@@ -12,6 +12,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
+using UnityEngine.UI;
 using Assembly = System.Reflection.Assembly;
 
 namespace Liminal.SDK.Build
@@ -146,7 +147,7 @@ namespace Liminal.SDK.Build
                     var fileName = Path.GetFileName(dllFile);
                     var output = Path.Combine(OutputDirectory, fileName);
                     AddAssemblyReference(asmDef, output);
-                    Test(asmDef, output);
+                    UpdateDLLWithReferences(asmDef, output);
                     
                     asmDef.Write(output);
                     Debug.Log("Assembly updated and saved successfully.");
@@ -155,234 +156,109 @@ namespace Liminal.SDK.Build
                 // Change UnityEngine.GUIText.Text to UnityEngine.UI.Text
             }
 
-            // Take a dll and rebuild it with Cecil.
-            /*
-            if (GUILayout.Button("Read from Output"))
+            void UpdateDLLWithReferences(AssemblyDefinition asmDef, string output)
             {
-                var asmDef = AssemblyDefinition.ReadAssembly(output);
-                /*foreach (var item in asmDef.MainModule.AssemblyReferences)
-                    Debug.Log(item.FullName);
+                var newTextType = new TypeReference("UnityEngine.UI", "Text", asmDef.MainModule, asmDef.MainModule.TypeSystem.CoreLibrary);
+                //var overrideTextType = new TypeReference("Liminal", "OverrideTextClass", module, module.TypeSystem.CoreLibrary);
 
-                foreach (var item in asmDef.MainModule.Types)
-                    Debug.Log(item.FullName);#1#
+                var overrideTextAssemblyPath = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Library\ScriptAssemblies\LiminalSdk.dll";
+                var overrideTextAssembly = AssemblyDefinition.ReadAssembly(overrideTextAssemblyPath);
+
+                // Assuming asmDef is your target assembly definition that you're modifying
+                var overrideTextType = asmDef.MainModule.ImportReference(overrideTextAssembly.MainModule.GetType("Liminal.OverrideTextClass"));
+                newTextType = overrideTextType;
 
                 foreach (var module in asmDef.Modules)
                 {
                     foreach (var type in module.Types)
                     {
-                        // Check fields
-                        foreach (var field in type.Fields)
-                        {
-                            if (field.FieldType.FullName == "UnityEngine.GUIText")
-                            {
-                                Debug.Log($"Field '{field.Name}' in type '{type.FullName}' uses GUIText.");
-                            }
-                        }
-
-                        // Check method parameters
-                        foreach (var method in type.Methods)
-                        {
-                            foreach (var parameter in method.Parameters)
-                            {
-                                if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
-                                {
-                                    Debug.Log($"Method '{method.Name}' in type '{type.FullName}' has a parameter '{parameter.Name}' that uses GUIText.");
-                                }
-                            }
-                        }
-                    }
-
-                    foreach (var type in module.Types)
-                    {
-                        // Existing updates for fields, method parameters, and properties
-
-                        // Update method return types
-                        foreach (var method in type.Methods)
-                        {
-                            if (method.ReturnType.FullName == "UnityEngine.GUIText")
-                            {
-                                //method.ReturnType = newTextType;
-                                Debug.Log($"Return type of method '{method.Name}' in type '{type.FullName}' updated from GUIText to Text.");
-                            }
-
-                            // Update local variables
-                            if (method.HasBody)
-                            {
-                                foreach (var variable in method.Body.Variables)
-                                {
-                                    if (variable.VariableType.FullName == "UnityEngine.GUIText")
-                                    {
-                                        //variable.VariableType = newTextType;
-                                        Debug.Log($"Local variable in method '{method.Name}' in type '{type.FullName}' updated from GUIText to Text.");
-                                    }
-                                }
-                            }
-                        }
+                        ProcessType(type, newTextType);
                     }
                 }
-
-                /*var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.UI.Text));
-                var methods = GetAllMethodDefinitions(asmDef);
-                foreach (var methodDef in methods)
-                {
-                    Replace(methodDef, newInputType, "UnityEngine.GUIText");
-                }#1#
             }
-            */
 
-            void Test(AssemblyDefinition asmDef, string output)
+            void ProcessType(TypeDefinition type, TypeReference newTextType)
             {
-                var newTextType = asmDef.MainModule.ImportReference(typeof(UnityEngine.UI.Text));
-                var guiTextTypeFullName = "UnityEngine.GUIText";
-
-                foreach (var module in asmDef.Modules)
+                if (type.BaseType != null && type.BaseType.FullName == "UnityEngine.GUIText")
                 {
+                    type.BaseType = newTextType;
+                }
 
-                    foreach (var type in module.Types)
+                foreach (var field in type.Fields)
+                {
+                    if (field.FieldType.FullName == "UnityEngine.GUIText")
                     {
-                        // Check fields
-                        foreach (var field in type.Fields)
-                        {
-                            if (field.FieldType.FullName == "UnityEngine.GUIText")
-                            {
-                                field.FieldType = newTextType;
-                                Debug.Log($"Field '{field.Name}' in type '{type.FullName}' uses GUIText.");
-                            }
-
-                            Debug.Log($"Field: {field.FieldType.FullName}");
-                        }
-
-                        // Check method parameters
-                        foreach (var method in type.Methods)
-                        {
-                            foreach (var parameter in method.Parameters)
-                            {
-                                if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
-                                {
-                                    parameter.ParameterType = newTextType;
-                                    Debug.Log($"Method '{method.Name}' in type '{type.FullName}' has a parameter '{parameter.Name}' that uses GUIText.");
-                                }
-                            }
-                        }
-
-                        foreach (var property in type.Properties)
-                        {
-                            Debug.Log($"Property {property.PropertyType.FullName} {property.DeclaringType} {property.Name}");
-                        }
-
-                        // Check method bodies for references to GUIText
-                        foreach (var method in type.Methods)
-                        {
-                            Debug.Log($"Method Type {type.Name} and method {method.Name}");
-
-                            if (!method.HasBody)
-                                continue;
-
-                            var ilProcessor = method.Body.GetILProcessor();
-                            foreach (var instruction in method.Body.Instructions)
-                            {
-                                // Check if the instruction is a call to UnityEngine.Input.get_touchCount
-                                if (instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference operand)
-                                {
-                                    if (operand.DeclaringType.FullName == "UnityEngine.Input")
-                                    {
-                                        Debug.Log($"[HELP] - {operand.Name}");
-                                    }
-
-                                    if (operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touchCount" ||
-                                        operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touches")
-                                    {
-                                        var inputPath = @"C:\Program Files\Unity\Hub\Editor\2022.3.16f1\Editor\Data\Managed\UnityEngine\UnityEngine.InputLegacyModule.dll";
-                                        var reference = AssemblyNameReference.Parse("UnityEngine.InputLegacyModule, Version=0.0.0.0");
-                                        var inputAsm = AssemblyDefinition.ReadAssembly(inputPath);
-
-                                        // go through this asm, get the op for the same type and replace it!
-
-                                        //instruction.Operand = CloneMethodWithDeclaringType(operand, newInputType);
-
-
-
-
-
-
-                                        // Assuming asmDef is your AssemblyDefinition
-                                        // You need to create a reference to CustomInputHandler.GetOverrideTouch
-                                        // First, get a TypeReference to CustomInputHandler
-
-
-                                        /*string assemblyCSharpPath = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Library\ScriptAssemblies\Assembly-CSharp.dll";
-                                        var assemblyCSharp = AssemblyDefinition.ReadAssembly(assemblyCSharpPath);
-
-                                        var customInputHandlerType = assemblyCSharp.MainModule.Types.FirstOrDefault(t => t.FullName == "Liminal.Test.CustomInputHandler");
-                                        if (customInputHandlerType == null)
-                                        {
-                                            throw new InvalidOperationException("CustomInputHandler type not found in Assembly-CSharp.");
-                                        }
-
-
-                                        // Ensure the CustomInputHandler type is resolved
-                                        var resolvedCustomInputHandlerType = customInputHandlerType.Resolve();
-                                        if (resolvedCustomInputHandlerType == null)
-                                        {
-                                            throw new InvalidOperationException("CustomInputHandler could not be resolved.");
-                                        }
-
-                                        // Find the GetOverrideTouch method
-                                        var getOverrideTouchMethod = resolvedCustomInputHandlerType.Methods.FirstOrDefault(m => m.Name == "GetOverrideTouch" && m.IsStatic);
-                                        if (getOverrideTouchMethod == null)
-                                        {
-                                            throw new InvalidOperationException("GetOverrideTouch method not found.");
-                                        }
-
-                                        // Import the method reference into the assembly being modified
-                                        var getOverrideTouchMethodRef = asmDef.MainModule.ImportReference(getOverrideTouchMethod);
-
-                                        // Replace the operand with the new method reference
-                                        if (instruction.Operand is MethodReference methodRef)
-                                        {
-                                            instruction.Operand = getOverrideTouchMethodRef;
-                                        }*/
-
-                                    }
-                                }
-                            }
-                            
-
-                            if (type.Name == "SimpleActivatorMenu")
-                            {
-                                if (method.Name == "OnEnable")
-                                {
-                                    var instructions = method.Body.Instructions;
-
-                                    for (int i = 0; i < instructions.Count; i++)
-                                    {
-                                        // We found the name here.
-                                        if (instructions[i].OpCode == OpCodes.Callvirt && instructions[i].Operand is MethodReference methodRef && methodRef.DeclaringType.FullName == "UnityEngine.GUIText" && methodRef.Name == "set_text")
-                                        {
-                                            Debug.Log($"Method Types {methodRef.DeclaringType}, {methodRef.ReturnType}, {methodRef.MethodReturnType}");
-                                            instructions[i].Operand = CloneMethodWithDeclaringType(methodRef, newTextType);
-                                            methodRef.DeclaringType = newTextType;
-                                        }
-
-                                        // This is a highly simplified and specific example. You will need to adapt
-                                        // it based on the actual IL instructions you are dealing with.
-
-                                        if (instructions[i].Operand != null)
-                                        {
-                                            Debug.Log($"Operand Type {instructions[i].Operand.ToString()} : {instructions[i].Operand.GetType()}");
-
-                                        }
-
-                                        if (instructions[i].Operand is Type tRef)
-                                        {
-                                            Debug.Log($"Found Type Ref {tRef.FullName}");
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        field.FieldType = newTextType;
                     }
                 }
+
+                foreach (var method in type.Methods)
+                {
+                    // Update return type and parameters as needed
+                    if (method.ReturnType.FullName == "UnityEngine.GUIText")
+                    {
+                        method.ReturnType = newTextType;
+                    }
+
+                    foreach (var parameter in method.Parameters)
+                    {
+                        if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
+                        {
+                            parameter.ParameterType = newTextType;
+                        }
+                    }
+
+                    // Additional logic for method bodies, if necessary
+                }
+
+                foreach (var property in type.Properties)
+                {
+                    if (property.PropertyType.FullName == "UnityEngine.GUIText")
+                    {
+                        property.PropertyType = newTextType;
+                    }
+                }
+
+                // Recursively process nested types
+                foreach (var nestedType in type.NestedTypes)
+                {
+                    ProcessType(nestedType, newTextType);
+                }
+            }
+
+            // Implementation of the CloneMethodWithDeclaringType method.
+            MethodReference CloneMethodWithDeclaringTypeAndAdjustTypes(MethodReference originalMethod, TypeReference newDeclaringType, string newTextTypeName)
+            {
+                var clonedMethod = new MethodReference(originalMethod.Name, originalMethod.ReturnType, newDeclaringType)
+                {
+                    CallingConvention = originalMethod.CallingConvention,
+                    HasThis = originalMethod.HasThis,
+                    ExplicitThis = originalMethod.ExplicitThis
+                };
+
+                if (originalMethod.ReturnType.FullName == "UnityEngine.GUIText")
+                {
+                    clonedMethod.ReturnType = new TypeReference("UnityEngine.UI", "Text", originalMethod.ReturnType.Module, originalMethod.ReturnType.Scope);
+                }
+
+                foreach (var parameter in originalMethod.Parameters)
+                {
+                    if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
+                    {
+                        clonedMethod.Parameters.Add(new ParameterDefinition(new TypeReference("UnityEngine.UI", "Text", parameter.ParameterType.Module, parameter.ParameterType.Scope)));
+                    }
+                    else
+                    {
+                        clonedMethod.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
+                    }
+                }
+
+                foreach (var genericParameter in originalMethod.GenericParameters)
+                {
+                    clonedMethod.GenericParameters.Add(new GenericParameter(genericParameter.Name, clonedMethod));
+                }
+
+                return clonedMethod;
             }
 
             // Utility method to find a method on a given type

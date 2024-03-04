@@ -143,7 +143,10 @@ namespace Liminal.SDK.XR
 
                 //_controller.modelParent = _avatarHand.Anchor;
                 _controller.modelParent = controllerVisual.transform;
+
+				//_controller.transform.SetParent(controllerVisual.transform);
                 _controller.model.localPosition = Vector3.zero;
+                _controller.model.localEulerAngles = new Vector3(0, -180, 0);
             }
             else
             {
@@ -154,6 +157,7 @@ namespace Liminal.SDK.XR
             {
                 _pointer.transform.SetParent(_controller.model);
                 _pointer.transform.localPosition = Vector3.zero;
+                _pointer.transform.localEulerAngles = new Vector3(0, -180, 0);
             }
             else
             {

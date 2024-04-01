@@ -13,6 +13,7 @@ using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.UI;
+using static Liminal.SDK.Build.LimapPatchWindow;
 using Assembly = System.Reflection.Assembly;
 
 namespace Liminal.SDK.Build
@@ -159,7 +160,7 @@ namespace Liminal.SDK.Build
             void UpdateDLLWithReferences(AssemblyDefinition asmDef, string output)
             {
                 var newTextType = new TypeReference("UnityEngine.UI", "Text", asmDef.MainModule, asmDef.MainModule.TypeSystem.CoreLibrary);
-                //var overrideTextType = new TypeReference("Liminal", "OverrideTextClass", module, module.TypeSystem.CoreLibrary);
+                var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Input));
 
                 var overrideTextAssemblyPath = @"C:\Work\Liminal\Platform\Liminal-SDK - 2022\Liminal-SDK-Unity-Package\Library\ScriptAssemblies\LiminalSdk.dll";
                 var overrideTextAssembly = AssemblyDefinition.ReadAssembly(overrideTextAssemblyPath);
@@ -170,123 +171,135 @@ namespace Liminal.SDK.Build
 
                 foreach (var module in asmDef.Modules)
                 {
+                    var typeReferences = module.GetTypeReferences();
+                    foreach (var typeRef in typeReferences)
+                    {
+                        if (typeRef.FullName == "UnityEngine.GUIText")
+                        {
+                            // Output the reference for inspection
+                            Debug.Log($"Found TypeReference to 'UnityEngine.GUIText': {typeRef.FullName}");
+
+                            // You would have to inspect whether this type reference is actually used anywhere.
+                            // If not, you might consider what to do with this information - such as informing
+                            // the user or logging it for further action.
+                        }
+                    }
+
                     foreach (var type in module.Types)
                     {
-                        ProcessType(type, newTextType);
+                        ProcessType(type, newTextType, "UnityEngine.GUIText");
+                        ProcessType(type, newInputType, "UnityEngine.Input");
+                        ProcessType(type, newInputType, " UnityEngine.InputLegacyModule");
+                    }
+                }
+
+                for (int i = asmDef.MainModule.AssemblyReferences.Count - 1; i >= 0; i--)
+                {
+                    var reference = asmDef.MainModule.AssemblyReferences[i];
+                    if (reference.Name == "UnityEngine.GUIText")
+                    {
+                        asmDef.MainModule.AssemblyReferences.RemoveAt(i);
+                        Debug.Log("Reference moved - UnityEngine.GUIText");
+                    }
+                }
+
+
+                // Go through all type references in the assembly
+                foreach (var typeReference in asmDef.MainModule.GetTypeReferences())
+                {
+                    if (typeReference.FullName == "UnityEngine.GUIText")
+                    {
+                        Console.WriteLine($"TypeReference to 'GUIText' found: {typeReference}");
+                    }
+                }
+
+                // Go through all types in the assembly
+                foreach (var typeDefinition in asmDef.MainModule.GetTypes())
+                {
+                    // Inspect fields, methods, etc.
+                    foreach (var field in typeDefinition.Fields)
+                    {
+                        if (field.FieldType.FullName == "UnityEngine.GUIText")
+                        {
+                            Console.WriteLine($"Field '{field.Name}' in type '{typeDefinition.Name}' is of type 'GUIText'.");
+                        }
                     }
                 }
             }
 
-            void ProcessType(TypeDefinition type, TypeReference newTextType)
+            void ProcessType(TypeDefinition type, TypeReference newTextType, string typeName)
             {
-                if (type.BaseType != null && type.BaseType.FullName == "UnityEngine.GUIText")
+                if (type.BaseType != null && type.BaseType.FullName == typeName)
                 {
                     type.BaseType = newTextType;
-                }
-
-                foreach (var field in type.Fields)
-                {
-                    if (field.FieldType.FullName == "UnityEngine.GUIText")
-                    {
-                        field.FieldType = newTextType;
-                    }
+                    Debug.Log($"[Process Type] - {typeName} - Updated");
                 }
 
                 foreach (var method in type.Methods)
                 {
-                    // Update return type and parameters as needed
-                    if (method.ReturnType.FullName == "UnityEngine.GUIText")
+                    //Debug.Log($"[Process Type Method] {method.Name}");
+                    if (method.ReturnType.FullName == typeName)
                     {
                         method.ReturnType = newTextType;
+                        Debug.Log($"[Process Type] - {typeName} - Updated");
                     }
 
                     foreach (var parameter in method.Parameters)
                     {
-                        if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
+                        if (parameter.ParameterType.FullName == typeName)
                         {
                             parameter.ParameterType = newTextType;
+                            Debug.Log($"[Process Type] - {typeName} - Updated");
                         }
                     }
 
-                    // Additional logic for method bodies, if necessary
+                    //Replace(method, newTextType, typeName);
+
+                    var targetMethod = method;
+                    if (!targetMethod.HasBody)
+                        return;
+
+                    foreach (var instruction in method.Body.Instructions)
+                    {
+                        if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
+                        {
+                            var fieldReference = instruction.Operand as FieldReference;
+                            if (fieldReference != null && fieldReference.FieldType.FullName == typeName)
+                            {
+                                Debug.Log($"[Process Type Method] - {fieldReference.FullName} - Replaced Field. Current Declare Type {fieldReference.DeclaringType.FullName}");
+
+                                // Create a new FieldReference with the new type
+                                var newFieldReference = new FieldReference(fieldReference.Name, newTextType, fieldReference.DeclaringType);
+                                instruction.Operand = newFieldReference;
+                                // Additional steps might be required to handle type conversions
+                            }
+                        }
+                    }
+
+                }
+
+                foreach (var field in type.Fields)
+                {
+                    if (field.FieldType.FullName == typeName)
+                    {
+                        field.FieldType = newTextType;
+                        Debug.Log($"[Process Type] - {typeName} - Updated");
+                    }
                 }
 
                 foreach (var property in type.Properties)
                 {
-                    if (property.PropertyType.FullName == "UnityEngine.GUIText")
+                    if (property.PropertyType.FullName == typeName)
                     {
                         property.PropertyType = newTextType;
+                        Debug.Log($"[Process Type] - {typeName} - Updated");
                     }
                 }
 
                 // Recursively process nested types
                 foreach (var nestedType in type.NestedTypes)
-                {
-                    ProcessType(nestedType, newTextType);
-                }
+                    ProcessType(nestedType, newTextType, typeName);
             }
-
-            // Implementation of the CloneMethodWithDeclaringType method.
-            MethodReference CloneMethodWithDeclaringTypeAndAdjustTypes(MethodReference originalMethod, TypeReference newDeclaringType, string newTextTypeName)
-            {
-                var clonedMethod = new MethodReference(originalMethod.Name, originalMethod.ReturnType, newDeclaringType)
-                {
-                    CallingConvention = originalMethod.CallingConvention,
-                    HasThis = originalMethod.HasThis,
-                    ExplicitThis = originalMethod.ExplicitThis
-                };
-
-                if (originalMethod.ReturnType.FullName == "UnityEngine.GUIText")
-                {
-                    clonedMethod.ReturnType = new TypeReference("UnityEngine.UI", "Text", originalMethod.ReturnType.Module, originalMethod.ReturnType.Scope);
-                }
-
-                foreach (var parameter in originalMethod.Parameters)
-                {
-                    if (parameter.ParameterType.FullName == "UnityEngine.GUIText")
-                    {
-                        clonedMethod.Parameters.Add(new ParameterDefinition(new TypeReference("UnityEngine.UI", "Text", parameter.ParameterType.Module, parameter.ParameterType.Scope)));
-                    }
-                    else
-                    {
-                        clonedMethod.Parameters.Add(new ParameterDefinition(parameter.ParameterType));
-                    }
-                }
-
-                foreach (var genericParameter in originalMethod.GenericParameters)
-                {
-                    clonedMethod.GenericParameters.Add(new GenericParameter(genericParameter.Name, clonedMethod));
-                }
-
-                return clonedMethod;
-            }
-
-            // Utility method to find a method on a given type
-            MethodReference FindMethod(ModuleDefinition module, TypeReference typeRef, string methodName, params Type[] parameterTypes)
-            {
-                var typeDef = typeRef.Resolve();
-                foreach (var method in typeDef.Methods)
-                {
-                    if (method.Name != methodName || method.Parameters.Count != parameterTypes.Length)
-                        continue;
-
-                    bool parametersMatch = true;
-                    for (int i = 0; i < method.Parameters.Count; i++)
-                    {
-                        // Using the module to import the parameter type reference for comparison
-                        if (method.Parameters[i].ParameterType.FullName != module.ImportReference(parameterTypes[i]).FullName)
-                        {
-                            parametersMatch = false;
-                            break;
-                        }
-                    }
-
-                    if (parametersMatch)
-                        return module.ImportReference(method); // Import the method reference through the provided module
-                }
-                return null;
-            }
-
 
             void AddAssemblyReference(AssemblyDefinition asmDef, string output)
             {
@@ -295,16 +308,9 @@ namespace Liminal.SDK.Build
                 asmDef.MainModule.AssemblyReferences.Add(reference);
 
                 var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Input));
-                
-
                 var methods = GetAllMethodDefinitions(asmDef);
                 foreach (var methodDef in methods)
-                {
                     Replace(methodDef, newInputType, nameof(UnityEngine.Input));
-                }
-                
-                //Debug.Log(inputTypeRef.FullName);
-                //asmDef.Write(output);
             }
 
             void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, string type)
@@ -319,12 +325,18 @@ namespace Liminal.SDK.Build
                 foreach (var instruction in methodCalls)
                 {
                     if (instruction.Operand is not MethodReference mRef)
+                    {
+                        //Debug.Log($"[Replace {type}] - {instruction.Operand.GetType().FullName} Ignored");
                         continue;
+                    }
 
-                    if (!mRef.DeclaringType.Name.Equals(type)) 
+                    if (!mRef.DeclaringType.Name.Equals(type))
+                    {
+                        //Debug.Log($"[Replace {type}] - {instruction.Operand.GetType().FullName} Ignored due to DeclaringType none matching.");
                         continue;
+                    }
 
-                    Debug.Log($"{mRef.Name}, Declare Type {mRef.DeclaringType}");
+                    Debug.Log($"[Replace] - {mRef.Name}, Declare Type {mRef.DeclaringType}");
                     instruction.Operand = CloneMethodWithDeclaringType(mRef, replacementTypeRef);
                 }
             }

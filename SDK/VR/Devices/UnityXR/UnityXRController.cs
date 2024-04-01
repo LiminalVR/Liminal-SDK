@@ -136,7 +136,10 @@ namespace Liminal.SDK.XR
             var controllerVisual = _avatarHand.Transform.GetComponentInChildren<VRAvatarController>();
             var hasControllerVisual = controllerVisual != null;
 
-			if (hasControllerVisual)
+			// This is the default angle we use for all experiences. Some experiences might feel awkward if we start using 0.
+            var laserPointerXAngle = -15;
+			
+            if (hasControllerVisual)
             {
 				Debug.Log("Has controller visual, so move it over!");
                 _controller.hideControllerModel = false;
@@ -146,7 +149,7 @@ namespace Liminal.SDK.XR
 
 				//_controller.transform.SetParent(controllerVisual.transform);
                 _controller.model.localPosition = Vector3.zero;
-                _controller.model.localEulerAngles = new Vector3(0, -180, 0);
+                _controller.model.localEulerAngles = new Vector3(laserPointerXAngle, -180, 0);
             }
             else
             {
@@ -157,7 +160,7 @@ namespace Liminal.SDK.XR
             {
                 _pointer.transform.SetParent(_controller.model);
                 _pointer.transform.localPosition = Vector3.zero;
-                _pointer.transform.localEulerAngles = new Vector3(0, -180, 0);
+                _pointer.transform.localEulerAngles = new Vector3(laserPointerXAngle, -180, 0);
             }
             else
             {

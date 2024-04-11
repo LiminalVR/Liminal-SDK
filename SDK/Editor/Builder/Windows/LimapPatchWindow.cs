@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Liminal.Cecil.Mono.Cecil;
 using Liminal.Cecil.Mono.Cecil.Cil;
 using Liminal.SDK.Editor.Build;
@@ -12,8 +14,7 @@ using Unity.EditorCoroutines.Editor;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
-using UnityEngine.UI;
-using static Liminal.SDK.Build.LimapPatchWindow;
+using Debug = UnityEngine.Debug;
 using Assembly = System.Reflection.Assembly;
 
 namespace Liminal.SDK.Build
@@ -147,14 +148,47 @@ namespace Liminal.SDK.Build
                     var asmDef = AssemblyDefinition.ReadAssembly(dllFile);
                     var fileName = Path.GetFileName(dllFile);
                     var output = Path.Combine(OutputDirectory, fileName);
+                    EmptyMethodBody(asmDef, "TMPro.Examples.CameraController", "GetPlayerInput");
+                    EmptyMethodBody(asmDef, "mitaywalle.ThreeSliceLine.Demo.Scripts.MouseOrbitImproved", "LateUpdate");
+                    EmptyMethodBody(asmDef, "SpaceGraphicsToolkit.SgtInputManager", "Poll");
+
                     AddAssemblyReference(asmDef, output);
                     UpdateDLLWithReferences(asmDef, output);
                     
+                    // We want to read and write from the output.
                     asmDef.Write(output);
                     Debug.Log("Assembly updated and saved successfully.");
                 }
 
                 // Change UnityEngine.GUIText.Text to UnityEngine.UI.Text
+            }
+
+            void EmptyMethodBody(AssemblyDefinition assembly, string classFullName, string methodName)
+            {
+                var classContainer = assembly.MainModule.Types.FirstOrDefault(t => t.FullName == classFullName);
+
+                if (classContainer == null)
+                    return;
+
+                foreach (var method in classContainer.Methods)
+                {
+                    Debug.Log($"{method.Name}");
+                }
+
+                var getPlayerInputMethod = classContainer.Methods.FirstOrDefault(m => m.Name == methodName);
+                if (getPlayerInputMethod == null)
+                    return;
+
+                DeleteWholeBody();
+
+                Debug.Log($"Deleted {classContainer.FullName}.{getPlayerInputMethod.FullName}()");
+
+                void DeleteWholeBody()
+                {
+                    var ilProcessor = getPlayerInputMethod.Body.GetILProcessor();
+                    getPlayerInputMethod.Body = new MethodBody(getPlayerInputMethod);
+                    ilProcessor.Append(ilProcessor.Create(OpCodes.Ret)); // Add a return statement to avoid errors
+                }
             }
 
             void UpdateDLLWithReferences(AssemblyDefinition asmDef, string output)
@@ -171,25 +205,10 @@ namespace Liminal.SDK.Build
 
                 foreach (var module in asmDef.Modules)
                 {
-                    var typeReferences = module.GetTypeReferences();
-                    foreach (var typeRef in typeReferences)
-                    {
-                        if (typeRef.FullName == "UnityEngine.GUIText")
-                        {
-                            // Output the reference for inspection
-                            Debug.Log($"Found TypeReference to 'UnityEngine.GUIText': {typeRef.FullName}");
-
-                            // You would have to inspect whether this type reference is actually used anywhere.
-                            // If not, you might consider what to do with this information - such as informing
-                            // the user or logging it for further action.
-                        }
-                    }
-
                     foreach (var type in module.Types)
                     {
                         ProcessType(type, newTextType, "UnityEngine.GUIText");
                         ProcessType(type, newInputType, "UnityEngine.Input");
-                        ProcessType(type, newInputType, " UnityEngine.InputLegacyModule");
                     }
                 }
 
@@ -203,8 +222,6 @@ namespace Liminal.SDK.Build
                     }
                 }
 
-
-                // Go through all type references in the assembly
                 foreach (var typeReference in asmDef.MainModule.GetTypeReferences())
                 {
                     if (typeReference.FullName == "UnityEngine.GUIText")
@@ -225,13 +242,15 @@ namespace Liminal.SDK.Build
                         }
                     }
                 }
+
+
             }
 
-            void ProcessType(TypeDefinition type, TypeReference newTextType, string typeName)
+            void ProcessType(TypeDefinition type, TypeReference newType, string typeName)
             {
                 if (type.BaseType != null && type.BaseType.FullName == typeName)
                 {
-                    type.BaseType = newTextType;
+                    type.BaseType = newType;
                     Debug.Log($"[Process Type] - {typeName} - Updated");
                 }
 
@@ -240,7 +259,7 @@ namespace Liminal.SDK.Build
                     //Debug.Log($"[Process Type Method] {method.Name}");
                     if (method.ReturnType.FullName == typeName)
                     {
-                        method.ReturnType = newTextType;
+                        method.ReturnType = newType;
                         Debug.Log($"[Process Type] - {typeName} - Updated");
                     }
 
@@ -248,7 +267,7 @@ namespace Liminal.SDK.Build
                     {
                         if (parameter.ParameterType.FullName == typeName)
                         {
-                            parameter.ParameterType = newTextType;
+                            parameter.ParameterType = newType;
                             Debug.Log($"[Process Type] - {typeName} - Updated");
                         }
                     }
@@ -269,9 +288,25 @@ namespace Liminal.SDK.Build
                                 Debug.Log($"[Process Type Method] - {fieldReference.FullName} - Replaced Field. Current Declare Type {fieldReference.DeclaringType.FullName}");
 
                                 // Create a new FieldReference with the new type
-                                var newFieldReference = new FieldReference(fieldReference.Name, newTextType, fieldReference.DeclaringType);
+                                var newFieldReference = new FieldReference(fieldReference.Name, newType, fieldReference.DeclaringType);
                                 instruction.Operand = newFieldReference;
                                 // Additional steps might be required to handle type conversions
+                            }
+                        }
+                    }
+
+                    //var ilProcessor = method.Body.GetILProcessor();
+
+                    if (typeName == "UnityEngine.Input")
+                    {
+                        foreach (var instruction in method.Body.Instructions)
+                        {
+                            // Check if the instruction is a call to UnityEngine.Input.get_touchCount
+                            if (instruction.OpCode == OpCodes.Call && instruction.Operand is MethodReference operand)
+                            {
+                                if (operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touchCount" ||
+                                    operand.DeclaringType.FullName == "UnityEngine.Input" && operand.Name == "get_touches")
+                                    instruction.Operand = CloneMethodWithDeclaringType(operand, newType);
                             }
                         }
                     }
@@ -282,7 +317,7 @@ namespace Liminal.SDK.Build
                 {
                     if (field.FieldType.FullName == typeName)
                     {
-                        field.FieldType = newTextType;
+                        field.FieldType = newType;
                         Debug.Log($"[Process Type] - {typeName} - Updated");
                     }
                 }
@@ -291,14 +326,14 @@ namespace Liminal.SDK.Build
                 {
                     if (property.PropertyType.FullName == typeName)
                     {
-                        property.PropertyType = newTextType;
+                        property.PropertyType = newType;
                         Debug.Log($"[Process Type] - {typeName} - Updated");
                     }
                 }
 
                 // Recursively process nested types
                 foreach (var nestedType in type.NestedTypes)
-                    ProcessType(nestedType, newTextType, typeName);
+                    ProcessType(nestedType, newType, typeName);
             }
 
             void AddAssemblyReference(AssemblyDefinition asmDef, string output)
@@ -311,6 +346,7 @@ namespace Liminal.SDK.Build
                 var methods = GetAllMethodDefinitions(asmDef);
                 foreach (var methodDef in methods)
                     Replace(methodDef, newInputType, nameof(UnityEngine.Input));
+
             }
 
             void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, string type)

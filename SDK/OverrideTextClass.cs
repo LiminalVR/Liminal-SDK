@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Liminal
@@ -6,4 +7,13 @@ namespace Liminal
     {
         // Add any additional properties, methods, or overrides here
     }
+
+    public class OverrideInput : Input
+    {
+    }
+
+    public struct OverrideTouch
+    {
+    }
+
 }

@@ -151,7 +151,7 @@ namespace Liminal.SDK.Build
                     EmptyMethodBody(asmDef, "TMPro.Examples.CameraController", "GetPlayerInput");
                     EmptyMethodBody(asmDef, "mitaywalle.ThreeSliceLine.Demo.Scripts.MouseOrbitImproved", "LateUpdate");
                     EmptyMethodBody(asmDef, "SpaceGraphicsToolkit.SgtInputManager", "Poll");
-
+                    //csShowAllEffect.Update
                     AddAssemblyReference(asmDef, output);
                     UpdateDLLWithReferences(asmDef, output);
                     
@@ -280,6 +280,37 @@ namespace Liminal.SDK.Build
 
                     foreach (var instruction in method.Body.Instructions)
                     {
+                        if (instruction.ToString().Contains("UnityEngine.GUIText") && typeName == "UnityEngine.GUIText")
+                        {
+                            Debug.Log($"Instructions {instruction.ToString()}");
+                            var methodRef = instruction.Operand as MethodReference;
+                            if (methodRef.Name == "set_text" && methodRef.DeclaringType.Name == "GUIText")
+                            {
+                                // Change the instruction to call the new method
+                                //var newMethod = new MethodReference("set_text", methodRef.ReturnType, newType) {HasThis = true};
+                                //instruction.Operand = newMethod;
+                                
+                                instruction.Operand = CloneMethodWithDeclaringType(methodRef, newType);
+
+                                // Create a new MethodReference to the modified method name in the same type
+                                /*var newMethodRef = new MethodReference("_set_text_override", methodRef.ReturnType, methodRef.DeclaringType)
+                                {
+                                    HasThis = methodRef.HasThis // Maintain the instance method flag
+                                };
+
+                                // Copy parameters from the original to new method reference
+                                foreach (var param in methodRef.Parameters)
+                                {
+                                    newMethodRef.Parameters.Add(new ParameterDefinition(param.ParameterType));
+                                }
+
+                                // Replace the operand with the new method reference
+                                instruction.Operand = newMethodRef;*/
+
+                                Debug.Log($"Found instruction, changed to {instruction.ToString()}");
+                            }
+                        }
+
                         if (instruction.OpCode == OpCodes.Ldfld || instruction.OpCode == OpCodes.Stfld)
                         {
                             var fieldReference = instruction.Operand as FieldReference;
@@ -343,10 +374,14 @@ namespace Liminal.SDK.Build
                 asmDef.MainModule.AssemblyReferences.Add(reference);
 
                 var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Input));
+                var newTextClass = asmDef.MainModule.ImportReference(typeof(Liminal.OverrideTextClass));
+
                 var methods = GetAllMethodDefinitions(asmDef);
                 foreach (var methodDef in methods)
+                {
                     Replace(methodDef, newInputType, nameof(UnityEngine.Input));
-
+                    Replace(methodDef, newTextClass, "UnityEngine.GUIText");
+                }
             }
 
             void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, string type)
@@ -361,16 +396,10 @@ namespace Liminal.SDK.Build
                 foreach (var instruction in methodCalls)
                 {
                     if (instruction.Operand is not MethodReference mRef)
-                    {
-                        //Debug.Log($"[Replace {type}] - {instruction.Operand.GetType().FullName} Ignored");
                         continue;
-                    }
 
                     if (!mRef.DeclaringType.Name.Equals(type))
-                    {
-                        //Debug.Log($"[Replace {type}] - {instruction.Operand.GetType().FullName} Ignored due to DeclaringType none matching.");
                         continue;
-                    }
 
                     Debug.Log($"[Replace] - {mRef.Name}, Declare Type {mRef.DeclaringType}");
                     instruction.Operand = CloneMethodWithDeclaringType(mRef, replacementTypeRef);

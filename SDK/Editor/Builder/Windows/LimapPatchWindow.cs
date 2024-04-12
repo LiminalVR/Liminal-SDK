@@ -203,12 +203,15 @@ namespace Liminal.SDK.Build
                 var overrideTextType = asmDef.MainModule.ImportReference(overrideTextAssembly.MainModule.GetType("Liminal.OverrideTextClass"));
                 newTextType = overrideTextType;
 
+                var touchType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Touch));
+
                 foreach (var module in asmDef.Modules)
                 {
                     foreach (var type in module.Types)
                     {
                         ProcessType(type, newTextType, "UnityEngine.GUIText");
                         ProcessType(type, newInputType, "UnityEngine.Input");
+                        ProcessType(type, touchType, "UnityEngine.Touch");
                     }
                 }
 
@@ -284,30 +287,29 @@ namespace Liminal.SDK.Build
                         {
                             Debug.Log($"Instructions {instruction.ToString()}");
                             var methodRef = instruction.Operand as MethodReference;
-                            if (methodRef.Name == "set_text" && methodRef.DeclaringType.Name == "GUIText")
+
+                            if (methodRef != null)
                             {
-                                // Change the instruction to call the new method
-                                //var newMethod = new MethodReference("set_text", methodRef.ReturnType, newType) {HasThis = true};
-                                //instruction.Operand = newMethod;
-                                
-                                instruction.Operand = CloneMethodWithDeclaringType(methodRef, newType);
-
-                                // Create a new MethodReference to the modified method name in the same type
-                                /*var newMethodRef = new MethodReference("_set_text_override", methodRef.ReturnType, methodRef.DeclaringType)
+                                if (methodRef.Name == "set_text" && methodRef.DeclaringType.Name == "GUIText")
                                 {
-                                    HasThis = methodRef.HasThis // Maintain the instance method flag
-                                };
-
-                                // Copy parameters from the original to new method reference
-                                foreach (var param in methodRef.Parameters)
-                                {
-                                    newMethodRef.Parameters.Add(new ParameterDefinition(param.ParameterType));
+                                    instruction.Operand = CloneMethodWithDeclaringType(methodRef, newType);
+                                    Debug.Log($"Found instruction, changed to {instruction.ToString()}");
                                 }
+                            }
+                        }
 
-                                // Replace the operand with the new method reference
-                                instruction.Operand = newMethodRef;*/
+                        if (typeName == "UnityEngine.Touch" && instruction.ToString().Contains("UnityEngine.Touch"))
+                        {
+                            Debug.Log($"Instructions {instruction.ToString()}");
+                            var methodRef = instruction.Operand as MethodReference;
 
-                                Debug.Log($"Found instruction, changed to {instruction.ToString()}");
+                            if (methodRef != null)
+                            {
+                                if (methodRef.DeclaringType.Name == "Touch")
+                                {
+                                    instruction.Operand = CloneMethodWithDeclaringType(methodRef, newType);
+                                    Debug.Log($"Found instruction, changed to {instruction.ToString()}");
+                                }
                             }
                         }
 

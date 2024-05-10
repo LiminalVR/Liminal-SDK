@@ -151,7 +151,6 @@ namespace Liminal.SDK.Build
                     EmptyMethodBody(asmDef, "TMPro.Examples.CameraController", "GetPlayerInput");
                     EmptyMethodBody(asmDef, "mitaywalle.ThreeSliceLine.Demo.Scripts.MouseOrbitImproved", "LateUpdate");
                     EmptyMethodBody(asmDef, "SpaceGraphicsToolkit.SgtInputManager", "Poll");
-                    //csShowAllEffect.Update
                     AddAssemblyReference(asmDef, output);
                     UpdateDLLWithReferences(asmDef, output);
                     
@@ -204,6 +203,8 @@ namespace Liminal.SDK.Build
                 newTextType = overrideTextType;
 
                 var touchType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Touch));
+                var androidJavaObjectType = asmDef.MainModule.ImportReference(typeof(UnityEngine.AndroidJavaObject));
+                var androidJavaProxyType = asmDef.MainModule.ImportReference(typeof(UnityEngine.AndroidJavaProxy));
 
                 foreach (var module in asmDef.Modules)
                 {
@@ -212,6 +213,8 @@ namespace Liminal.SDK.Build
                         ProcessType(type, newTextType, "UnityEngine.GUIText");
                         ProcessType(type, newInputType, "UnityEngine.Input");
                         ProcessType(type, touchType, "UnityEngine.Touch");
+                        ProcessType(type, androidJavaObjectType, "UnityEngine.AndroidJavaObject");
+                        ProcessType(type, androidJavaProxyType, "UnityEngine.AndroidJavaProxy");
                     }
                 }
 
@@ -245,8 +248,6 @@ namespace Liminal.SDK.Build
                         }
                     }
                 }
-
-
             }
 
             void ProcessType(TypeDefinition type, TypeReference newType, string typeName)
@@ -306,6 +307,36 @@ namespace Liminal.SDK.Build
                             if (methodRef != null)
                             {
                                 if (methodRef.DeclaringType.Name == "Touch")
+                                {
+                                    instruction.Operand = CloneMethodWithDeclaringType(methodRef, newType);
+                                    Debug.Log($"Found instruction, changed to {instruction.ToString()}");
+                                }
+                            }
+                        }
+
+                        if (typeName == "UnityEngine.AndroidJavaObject" && instruction.ToString().Contains("UnityEngine.AndroidJavaObject"))
+                        {
+                            Debug.Log($"Instructions {instruction.ToString()}");
+                            var methodRef = instruction.Operand as MethodReference;
+
+                            if (methodRef != null)
+                            {
+                                if (methodRef.DeclaringType.Name == "AndroidJavaObject")
+                                {
+                                    instruction.Operand = CloneMethodWithDeclaringType(methodRef, newType);
+                                    Debug.Log($"Found instruction, changed to {instruction.ToString()}");
+                                }
+                            }
+                        }
+
+                        if (typeName == "UnityEngine.AndroidJavaProxy" && instruction.ToString().Contains("UnityEngine.AndroidJavaProxy"))
+                        {
+                            Debug.Log($"Instructions {instruction.ToString()}");
+                            var methodRef = instruction.Operand as MethodReference;
+
+                            if (methodRef != null)
+                            {
+                                if (methodRef.DeclaringType.Name == "AndroidJavaProxy")
                                 {
                                     instruction.Operand = CloneMethodWithDeclaringType(methodRef, newType);
                                     Debug.Log($"Found instruction, changed to {instruction.ToString()}");
@@ -374,7 +405,6 @@ namespace Liminal.SDK.Build
                 //asmDef.Name.Name = asmDef.Name.Name.Replace(ipp, version);
                 var reference = AssemblyNameReference.Parse("UnityEngine.InputLegacyModule, Version=0.0.0.0");
                 asmDef.MainModule.AssemblyReferences.Add(reference);
-
                 var newInputType = asmDef.MainModule.ImportReference(typeof(UnityEngine.Input));
                 var newTextClass = asmDef.MainModule.ImportReference(typeof(Liminal.OverrideTextClass));
 
@@ -384,6 +414,10 @@ namespace Liminal.SDK.Build
                     Replace(methodDef, newInputType, nameof(UnityEngine.Input));
                     Replace(methodDef, newTextClass, "UnityEngine.GUIText");
                 }
+
+                // Try Add AndroidJNI
+                var jniRef = AssemblyNameReference.Parse("UnityEngine.AndroidJNIModule, Version=0.0.0.0");
+                asmDef.MainModule.AssemblyReferences.Add(jniRef);
             }
 
             void Replace(MethodDefinition targetMethod, TypeReference replacementTypeRef, string type)

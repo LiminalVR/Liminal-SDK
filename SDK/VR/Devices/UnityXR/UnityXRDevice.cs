@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
 using Liminal.SDK.VR.Input;
@@ -297,6 +298,12 @@ namespace Liminal.SDK.XR
             var elapsed = Time.time - _startTime;
 			if(elapsed < 3)
 			    RecenterHeight();
+
+            if (elapsed > .2f && elapsed < 1)
+            {
+                mRightController.SyncControllers();
+                mLeftController.SyncControllers();
+            }
         }
 
 		public void RecenterHeight()
@@ -305,8 +312,6 @@ namespace Liminal.SDK.XR
 			var targetLocalPosition = new Vector3(0, -realWorldHeight, 0);
             _offset.transform.localPosition = targetLocalPosition;
 
-			// You could also store the realWorldHeight and re-use this as the offset
-			// Or do what is being done now.
         }
 	}
 }

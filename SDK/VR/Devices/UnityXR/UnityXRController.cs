@@ -131,7 +131,7 @@ namespace Liminal.SDK.XR
         {
         }
 
-        private void SyncControllers()
+        public void SyncControllers()
         {
             var controllerVisual = _avatarHand.Transform.GetComponentInChildren<VRAvatarController>();
             var hasControllerVisual = controllerVisual != null;
@@ -156,11 +156,16 @@ namespace Liminal.SDK.XR
                 _controller.hideControllerModel = true;
             }
 
+			//Could it be wrong one or need to be after? Make am ethod to call this after
+			// Pointer might be null going into this experience, should we do another check?
             if (_pointer != null)
             {
+                Debug.Log("[Unity XR Controller] - Setting up pointers");
+
                 _pointer.transform.SetParent(_controller.model);
                 _pointer.transform.localPosition = Vector3.zero;
                 _pointer.transform.localEulerAngles = new Vector3(laserPointerXAngle, -180, 0);
+                _pointer.transform.name += $"(Modified) - {_pointer.transform.localEulerAngles}";
             }
             else
             {

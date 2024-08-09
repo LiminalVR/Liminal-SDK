@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Avatars;
@@ -287,7 +288,9 @@ namespace Liminal.SDK.XR
 		// You want to try call this at some point later after launching the experience or setting up the avatar instead.
 
         public static bool UpdateControllers = true;
-        public static bool UpdateHeight = true;
+
+        [Obsolete("No longer used, was used prior to Pico Neo when XR did not have Device Tracking.")]
+        public static bool UpdateHeight = false;
 
 
         /// <summary>
@@ -325,7 +328,8 @@ namespace Liminal.SDK.XR
         }
 
         /// <summary>
-        /// We basically offset it by the real world height from ground.
+        /// Some Liminal Experiences are 6m in the sky and we expect that's where the user's POV starts from regardless or how tall they are.
+        /// So thi s method offset it by the real world height from ground to line the user up.
         /// </summary>
 		public void RecenterHeight()
         {

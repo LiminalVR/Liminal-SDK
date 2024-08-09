@@ -107,7 +107,12 @@ namespace Liminal.SDK.XR
 
 		public void SetupAvatar(IVRAvatar avatar)
 		{
-			Debug.Log("[UnityXRDevice] Setting up avatar");
+            // It may be a smart idea to duplicate existing rig for comparison.
+            var copy = GameObject.Instantiate(avatar.Transform.gameObject, avatar.Transform.parent);
+            copy.transform.name = "Avatar Copy";
+            copy.gameObject.SetActive(false);
+
+            Debug.Log("[UnityXRDevice] Setting up avatar");
             Assert.IsNotNull(avatar);
 
 			// Clean up existing pointers.
@@ -246,7 +251,7 @@ namespace Liminal.SDK.XR
 		private void SetupCameraRig(IVRAvatar avatar, XROrigin xrRig)
         {
 			//avatar.Head.Transform.SetParent(xrRig.Camera.transform);
-            xrRig.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+            xrRig.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Device;
             xrRig.Camera.enabled = false;
 
 			// Deduct Default Device Tracking Height from the avatar head as these experiences originally built for Oculus Go
@@ -279,14 +284,20 @@ namespace Liminal.SDK.XR
 
         private float _startTime;
 
-		/// <summary>
-		/// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
-		/// </summary>
-		public void Update()
+		// You want to try call this at some point later after launching the experience or setting up the avatar instead.
+
+        public static bool UpdateControllers = true;
+        public static bool UpdateHeight = true;
+
+
+        /// <summary>
+        /// Updates once per Tick from VRDeviceMonitor (const 0.5 seconds)
+        /// </summary>
+        public void Update()
         {
             if (_tracker == null)
                 return;
-
+            
 			// The camera floor offset object is necessary to match the head position to make sure the controllers are in place.
 			// Do note a problem that will exist is if you bend up and down, that would kind of add an offset?
 
@@ -296,22 +307,31 @@ namespace Liminal.SDK.XR
             xrRig.CameraFloorOffsetObject.transform.position = _offset.transform.position;
 
             var elapsed = Time.time - _startTime;
-			if(elapsed < 3)
-			    RecenterHeight();
 
-            if (elapsed > .2f && elapsed < 1)
+            if (UpdateHeight)
             {
-                mRightController.SyncControllers();
-                mLeftController.SyncControllers();
+                if (elapsed < 3)
+                    RecenterHeight();
+            }
+
+            if (UpdateControllers)
+            {
+                if (elapsed > .2f && elapsed < 1)
+                {
+                    mRightController.SyncControllers();
+                    mLeftController.SyncControllers();
+                }
             }
         }
 
+        /// <summary>
+        /// We basically offset it by the real world height from ground.
+        /// </summary>
 		public void RecenterHeight()
         {
 			var realWorldHeight = _tracker.transform.localPosition.y;
 			var targetLocalPosition = new Vector3(0, -realWorldHeight, 0);
             _offset.transform.localPosition = targetLocalPosition;
-
         }
 	}
 }

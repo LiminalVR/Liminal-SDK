@@ -109,9 +109,9 @@ namespace Liminal.SDK.XR
 		public void SetupAvatar(IVRAvatar avatar)
 		{
             // It may be a smart idea to duplicate existing rig for comparison.
-            var copy = GameObject.Instantiate(avatar.Transform.gameObject, avatar.Transform.parent);
+            /*var copy = GameObject.Instantiate(avatar.Transform.gameObject, avatar.Transform.parent);
             copy.transform.name = "Avatar Copy";
-            copy.gameObject.SetActive(false);
+            copy.gameObject.SetActive(false);*/
 
             Debug.Log("[UnityXRDevice] Setting up avatar");
             Assert.IsNotNull(avatar);

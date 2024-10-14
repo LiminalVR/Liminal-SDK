@@ -37,35 +37,16 @@ namespace Liminal.SDK.VR.Utils
         }
         public static void SetControllerVisibility(this IVRAvatarHand hand, bool state)
         {
-            var renderers = hand.Transform.GetComponentsInChildren<MeshRenderer>(true);
-            foreach (var r in renderers)
-            {
-                var laserPointerVisual = r.GetComponent<LaserPointerVisual>();
+            var visual = hand.GetControllerVisual();
 
-                if (laserPointerVisual != null)
-                {
-                    r.enabled = state;
-                }
-            }
+            // Move Laser Pointer out. This allows us to simply turn off the controller and no need to iterate over meshes.
+            var laserPointer = visual.GetComponentInChildren<LaserPointerVisual>();
 
-            /*var visual = hand.GetControllerVisual();
-            var controllerHelper = hand.Transform.GetComponentInChildren<OVRControllerHelper>(true);
+            if(laserPointer != null)
+                laserPointer.transform.SetParent(visual.transform.parent);
 
-            if (controllerHelper != null)
-                controllerHelper.enabled = state;
-
-            foreach (Transform child in visual.transform)
-            {
-                // Debug.Log(child.name);
-
-                var laserPointerVisual = child.GetComponent<LaserPointerVisual>();
-                if (laserPointerVisual == null)
-                {
-                    var renderers = child.GetComponentsInChildren<MeshRenderer>(true);
-                    foreach (var r in renderers)
-                        r.enabled = state;
-                }
-            }*/
+            visual.gameObject.SetActive(state);
         }
+    
     }
 }

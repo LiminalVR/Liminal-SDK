@@ -47,6 +47,29 @@ public class ControllerInputExample : MonoBehaviour
         avatar.SecondaryHand.SetControllerVisibility(state);
     }
 
+    /// <summary>
+    /// This example only hide the left hand pointer so you can still use the right hand to re-activate it.
+    /// </summary>
+    /// <param name="state"></param>
+    public void SetPointerVisibility(bool state)
+    {
+        GearVRAvatar.PointerActivationType = EPointerActivationType.None;
+
+        var avatar = VRAvatar.Active;
+
+        switch (state)
+        {
+            case false:
+                //avatar.PrimaryHand?.InputDevice?.Pointer.Deactivate();
+                avatar.SecondaryHand?.InputDevice?.Pointer.Deactivate();
+                break;
+            case true:
+                avatar.PrimaryHand?.InputDevice?.Pointer.Activate();
+                avatar.SecondaryHand?.InputDevice?.Pointer.Activate();
+                break;
+        }
+    }
+
     [ContextMenu("Hide Controllers")]
     public void TestHideControllers()
     {

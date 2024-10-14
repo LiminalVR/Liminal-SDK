@@ -11,8 +11,6 @@ namespace Liminal.SDK.VR.Utils
 {
     public static class ControllerUtils
     {
-        public static Dictionary<OVRInput.Controller, DateTime> HapticLastUsedTable = new Dictionary<OVRInput.Controller, DateTime>();
-
         /// <summary>
         /// Send haptics to a device input / controller that supports haptic. Currently only support Meta Quest controllers. 
         /// </summary>
@@ -28,19 +26,10 @@ namespace Liminal.SDK.VR.Utils
 
             var mask = device.Hand == VRInputDeviceHand.Left ? OVRInput.Controller.LTouch : OVRInput.Controller.RTouch;
 
-            if (!HapticLastUsedTable.ContainsKey(mask))
-                HapticLastUsedTable.Add(mask, DateTime.Now + TimeSpan.FromSeconds(0.2f));
-
-            var timeElapsed = DateTime.Now - HapticLastUsedTable[mask];
-            if (timeElapsed.TotalSeconds < 0.1F)
-                return null;
-            
             return CoroutineService.Instance.StartCoroutine(Routine());
             
             IEnumerator Routine()
             {
-                HapticLastUsedTable[mask] = DateTime.Now;
-
                 OVRInput.SetControllerVibration(frequency, amplitude, mask);
                 yield return new WaitForSecondsRealtime(duration);
                 OVRInput.SetControllerVibration(0, 0, mask);
@@ -48,9 +37,27 @@ namespace Liminal.SDK.VR.Utils
         }
         public static void SetControllerVisibility(this IVRAvatarHand hand, bool state)
         {
-            var visual = hand.GetControllerVisual();
+            var renderers = hand.Transform.GetComponentsInChildren<MeshRenderer>(true);
+            foreach (var r in renderers)
+            {
+                var laserPointerVisual = r.GetComponent<LaserPointerVisual>();
+
+                if (laserPointerVisual != null)
+                {
+                    r.enabled = state;
+                }
+            }
+
+            /*var visual = hand.GetControllerVisual();
+            var controllerHelper = hand.Transform.GetComponentInChildren<OVRControllerHelper>(true);
+
+            if (controllerHelper != null)
+                controllerHelper.enabled = state;
+
             foreach (Transform child in visual.transform)
             {
+                // Debug.Log(child.name);
+
                 var laserPointerVisual = child.GetComponent<LaserPointerVisual>();
                 if (laserPointerVisual == null)
                 {
@@ -58,7 +65,7 @@ namespace Liminal.SDK.VR.Utils
                     foreach (var r in renderers)
                         r.enabled = state;
                 }
-            }
+            }*/
         }
     }
 }

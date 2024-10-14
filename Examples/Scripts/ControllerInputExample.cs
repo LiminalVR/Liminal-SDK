@@ -47,6 +47,12 @@ public class ControllerInputExample : MonoBehaviour
         avatar.SecondaryHand.SetControllerVisibility(state);
     }
 
+    [ContextMenu("Hide Controllers")]
+    public void TestHideControllers()
+    {
+        SetControllerVisibility(false);
+    }
+
     public void AppendDeviceInput(StringBuilder builder, IVRInputDevice inputDevice, string deviceName)
     {
         if (inputDevice == null)

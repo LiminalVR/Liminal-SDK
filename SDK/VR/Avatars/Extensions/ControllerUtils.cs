@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using UnityEngine;
+using Liminal.SDK.VR.Avatars;
 
 namespace Liminal.SDK.VR.Utils
 {
@@ -43,6 +44,12 @@ namespace Liminal.SDK.VR.Utils
                 yield return new WaitForSecondsRealtime(duration);
                 OVRInput.SetControllerVibration(0, 0, mask);
             }
+        }
+        public static void SetControllerVisibility(this IVRAvatarHand hand, bool state)
+        {
+            var renderers = hand.Transform.GetComponentsInChildren<MeshRenderer>(true);
+            foreach (var r in renderers)
+                r.enabled = state;
         }
     }
 }

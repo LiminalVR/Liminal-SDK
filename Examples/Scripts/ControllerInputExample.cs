@@ -53,6 +53,8 @@ public class ControllerInputExample : MonoBehaviour
     /// <param name="state"></param>
     public void SetPointerVisibility(bool state)
     {
+        GearVRAvatar.PointerActivationType = EPointerActivationType.None;
+
         var avatar = VRAvatar.Active;
 
         switch (state)

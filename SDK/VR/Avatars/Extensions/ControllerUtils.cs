@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Liminal.SDK.VR.Avatars;
+using Liminal.SDK.VR.Pointers;
 
 namespace Liminal.SDK.VR.Utils
 {
@@ -47,9 +48,17 @@ namespace Liminal.SDK.VR.Utils
         }
         public static void SetControllerVisibility(this IVRAvatarHand hand, bool state)
         {
-            var renderers = hand.Transform.GetComponentsInChildren<MeshRenderer>(true);
-            foreach (var r in renderers)
-                r.enabled = state;
+            var visual = hand.GetControllerVisual();
+            foreach (Transform child in visual.transform)
+            {
+                var laserPointerVisual = child.GetComponent<LaserPointerVisual>();
+                if (laserPointerVisual == null)
+                {
+                    var renderers = child.GetComponentsInChildren<MeshRenderer>(true);
+                    foreach (var r in renderers)
+                        r.enabled = state;
+                }
+            }
         }
     }
 }

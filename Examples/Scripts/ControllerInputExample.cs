@@ -40,6 +40,13 @@ public class ControllerInputExample : MonoBehaviour
         device?.PrimaryInputDevice?.SendInputHaptics(.5f, .5f, 0.05f);
     }
 
+    public void SetControllerVisibility(bool state)
+    {
+        var avatar = VRAvatar.Active;
+        avatar.PrimaryHand.SetControllerVisibility(state);
+        avatar.SecondaryHand.SetControllerVisibility(state);
+    }
+
     public void AppendDeviceInput(StringBuilder builder, IVRInputDevice inputDevice, string deviceName)
     {
         if (inputDevice == null)

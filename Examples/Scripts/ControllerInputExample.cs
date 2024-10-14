@@ -2,6 +2,9 @@
 using Liminal.SDK.VR;
 using Liminal.SDK.VR.Input;
 using System.Text;
+using Liminal.SDK.VR.Avatars;
+using Liminal.SDK.VR.Devices.GearVR.Avatar;
+using Liminal.SDK.VR.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,8 +24,20 @@ public class ControllerInputExample : MonoBehaviour
             AppendDeviceInput(inputStringBuilder, device.SecondaryInputDevice, "Secondary");
 
             InputText.text = inputStringBuilder.ToString();
-
         }
+
+        var avatar = VRAvatar.Active;
+        if (avatar != null)
+        {
+            var rightHand = avatar.PrimaryHand;
+            var helper = rightHand.Transform.GetComponentInChildren<GearVRControllerInputVisual>(true);
+        }
+    }
+
+    public void SendControllerHaptics()
+    {
+        var device = VRDevice.Device;
+        device?.PrimaryInputDevice?.SendInputHaptics(.5f, .5f, 0.05f);
     }
 
     public void AppendDeviceInput(StringBuilder builder, IVRInputDevice inputDevice, string deviceName)

@@ -26,19 +26,10 @@ namespace Liminal.Tools.Common
 
         private Vector3 _followingPosition;
 
-        public Transform LookAnchor;
         public bool FlipFacing;
 
         private void OnEnable()
         {
-            if (LookAnchor == null)
-            {
-                LookAnchor = new GameObject("LookAnchor").transform;
-                LookAnchor.SetParent(Camera);
-                LookAnchor.localPosition = new Vector3(0, 0, Distance);
-                LookAnchor.localRotation = Quaternion.identity;
-            }
-
             if (Camera == null && UnityEngine.Camera.main != null)
                 Camera = UnityEngine.Camera.main.transform;
 
